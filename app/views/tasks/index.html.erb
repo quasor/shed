@@ -1,0 +1,48 @@
+<% unless @tasks.empty? %>
+<h1>Listing tasks</h1>
+<table border="1" cellspacing="0" cellpadding="3">
+  <tr>
+    <th></th>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Low</th>
+    <th>High</th>
+    <th>Estimate</th>
+    <th>Sim</th>
+    <th>User</th>
+    <th>Start</th>
+    <th>End</th>
+  </tr>
+
+<% for task in @tasks %>
+  <tr>
+    <td><%= task.completed ? 'Done' : '' %></td>
+    <td><% (task.level * 4).times do %>&nbsp;<%end%> <%=h task.title %><%= task.type%></td>
+		<% if task.type == "Release"%>
+    <td colspan="8"><%=  link_to 'New Project', new_project_path(:parent_id => task.id) %></td>
+		<% elsif task.type == "Project"%>
+    <td colspan="8"><%=  link_to 'New Task', new_task_path(:parent_id => task.id) %></td>
+		<% else %>
+    <td><%=h task.description %></td>
+    <td><%=h task.low %></td>
+    <td><%=h task.high %></td>
+    <td><%=h task.estimate.round(3) unless task.low.nil?%></td>
+    <td><%#=h task.monte_estimate.round(2) unless task.low.nil?%></td>
+    <td><%=h task.user.name %></td>
+    <td><%=h task.start %></td>
+    <td><%=h task.start + task.estimate %></td>
+		<% end %>
+    <td><%= link_to 'Show', task %></td>
+    <td><%= link_to 'Edit', edit_task_path(task) %></td>
+    <td><%= link_to 'Destroy', task_path(task), :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+	<tr>
+		<td colspan="6"></td>
+    <td><%=  @tasks.collect(&:estimate).sum %></td>
+    <td><%= @durations[@durations.size * 0.666].round(3)%></td>
+	</tr>
+</table>
+<% else %>
+<%= link_to "New Release", new_release_path%>
+<% end %>

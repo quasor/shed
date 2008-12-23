@@ -1,0 +1,21 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  title: MyString
+  type: MyString
+  description: MyText
+  low: 
+  high: 
+  completed: false
+  user_id: 1
+  start: 2008-12-21
+
+two:
+  title: MyString
+  type: MyString
+  description: MyText
+  low: 
+  high: 
+  completed: false
+  user_id: 1
+  start: 2008-12-21

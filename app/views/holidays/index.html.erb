@@ -1,0 +1,34 @@
+<% form_for(@holiday) do |f| %>
+  <%= f.error_messages %>
+
+	<h1>New holidays</h1>
+  <p>
+    <%= f.date_select :holiday %>
+  </p>
+  <p>
+    <%= f.submit "Create" %>
+  </p>
+<% end %>
+
+<h1>Listing holidays</h1>
+<style type="text/css" media="screen">
+	.weekend { color: #CCC;}
+</style>
+<table>
+  <tr>
+    <th>Holiday</th>
+  </tr>
+
+<% for holiday in @holidays %>
+  <tr>
+    <td<% if [0,6].include? holiday.holiday.wday %> class="weekend"<%end%>><%=h holiday.holiday.strftime("%a %B %d, %Y") %> </td>
+    <td><%= link_to 'Show', holiday %></td>
+    <td><%= link_to 'Edit', edit_holiday_path(holiday) %></td>
+    <td><%= link_to 'Destroy', holiday, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New holiday', new_holiday_path %>

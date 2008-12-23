@@ -1,0 +1,12 @@
+<h1>Editing release</h1>
+
+<% form_for(@release) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @release %> |
+<%= link_to 'Back', releases_path %>

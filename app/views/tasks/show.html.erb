@@ -1,0 +1,43 @@
+<p>
+  <b>Title:</b>
+  <%=h @task.title %>
+</p>
+
+<p>
+  <b>Type:</b>
+  <%=h @task.type %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%=h @task.description %>
+</p>
+
+<p>
+  <b>Low:</b>
+  <%=h @task.low %>
+</p>
+
+<p>
+  <b>High:</b>
+  <%=h @task.high %>
+</p>
+
+<p>
+  <b>Completed:</b>
+  <%=h @task.completed %>
+</p>
+
+<p>
+  <b>User:</b>
+  <%=h @task.user_id %>
+</p>
+
+<p>
+  <b>Start:</b>
+  <%=h @task.start %>
+</p>
+
+
+<%= link_to 'Edit', edit_task_path(@task) %> |
+<%= link_to 'Back', tasks_path %>
