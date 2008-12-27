@@ -10,18 +10,26 @@ class TasksController < ApplicationController
     @root = Task.root # replace this later with a local root
     @tasks = []
     @durations = []
+    
     unless @root.nil?
       @tasks = @root.full_set
 
       # Compute start times for each task
       @end_date = Date.today
+
+      user_end_dates = {}
       @tasks.each do |task|
-        task.start = @end_date
-        @end_date = @end_date.work_day(task.estimate)
+        unless task.user.nil?
+          user_end_dates[task.user.id] ||= Date.today
+          task.start = user_end_dates[task.user.id]
+          user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate)
+        else 
+          task.start = Date.today
+        end
         #task.save
       end
 
-      @durations = Rails.cache.fetch("duration_for_#{@root.cache_key}-#{Task.count}-#{Task.last.id}") do 
+      @durations = Rails.cache.fetch("duration_for_#{@root.cache_key}-#{Task.count}-#{Task.last.id}#{Time.now}") do 
         durations = []
         100.times do |i|
           duration = @root.full_set.collect(&:monte_estimate).sum
@@ -30,6 +38,9 @@ class TasksController < ApplicationController
         durations.sort!
       end 
     end
+    
+    @total_calendar_days = @durations.last + (@durations.last / 7 * 2)
+    
     if Release.count == 0
       flash[:warning] = 'Your schedule is empty'
     end
@@ -114,6 +125,39 @@ class TasksController < ApplicationController
       format.xml  { head :ok }
     end
   end
+  
+  def bulk
+    @text = params[:tasks]
+    @rows = @text.split("\n").collect {|t| t.split(',') }
+    @tasks = []
+    
+    @rows.collect do |r|
+      if r.size > 4
+        task = {
+          :user     => r[0],
+          :section  => r[1],
+          :title    => r[2],
+          :low      => r[3],
+          :high     => r[4],
+        }
+        logger.info task.inspect
+        @low = r[3]
+        @project = Task.find params[:project_id]
+        unless @project.nil? || @low.blank?
+          @user = User.find_by_name r[0]
+          @user_id = @user.id unless @user.nil?
+          @task = Task.new(:title => r[2], :low => r[3], :high => r[4], :user_id => @user_id)
+          @task.tag_list = r[1] unless r[1].blank?
+          @task.save! 
+          @task.move_to_child_of(@project)
+          flash[:notice] = 'Tasks were successfully created.'
+        else
+          flash[:notice] = 'Tasks were not created.'
+        end
+      end
+    end
+    redirect_to root_path
+  end 
 
   # meuselect is the id of currently selected menu
     def showmenu(menuselect)

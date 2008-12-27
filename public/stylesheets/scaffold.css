@@ -1,9 +1,8 @@
-body { background-color: #fff; color: #333; }
+
 
 body, p, ol, ul, td {
-  font-family: verdana, arial, helvetica, sans-serif;
-  font-size:   13px;
-  line-height: 18px;
+  font-family: "lucida grande", arial, helvetica, sans-serif;
+  font-size:   11px;
 }
 
 pre {
@@ -51,4 +50,22 @@ a:hover { color: #fff; background-color:#000; }
   font-size: 12px;
   list-style: square;
 }
+
+.unassigned { color : red;}
+.project { font-weight : bold;}
+.st { border:1px solid #ccc;border-collapse:collapse;}
+.st td {border:1px solid #eee; margin:0px}
+
+.button_link { background-color:#ABFF8F; padding:2px; text-decoration:none; border:1px solid #777;}
+.left_col  { width:298px; left: 0px;  top:72px;position:absolute; border:0px solid green;}
+.right_col { width:1135px;left: 301px;top:72px;position:absolute; border:0px solid red; overflow:auto;}
+.srow {height:1.5em;}
+.srow:hover {background-color:#FFF0CB;}
+
+div.t_title { width:298px;overflow:hidden;}
+.st td {padding-left:3px;padding-right:3px;line-height:2em;}
+.ganttbar {height:1em; background-color: #74A5FF;position:absolute;margin-top:0.25em;border:1px solid black;}
+table td {text-align:left;}
+.hideul {text-decoration:none;}
+
 

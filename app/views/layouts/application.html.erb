@@ -6,20 +6,57 @@
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
   <title>Tasks: <%= controller.action_name %></title>
   <%= stylesheet_link_tag 'scaffold' %>
+
+<% if false %>
+
+	<!--Include YUI Loader: --> 
+	<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/yuiloader/yuiloader-min.js"></script> 
+
+	<!--Use YUI Loader to bring in your other dependencies: --> 
+	<script type="text/javascript"> 
+	// Instantiate and configure YUI Loader: 
+	(function() { 
+	    var loader = new YAHOO.util.YUILoader({ 
+	        base: "", 
+	        require: ["datatable", "resize"], 
+	        loadOptional: false, 
+	        combine: true, 
+	        filter: "MIN", 
+	        allowRollup: false, 
+	        onSuccess: function() { 
+	            //you can make use of all requested YUI modules 
+	            //here. 
+	        } 
+	    }); 
+
+	// Load the files using the insert() method. 
+	loader.insert(); 
+	})(); 
+	</script>
+<% end %>
+
+	<%= javascript_include_tag "prototype",'lowpro' %>
+
+
+
 </head>
-<body>
+<body  class="yui-skin-sam">
+	
+<% if false %>
 <%= link_to_unless_current 'Home', root_path%> | 
 <%= link_to_unless_current 'Users', users_path%>
-
 <% form_for(:session, :url => tasks_path, :html => {:method => "get"}) do |f| %>
 Filter:<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>	
 <%= f.submit 'Go'%>
 <%end%>
-<hr>
+
+<% end %>
+
+
 <p style="color: green"><%= flash[:notice] %></p>
 <p style="color: red"><%= flash[:warning] %></p>
 
-<%= yield  %>
+<%= yield %>
 
 </body>
 </html>

@@ -1,48 +1,178 @@
-<% unless @tasks.empty? %>
-<h1>Listing tasks</h1>
-<table border="1" cellspacing="0" cellpadding="3">
-  <tr>
-    <th></th>
-    <th>Title</th>
-    <th>Description</th>
-    <th>Low</th>
-    <th>High</th>
-    <th>Estimate</th>
-    <th>Sim</th>
-    <th>User</th>
-    <th>Start</th>
-    <th>End</th>
-  </tr>
+<% unless @tasks.empty?%>
 
-<% for task in @tasks %>
-  <tr>
-    <td><%= task.completed ? 'Done' : '' %></td>
-    <td><% (task.level * 4).times do %>&nbsp;<%end%> <%=h task.title %><%= task.type%></td>
-		<% if task.type == "Release"%>
-    <td colspan="8"><%=  link_to 'New Project', new_project_path(:parent_id => task.id) %></td>
-		<% elsif task.type == "Project"%>
-    <td colspan="8"><%=  link_to 'New Task', new_task_path(:parent_id => task.id) %></td>
-		<% else %>
-    <td><%=h task.description %></td>
-    <td><%=h task.low %></td>
-    <td><%=h task.high %></td>
-    <td><%=h task.estimate.round(3) unless task.low.nil?%></td>
-    <td><%#=h task.monte_estimate.round(2) unless task.low.nil?%></td>
-    <td><%=h task.user.name %></td>
-    <td><%=h task.start %></td>
-    <td><%=h task.start + task.estimate %></td>
-		<% end %>
-    <td><%= link_to 'Show', task %></td>
-    <td><%= link_to 'Edit', edit_task_path(task) %></td>
-    <td><%= link_to 'Destroy', task_path(task), :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
+<div id="markup">
+	<table class="st" id="schedule">
+	<thead>
+		<tr>
+			<td>Title</td>
+			<td>Section</td>
+	    <td>Low</td>
+	    <td>High</td>
+	    <td>Estimate</td>
+	    <td>Sim</td>
+	    <td>User</td>
+	    <td>Start</td>
+	    <td>End</td>
+		</tr>
+  </thead>
+	<% for task in @tasks %>
+  <tr class="srow">
+		<td nowrap style="overflow:hidden"><% (task.level * 4).times do -%>&nbsp;<%end%><%=link_to task.title.gsub(/ /,"&nbsp;"), edit_task_path(task), :class => :hideul %> 
+				<% if task.type == "Release"%><%=  link_to 'New Project', new_project_path(:parent_id => task.id) %>
+				<% elsif task.type == "Project"%><%=  link_to '+', new_task_path(:parent_id => task.id), :class => 'button_link' %>
+				<%= link_to_function "++", "$('bulk_form').show();$('project_id').value = '#{task.id}';", :class => 'button_link'%>
+				<% end %>
+			</td>
+
+			<% unless task.type == "Release" or task.type == "Project"%>
+	    <td nowrap><%=h task.tag_list %></td>
+	    <td><%=h task.low %></td>
+	    <td><%=h task.high %></td>
+	    <td><%=h task.estimate.round(3) %></td>
+	    <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td>
+	    <td nowrap><%=task.user ? task.user.name : '<span class="unassigned">Unassigned</span>'%></td>
+	    <td><%=h task.start.to_s(:mdy) %></td>
+	    <td><%=h (task.start + task.estimate).to_s(:mdy) %></td>
+			
+			<td style="width:<%=2* @total_calendar_days %>em;vertical-align:top">
+				<div style="position:relative; width:<%= 2*@total_calendar_days %>em; padding:0px">
+				<span class="ganttbar" style="width:<%= 2 * (task.estimate.round(3)) %>em; left:<%= 2 * (task.start - Date.today) %>em"></span>					
+				</div>
+			</td>
+	    <td><%= link_to 'E', edit_task_path(task) %></td>
+	    <td><%= link_to('X', task_path(task), :confirm => 'Are you sure?', :method => :delete) if task.deleteable?%></td>
+			<%else %>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<% end %>
+	  </tr>
+	<% end %>
+<% if false %>
+		<tr>
+			<td colspan="5"></td>
+	    <td><%=  @tasks.collect(&:estimate).sum %></td>
+	    <td><%= @durations[@durations.size * 0.05].round(3)%> - <%= @durations[@durations.size * 0.95].round(3)%></td>
+		</tr>
 <% end %>
-	<tr>
-		<td colspan="6"></td>
-    <td><%=  @tasks.collect(&:estimate).sum %></td>
-    <td><%= @durations[@durations.size * 0.666].round(3)%></td>
-	</tr>
-</table>
+	</table>
+	
+</div>
+		
+		<div id="bulk_form" style="display:none">
+		<% form_for :bulk_tasks, :url => bulk_new_task_path do |f| %>
+		<input type="text" id="project_id" name="project_id">
+		<b>Add tasks, one per line, comma separated in the format:</b><br />
+		<div style="font-size:.8em">
+		[Owner], [Section / Category], [Task Title], [Low Estimate], [High Estimate (optional)]<br>
+		e.g.<br>
+		Peter Sommer, Meetings Context, Add meeting id to cookie (and supporting functions), 1, 1.5
+		</div>
+		<%= text_area_tag 'tasks', '', :rows => 20, :cols => 120, :style => 'font-family: courier; font-size:0.8em' %>
+		<%= f.submit 'Save' %>
+		<% end %>
+		</div>
+		
+
 <% else %>
 <%= link_to "New Release", new_release_path%>
+<% end %>
+
+<% if false %>
+<script type="text/javascript" charset="utf-8">
+Event.onReady(function() { Resize();});
+window.size = function()
+{
+	var w = 0;
+	var h = 0;
+
+	//IE
+	if(!window.innerWidth)
+	{
+		//strict mode
+		if(!(document.documentElement.clientWidth == 0))
+		{
+			w = document.documentElement.clientWidth;
+			h = document.documentElement.clientHeight;
+		}
+		//quirks mode
+		else
+		{
+			w = document.body.clientWidth;
+			h = document.body.clientHeight;
+		}
+	}
+	//w3c
+	else
+	{
+		w = window.innerWidth;
+		h = window.innerHeight;
+	}
+	return {width:w,height:h};
+}
+
+function Resize()
+{
+	$('right_col').style.height = window.size().height - 72 + "px";
+	$('left_col').style.height = window.size().height - 72 + "px";
+	
+//	$('a-col').style.height = window.size().height - 20 + "px";
+//	$('map_canvas').style.width = window.size().width - 255 + "px";
+	}
+if (window.attachEvent) {
+    window.attachEvent("onresize", function() {setTimeout("Resize()",50);} );
+} else {
+    window.addEventListener("resize", function() {setTimeout("Resize()",50);}, false);
+}	
+</script>
+<% end %>
+<% unless @want_table.nil?%>
+<script type="text/javascript" charset="utf-8">
+//{key:"account",label:"Account Number", sortable:true, resizeable:true, width:20},
+//{key:"quantity",label:"Quantity",formatter:YAHOO.widget.DataTable.formatNumber,sortable:true},
+//{key:"amount",label:"Amount Due",formatter:YAHOO.widget.DataTable.formatCurrency,sortable:true}
+
+YAHOO.util.Event.addListener(window, "load", function() {
+    YAHOO.example.EnhanceFromMarkup = new function() {
+        var myColumnDefs = [
+					{key:"title",label:"Title", sortable:false, resizeable:true, width:300},
+					{key:"section",label:"Section", sortable:false, width:150},
+					{key:"low",label:"Low", sortable:false},
+					{key:"high",label:"High", sortable:false},
+					{key:"estimate",label:"Estimate", sortable:false},
+					{key:"sim",label:"Sim", sortable:false},
+					{key:"user",label:"User", sortable:false, width:100},
+					{key:"start",label:"Start", sortable:false,formatter:YAHOO.widget.DataTable.formatDate},
+					{key:"end",label:"End", sortable:false,formatter:YAHOO.widget.DataTable.formatDate},
+					{key: "gantt", label:""},
+					
+        ];
+
+        this.parseNumberFromCurrency = function(sString) {
+            // Remove dollar sign and make it a float
+            return parseFloat(sString.substring(1));
+        };
+// {key:"title", parser:"date"}
+        this.myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("schedule"));
+        this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
+        this.myDataSource.responseSchema = {
+            fields: [
+							{key:"title"}, 
+							{key:"section"},
+							{key:"low"}, 
+							{key:"high"}, 
+							{key:"estimate"}, 
+							{key:"sim"}, 
+							{key:"user"}, 
+							{key:"start", parser:"date"}, 
+							{key:"end", parser:"date"}, 
+							{key: "gantt"}
+            ]
+        };
+
+        this.myDataTable = new YAHOO.widget.DataTable("markup", myColumnDefs, this.myDataSource,
+                {caption:"Solidschedule"}
+        );
+    };
+});
+
+</script>
 <% end %>
