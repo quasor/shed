@@ -1,0 +1,26 @@
+<h1>Listing projections</h1>
+
+<table>
+  <tr>
+    <th>Task</th>
+    <th>Start</th>
+    <th>End</th>
+    <th>Confidence</th>
+  </tr>
+
+<% for projection in @projections %>
+  <tr>
+    <td><%=h projection.task_id %></td>
+    <td><%=h projection.start %></td>
+    <td><%=h projection.end %></td>
+    <td><%=h projection.confidence %></td>
+    <td><%= link_to 'Show', projection %></td>
+    <td><%= link_to 'Edit', edit_projection_path(projection) %></td>
+    <td><%= link_to 'Destroy', projection, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New projection', new_projection_path %>

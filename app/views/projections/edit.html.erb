@@ -1,0 +1,28 @@
+<h1>Editing projection</h1>
+
+<% form_for(@projection) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :task_id %><br />
+    <%= f.text_field :task_id %>
+  </p>
+  <p>
+    <%= f.label :start %><br />
+    <%= f.date_select :start %>
+  </p>
+  <p>
+    <%= f.label :end %><br />
+    <%= f.date_select :end %>
+  </p>
+  <p>
+    <%= f.label :confidence %><br />
+    <%= f.text_field :confidence %>
+  </p>
+  <p>
+    <%= f.submit "Update" %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @projection %> |
+<%= link_to 'Back', projections_path %>

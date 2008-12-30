@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  task_id: 1
+  start: 2008-12-29
+  end: 2008-12-29
+  confidence: 9.99
+
+two:
+  task_id: 1
+  start: 2008-12-29
+  end: 2008-12-29
+  confidence: 9.99

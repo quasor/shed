@@ -1,0 +1,23 @@
+<p>
+  <b>Task:</b>
+  <%=h @projection.task_id %>
+</p>
+
+<p>
+  <b>Start:</b>
+  <%=h @projection.start %>
+</p>
+
+<p>
+  <b>End:</b>
+  <%=h @projection.end %>
+</p>
+
+<p>
+  <b>Confidence:</b>
+  <%=h @projection.confidence %>
+</p>
+
+
+<%= link_to 'Edit', edit_projection_path(@projection) %> |
+<%= link_to 'Back', projections_path %>
