@@ -20,4 +20,33 @@ module TasksHelper
    def standard_deviation(population)
      Math.sqrt(variance(population)[0])
    end  
+
+  def sim_end_dates(root)
+    durationz = Rails.cache.fetch("durations_for_#{root.cache_key}") do 
+      durations = []
+      100.times do |i|
+        user_end_dates = {}
+        tasks_raw = root.full_set
+        #duration = root.full_set.collect(&:monte_estimate).sum
+        #durations.push duration
+        
+        tasks_raw.each do |task|
+          unless task.user.nil? || task.completed? 
+            user_end_dates[task.user.id] ||= Date.today.work_day(0)
+            task.start = user_end_dates[task.user.id].work_day(0)
+            user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate)
+          else 
+            task.start = Date.today
+          end
+        end
+        
+        durations.push(user_end_dates.values.max - Date.today)
+        
+      end
+      durations.sort!
+    end
+    durationz
+  end
+
+
 end

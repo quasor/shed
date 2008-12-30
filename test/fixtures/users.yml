@@ -2,10 +2,10 @@
 
 one:
   name: MyString
-  login: MyString
+  login: MyString1
   efficiency: 9.99
 
 two:
   name: MyString
-  login: MyString
+  login: MyString2
   efficiency: 9.99

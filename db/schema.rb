@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20081222085823) do
+ActiveRecord::Schema.define(:version => 20081230074656) do
 
   create_table "holidays", :force => true do |t|
     t.date     "holiday"
@@ -17,12 +17,48 @@ ActiveRecord::Schema.define(:version => 20081222085823) do
     t.datetime "updated_at"
   end
 
+  create_table "intervals", :force => true do |t|
+    t.datetime "start"
+    t.datetime "end"
+    t.integer  "user_id"
+    t.integer  "task_id"
+    t.integer  "hours",      :limit => 10, :precision => 10, :scale => 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "projections", :force => true do |t|
+    t.integer  "task_id"
+    t.date     "start"
+    t.date     "end"
+    t.integer  "confidence", :limit => 10, :precision => 10, :scale => 0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "taggings", :force => true do |t|
+    t.integer  "tag_id"
+    t.integer  "taggable_id"
+    t.integer  "tagger_id"
+    t.string   "tagger_type"
+    t.string   "taggable_type"
+    t.string   "context"
+    t.datetime "created_at"
+  end
+
+  add_index "taggings", ["tag_id"], :name => "index_taggings_on_tag_id"
+  add_index "taggings", ["taggable_id", "taggable_type", "context"], :name => "index_taggings_on_taggable_id_and_taggable_type_and_context"
+
+  create_table "tags", :force => true do |t|
+    t.string "name"
+  end
+
   create_table "tasks", :force => true do |t|
     t.string   "title"
     t.string   "type"
     t.text     "description"
-    t.decimal  "low"
-    t.decimal  "high"
+    t.integer  "low",             :limit => 10, :precision => 10, :scale => 0
+    t.integer  "high",            :limit => 10, :precision => 10, :scale => 0
     t.boolean  "completed"
     t.integer  "user_id"
     t.date     "start"
@@ -31,12 +67,15 @@ ActiveRecord::Schema.define(:version => 20081222085823) do
     t.integer  "rgt"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "cached_tag_list"
+    t.date     "due"
+    t.date     "end"
   end
 
   create_table "users", :force => true do |t|
     t.string   "name"
     t.string   "login"
-    t.decimal  "efficiency"
+    t.integer  "efficiency", :limit => 10, :precision => 10, :scale => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

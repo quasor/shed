@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  start: 2008-12-27 22:57:08
+  end: 2008-12-27 22:57:08
+  user_id: 1
+  task_id: 1
+  hours: 9.99
+
+two:
+  start: 2008-12-27 22:57:08
+  end: 2008-12-27 22:57:08
+  user_id: 1
+  task_id: 1
+  hours: 9.99

@@ -1,7 +1,7 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  holiday: 2008-12-21
+  holiday: 2008-12-31
 
 two:
-  holiday: 2008-12-21
+  holiday: 2008-12-25

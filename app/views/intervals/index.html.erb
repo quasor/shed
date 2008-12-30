@@ -1,0 +1,28 @@
+<h1>Listing intervals</h1>
+
+<table>
+  <tr>
+    <th>Start</th>
+    <th>End</th>
+    <th>User</th>
+    <th>Task</th>
+    <th>Hours</th>
+  </tr>
+
+<% for interval in @intervals %>
+  <tr>
+    <td><%=h interval.start %></td>
+    <td><%=h interval.end %></td>
+    <td><%=h interval.user_id %></td>
+    <td><%=h interval.task_id %></td>
+    <td><%=h interval.hours %></td>
+    <td><%= link_to 'Show', interval %></td>
+    <td><%= link_to 'Edit', edit_interval_path(interval) %></td>
+    <td><%= link_to 'Destroy', interval, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New interval', new_interval_path %>

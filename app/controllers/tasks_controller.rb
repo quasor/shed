@@ -1,45 +1,50 @@
 class TasksController < ApplicationController
   # GET /tasks
   # GET /tasks.xml
+  before_filter :login_required
   def index
+    @day_in_pixels = 10
+    
     unless params[:filter].blank?
       unless params[:filter][:user_id].blank?
         session[:user_id] = params[:filter][:user_id]
       end
     end
     @root = Task.root # replace this later with a local root
-    @tasks = []
-    @durations = []
     
+    @total_calendar_days = 0
+
     unless @root.nil?
-      @tasks = @root.full_set
-
-      # Compute start times for each task
-      @end_date = Date.today
-
-      user_end_dates = {}
-      @tasks.each do |task|
-        unless task.user.nil?
-          user_end_dates[task.user.id] ||= Date.today
-          task.start = user_end_dates[task.user.id]
-          user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate)
-        else 
-          task.start = Date.today
+      
+      @tasks = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Task.count}-#{Task.last.id}") do
+        user_end_dates = {}
+        tasks = []
+        @tasks_raw = Task.root.full_set
+        # Compute start times for each task
+        @tasks_raw.each do |task|
+          unless task.user.nil? || task.completed? 
+            user_end_dates[task.user.id] ||= Date.today.work_day(0)
+            task.start = user_end_dates[task.user.id].work_day(0)
+            task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate)
+            task.save
+          else 
+            task.start = Date.today
+          end
+        
+          tasks.push task if params[:u].blank? || task.user.id == params[:u].to_i
         end
-        #task.save
+        tasks
       end
-
-      @durations = Rails.cache.fetch("duration_for_#{@root.cache_key}-#{Task.count}-#{Task.last.id}#{Time.now}") do 
-        durations = []
-        100.times do |i|
-          duration = @root.full_set.collect(&:monte_estimate).sum
-          durations.push duration
-        end
-        durations.sort!
+      @tasks = @root.full_set
+      
+      @total_calendar_days = @tasks.collect(&:end).max - Date.today 
+      
+      Rails.cache.fetch("run_sim_#{@root.cache_key}") do 
+        run_simulation
       end 
+
     end
     
-    @total_calendar_days = @durations.last + (@durations.last / 7 * 2)
     
     if Release.count == 0
       flash[:warning] = 'Your schedule is empty'
@@ -61,10 +66,14 @@ class TasksController < ApplicationController
     end
   end
 
+  def bulk_new
+  end 
+
   # GET /tasks/new
   # GET /tasks/new.xml
   def new
     @task = Task.new
+    @task.user = current_user
 
     respond_to do |format|
       format.html # new.html.erb
@@ -103,7 +112,7 @@ class TasksController < ApplicationController
     @task = Task.find(params[:id])
 
     respond_to do |format|
-      if @task.update_attributes(params[:task])
+      if @task.update_attributes(params[:task] || params[:project])
         flash[:notice] = 'Task was successfully updated.'
         format.html { redirect_to(tasks_url(:p => params[:parent_id] ? params[:parent_id].to_i : nil)) }
         format.xml  { head :ok }
@@ -125,14 +134,14 @@ class TasksController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
+    
   def bulk
     @text = params[:tasks]
     @rows = @text.split("\n").collect {|t| t.split(',') }
     @tasks = []
     
     @rows.collect do |r|
-      if r.size > 4
+      if r.size > 3
         task = {
           :user     => r[0],
           :section  => r[1],
@@ -144,16 +153,18 @@ class TasksController < ApplicationController
         @low = r[3]
         @project = Task.find params[:project_id]
         unless @project.nil? || @low.blank?
-          @user = User.find_by_name r[0]
+          @user = User.find_by_name(r[0].strip) || User.find_by_login(r[0].strip)
           @user_id = @user.id unless @user.nil?
-          @task = Task.new(:title => r[2], :low => r[3], :high => r[4], :user_id => @user_id)
+          @task = Task.new(:title => r[2].strip, :low => r[3], :high => r[4], :user_id => @user_id)
           @task.tag_list = r[1] unless r[1].blank?
           @task.save! 
           @task.move_to_child_of(@project)
           flash[:notice] = 'Tasks were successfully created.'
         else
-          flash[:notice] = 'Tasks were not created.'
+          flash[:notice] = 'Tasks were not created:<br>' + params[:tasks]
         end
+      else
+        flash[:notice] = 'Tasks were not created (not enough)<br>' + params[:tasks] + '<br>' + @rows.inspect
       end
     end
     redirect_to root_path
@@ -193,6 +204,48 @@ class TasksController < ApplicationController
       @menus.last[:close] = 1
 
     end
+    private
+    
+    def run_simulation
+      durations = []
+      #Projection.destroy_all
+      projection_collection = {}
+      100.times do |i|
+        # walk the schedule once
+        user_end_dates = {}
+        projections={}
+        tasks = Task.root.full_set
+        tasks.each do |task|
+          unless task.user.nil? || task.completed? 
+            user_end_dates[task.user.id] ||= Date.today.work_day(0)
+            task.start = user_end_dates[task.user.id].work_day(0)
+            task_end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate)
+            projections[task.id] = Projection.new(:start => task.start, :end => task_end) if task.type.nil?
+            # task.projections << 
+          else 
+            task.start = Date.today
+          end
+        end
+        # use the estimates from the simulation to determine the end date of the project
+        Project.all.each do |project|
+          #project.projections.destroy_all
+          projection_collection[project.id] ||= []
+          max_end_date = project.children.collect { |c| projections[c.id] }.flatten.compact.collect(&:end).max
+          #flatten.max
+          projection_collection[project.id].push max_end_date
+        end
+
+        durations.push (user_end_dates.values.max - Date.today)
+
+      end
+      projection_collection.each_pair do |k,v|
+        v.sort!
+        logger.info "!!!!!#{v.size} dates #{v.join "\n"}"
+        Projection.create(:task_id => k, :start => v[10], :end => v[95])
+      end
+      
+    end
+    # end of class
 end
 
 

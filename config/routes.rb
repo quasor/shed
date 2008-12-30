@@ -1,4 +1,8 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :projections
+
+  map.resources :intervals
+
   map.resources :projects
 
   map.resources :folders
@@ -9,7 +13,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :holidays
 
-  map.resources :tasks, :new => { :bulk => :post } 
+  map.resources :tasks, :new => { :bulk => :post, :bulknew => :get }
   
 
   # The priority is based upon order of creation: first created -> highest priority.
@@ -47,6 +51,9 @@ ActionController::Routing::Routes.draw do |map|
   map.root :controller => "tasks"
 
   # See how all your routes lay out with "rake routes"
+
+  map.logout 'logout', :controller => "login", :action => "logout"
+  map.login 'login', :controller => "login", :action => 'login'
 
   # Install the default routes as the lowest priority.
   # Note: These default routes make all actions in every controller accessible via GET requests. You should

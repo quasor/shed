@@ -1,8 +1,12 @@
-<div style="float:left">
+<h1>
+	<%= f.text_field :title, :class => :big%>
+</h1>
 <p>
-  <%= f.label :title %><br />
-  <%= f.text_field :title %>
+  <%= f.label :owner %><br />
+	<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
 </p>
+<div style="float:left">
+<% if @task.type.nil?%>
 <p>
   <%= f.label :low %><br />
   <%= f.text_field :low %>
@@ -12,25 +16,37 @@
   <%= f.text_field :high %>
 </p>
 <p>
-  <%= f.label :completed %> 
   <%= f.check_box :completed %>
+  <%= f.label :completed %> 
 </p>
+<% else %>
 <p>
-  <%= f.label :user_id %><br />
-	<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
-</p>
+  <%= f.label :due %><br />
+  <%= f.date_select :due %>
+</p>	
+<% end %>
+<% if false %>
+<!--- 
 <p>
   <%= f.label :start %><br />
   <%= f.date_select :start %>
 </p>	
+-->
+<% end %>
 <p>
 	<%= hidden_field_tag :parent_id, params[:parent_id]%>
 </p>
 </div>
-<div style="float:left">
+<div style="float:left; padding-left:20px">
 <p>
   <%= f.label :description %><br />
-  <%= f.text_area :description %>
+  <%= f.text_area :description, :rows => 7 %>
 </p>
 </div>
 <div style="clear:both"></div>
+<script type="text/javascript" charset="utf-8">
+	function startup()
+	{
+		$("input:visible:enabled:first").focus();
+	}
+</script>

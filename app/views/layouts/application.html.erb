@@ -6,41 +6,31 @@
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
   <title>Tasks: <%= controller.action_name %></title>
   <%= stylesheet_link_tag 'scaffold' %>
-
-<% if false %>
-
-	<!--Include YUI Loader: --> 
-	<script type="text/javascript" src="http://yui.yahooapis.com/2.6.0/build/yuiloader/yuiloader-min.js"></script> 
-
-	<!--Use YUI Loader to bring in your other dependencies: --> 
-	<script type="text/javascript"> 
-	// Instantiate and configure YUI Loader: 
-	(function() { 
-	    var loader = new YAHOO.util.YUILoader({ 
-	        base: "", 
-	        require: ["datatable", "resize"], 
-	        loadOptional: false, 
-	        combine: true, 
-	        filter: "MIN", 
-	        allowRollup: false, 
-	        onSuccess: function() { 
-	            //you can make use of all requested YUI modules 
-	            //here. 
-	        } 
-	    }); 
-
-	// Load the files using the insert() method. 
-	loader.insert(); 
-	})(); 
+<% if true %>
+	<script src="http://www.google.com/jsapi"></script>
+	<script type="text/javascript" charset="utf-8">
+	function startup() {}
+	google.load("jquery", "1");
+	google.load("jqueryui", "1");
+	google.setOnLoadCallback(function() { 
+		// Load jQuery
+		//jQuery.noConflict();		
+		startup();
+	});
 	</script>
+	<%= javascript_include_tag 'jquery.hotkeys-0.7.8-packed'%>
 <% end %>
-
-	<%= javascript_include_tag "prototype",'lowpro' %>
-
-
-
 </head>
-<body  class="yui-skin-sam">
+<body>
+	<div id="header">
+		<span style="float:right">
+		<%= "Welcome #{session[:username]}" unless session[:username].blank?%>
+		<%#= link_to_unless_current 'Login', admin_releases_path unless current_user%>
+		<%= link_to_unless_current 'Login', :controller => :login unless current_user%>
+		<%= link_to_unless_current 'Logout', logout_path if current_user%>
+		</span>
+		<h1>Schedule&nbsp;&nbsp;</h1>
+	</div>
 	
 <% if false %>
 <%= link_to_unless_current 'Home', root_path%> | 
@@ -52,11 +42,9 @@ Filter:<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt =
 
 <% end %>
 
-
 <p style="color: green"><%= flash[:notice] %></p>
 <p style="color: red"><%= flash[:warning] %></p>
 
 <%= yield %>
-
 </body>
 </html>

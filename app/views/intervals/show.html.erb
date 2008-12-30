@@ -1,0 +1,28 @@
+<p>
+  <b>Start:</b>
+  <%=h @interval.start %>
+</p>
+
+<p>
+  <b>End:</b>
+  <%=h @interval.end %>
+</p>
+
+<p>
+  <b>User:</b>
+  <%=h @interval.user_id %>
+</p>
+
+<p>
+  <b>Task:</b>
+  <%=h @interval.task_id %>
+</p>
+
+<p>
+  <b>Hours:</b>
+  <%=h @interval.hours %>
+</p>
+
+
+<%= link_to 'Edit', edit_interval_path(@interval) %> |
+<%= link_to 'Back', intervals_path %>

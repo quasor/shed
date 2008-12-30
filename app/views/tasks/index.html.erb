@@ -1,84 +1,134 @@
-<% unless @tasks.empty?%>
-
-<div id="markup">
-	<table class="st" id="schedule">
-	<thead>
-		<tr>
-			<td>Title</td>
-			<td>Section</td>
-	    <td>Low</td>
-	    <td>High</td>
-	    <td>Estimate</td>
-	    <td>Sim</td>
-	    <td>User</td>
-	    <td>Start</td>
-	    <td>End</td>
-		</tr>
-  </thead>
-	<% for task in @tasks %>
-  <tr class="srow">
-		<td nowrap style="overflow:hidden"><% (task.level * 4).times do -%>&nbsp;<%end%><%=link_to task.title.gsub(/ /,"&nbsp;"), edit_task_path(task), :class => :hideul %> 
-				<% if task.type == "Release"%><%=  link_to 'New Project', new_project_path(:parent_id => task.id) %>
-				<% elsif task.type == "Project"%><%=  link_to '+', new_task_path(:parent_id => task.id), :class => 'button_link' %>
-				<%= link_to_function "++", "$('bulk_form').show();$('project_id').value = '#{task.id}';", :class => 'button_link'%>
-				<% end %>
-			</td>
-
-			<% unless task.type == "Release" or task.type == "Project"%>
-	    <td nowrap><%=h task.tag_list %></td>
-	    <td><%=h task.low %></td>
-	    <td><%=h task.high %></td>
-	    <td><%=h task.estimate.round(3) %></td>
-	    <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td>
-	    <td nowrap><%=task.user ? task.user.name : '<span class="unassigned">Unassigned</span>'%></td>
-	    <td><%=h task.start.to_s(:mdy) %></td>
-	    <td><%=h (task.start + task.estimate).to_s(:mdy) %></td>
-			
-			<td style="width:<%=2* @total_calendar_days %>em;vertical-align:top">
-				<div style="position:relative; width:<%= 2*@total_calendar_days %>em; padding:0px">
-				<span class="ganttbar" style="width:<%= 2 * (task.estimate.round(3)) %>em; left:<%= 2 * (task.start - Date.today) %>em"></span>					
-				</div>
-			</td>
-	    <td><%= link_to 'E', edit_task_path(task) %></td>
-	    <td><%= link_to('X', task_path(task), :confirm => 'Are you sure?', :method => :delete) if task.deleteable?%></td>
-			<%else %>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-			<% end %>
-	  </tr>
-	<% end %>
-<% if false %>
-		<tr>
-			<td colspan="5"></td>
-	    <td><%=  @tasks.collect(&:estimate).sum %></td>
-	    <td><%= @durations[@durations.size * 0.05].round(3)%> - <%= @durations[@durations.size * 0.95].round(3)%></td>
-		</tr>
-<% end %>
-	</table>
-	
-</div>
-		
-		<div id="bulk_form" style="display:none">
-		<% form_for :bulk_tasks, :url => bulk_new_task_path do |f| %>
-		<input type="text" id="project_id" name="project_id">
-		<b>Add tasks, one per line, comma separated in the format:</b><br />
-		<div style="font-size:.8em">
-		[Owner], [Section / Category], [Task Title], [Low Estimate], [High Estimate (optional)]<br>
-		e.g.<br>
-		Peter Sommer, Meetings Context, Add meeting id to cookie (and supporting functions), 1, 1.5
-		</div>
-		<%= text_area_tag 'tasks', '', :rows => 20, :cols => 120, :style => 'font-family: courier; font-size:0.8em' %>
-		<%= f.submit 'Save' %>
+<% unless @tasks.empty? %>
+<div id="leftcol" class="resizeable">
+		<table class="st" id="schedule">
+		<thead>
+			<tr class="srow">
+				<td>Title</td>
+			</tr>
+	  </thead>
+		<% @tasks.each do |task| %>
+	  <tr class="srow">
+			<td style="overflow:hidden"><nobr><% (task.level * 4).times do -%>&nbsp;<%end%><span <%if task.completed?%>style="text-decoration:line-through"<%end%>>
+					<%#=link_to_remote task.title, :update => "progress_dialog", :complete => "$('interval_hours').focus();", :url => new_interval_path(:task_id => task.id), :html => {:class => :hideul} %> 
+					<% if task.type.nil? %>
+						<%=link_to task.title, new_interval_path(:task_id => task.id), :html => {:class => :hideul} %> 
+					<% else %>
+						<%=link_to task.title, edit_task_path(task), :html => {:class => :hideul} %> 
+					<% end %>
+					<% if task.type == "Release"%><%=  link_to 'New Project', new_project_path(:parent_id => task.id) %>
+					<% elsif task.type == "Project"%><%=  link_to '+ New Task', new_task_path(:parent_id => task.id), :class => 'button_link' %>
+					<%= link_to "++ Bulk", {:controller => 'tasks', :action => 'bulknew', :project_id => task.id}, {:class => 'button_link'}%>
+					<% end %>
+					</nobr>
+				</td>
+		  </tr>
 		<% end %>
-		</div>
-		
+		</table>
 
+</div>
+<div id="rightcol" onscroll="scrollDiv('leftcol','rightcol')">
+		<table class="st" id="schedule">
+		<thead>
+			<tr class="srow2">
+				<td>Section</td>
+		    <td>Low</td>
+		    <td>High</td>
+		    <td>Estimate</td>
+<!--
+		    <td>Sim</td> 
+-->
+		    <td>Owner</td>
+		    <td>Start</td>
+		    <td>End</td>
+			  <td>Milestones
+						<div style="position:relative; margin-left:0px">				
+							<% for i in 0..@total_calendar_days%>
+							<% d = Date.today + i%>
+							<!-- oi: <%= d %> -->
+							<div style="position:absolute;left:<%= @day_in_pixels * i %>px;height:<%= @tasks.size * 2.5%>em;<% if d.wday == 0 || d.wday == 6 %>width:<%=@day_in_pixels-1%>px;background-color:#777;opacity:0.5;<% end %>border-left:1px solid #ccc"></div>
+							<% end %>
+						</div>
+				</td>
+			</tr>
+	  </thead>
+		<% @tasks.each do |task| %>
+	  <tr class="srow">
+				<% unless task.type == "Release" or task.type == "Project"%>
+			    <td nowrap><%=h task.tag_list %></td>
+			    <td><%=h task.low %></td>
+			    <td><%=h task.high %></td>
+			    <td><%=h task.estimate.round(3) %></td>
+	<!--
+		 		  <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td>
+	-->
+			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
+
+			    <td><%=h task.start.to_s(:mdy) unless task.completed?%></td>
+			    <td><%=h (task.end.to_s(:mdy)) unless task.completed?%></td>
+
+					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
+						<% unless task.completed? %>
+						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">
+						<span title="<%= task.start.to_s(:long) %> - <%= task.end.to_s(:long) %> (<%= task.estimate %>days)" class="ganttbar" style="width:<%= @day_in_pixels * (task.end - task.start) %>px; left:<%= @day_in_pixels * (task.start - Date.today) %>px"></span>					
+						</div>
+						<% end %>
+					</td>
+			    <td><%= link_to 'E', edit_task_path(task) %></td>
+				<%else %>
+				<td colspan="7">
+					Due <%= task.due %>  
+					<% unless task.projections.nil? || task.projections.empty?%>
+						<%= task.projections.last.start%>  - <%= task.projections.last.end%> (<%= task.projections.size%>)
+					<% end %>
+					</td>
+<!-- gantt bar here -->
+				<% end %>
+		  </tr>
+		<% end %>
+	<% if false %>
+			<tr>
+				<td colspan="5"></td>
+		    <td><%=  @tasks.collect(&:estimate).sum %></td>
+		    <td><%= @durations[@durations.size * 0.05].round(3)%> - <%= @durations[@durations.size * 0.95].round(3)%></td>
+			</tr>
+	<% end %>
+		</table>
+
+</div>
+<div id="progress_dialog" style="display:none; background-color:blue; z-index:10">
+	word
+</div>
+
+				
 <% else %>
 <%= link_to "New Release", new_release_path%>
 <% end %>
 
-<% if false %>
+<% if true %>
+
 <script type="text/javascript" charset="utf-8">
-Event.onReady(function() { Resize();});
+function startup()
+{
+	Resize();
+	$('#leftcol').resizable({ 
+	    handles: "e",
+	    stop: function(e, ui) { 
+//				$('#rightcol').width( );
+				$('#rightcol').animate({
+					left: $('#leftcol').width(),
+					width: $(window).width() - $('#leftcol').width(),
+					}, 1);
+	    }, 
+	});	
+}
+
+function scrollDiv(lckDiv, scrDiv)
+{
+	document.getElementById(lckDiv).scrollTop = document.getElementById(scrDiv).scrollTop;
+	//document.getElementById(lckDiv).scrollLeft = document.getElementById(scrDiv).scrollLeft;
+
+}
+
 window.size = function()
 {
 	var w = 0;
@@ -111,8 +161,9 @@ window.size = function()
 
 function Resize()
 {
-	$('right_col').style.height = window.size().height - 72 + "px";
-	$('left_col').style.height = window.size().height - 72 + "px";
+	$('#rightcol').css('height',window.size().height - 36);
+	$('#leftcol').css('height',window.size().height - 36 - 16);
+	$('#rightcol').css('width',window.size().width - 303);
 	
 //	$('a-col').style.height = window.size().height - 20 + "px";
 //	$('map_canvas').style.width = window.size().width - 255 + "px";
@@ -176,3 +227,4 @@ YAHOO.util.Event.addListener(window, "load", function() {
 
 </script>
 <% end %>
+
