@@ -2,6 +2,7 @@ class LoginController < ApplicationController
 # GET /login?username=
 # http://ham64:8080/?rurl=http://localhost:3000/login?u=
 	def login
+		session[:user_id] = nil
 		if params[:u].blank? || params[:challenge] != "mttpowerful"
 			redirect_to "http://ham64:8080/?rurl=http://#{request.env['HTTP_HOST']}/login?u="
 			#render :inline => "<%= debug request.env%>"
