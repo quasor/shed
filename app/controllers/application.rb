@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
   	if current_user.nil?
   		false
   	else
-  		%(acoldham).include? current_user
+  		%(acoldham).include? current_user.login
   	end
   end
 

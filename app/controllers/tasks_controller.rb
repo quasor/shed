@@ -261,11 +261,12 @@ class TasksController < ApplicationController
             end
             tasks
           end
-          @tasks = @root.all_children
+          
+          @tasks = Task.root.all_children
           unless @tasks.empty?
             end_dates = @tasks.collect(&:end) 
             unless end_dates.compact.empty?
-              @total_calendar_days = end_dates.max - Date.today 
+              @total_calendar_days = end_dates.compact.max - Date.today 
 
               Rails.cache.fetch("run_sim_#{@root.cache_key}#{Date.today}") do 
                 run_simulation
