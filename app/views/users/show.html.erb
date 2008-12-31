@@ -14,7 +14,8 @@
 	}
 	
 </style>
-<div id="stopwatch" class="<%unless @task.nil?%>running<%end%>" style="position:absolute;top:0px;left:0px;width:100%">
+
+<div id="stopwatch" class="<%unless @current_task.nil?%>running<%end%>" style="position:absolute;top:0px;left:0px;width:100%">
 <div id="timer">
 	<span id="timer-display">00:00<small>.00</small></span>
 </div>
@@ -22,7 +23,17 @@
 <div style="position:relative;top:34px;">
 	<%= render :partial => 'tasks/tasklist', :locals => { :skip_completed => false}%>
 	<%= render :partial => 'tasks/tasklist', :locals => { :skip_completed => true }%>
+
+<% content_for :save_module do %>
+	<% remote_form_for :task, :url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')" do |f|%>
+	<%= hidden_field_tag :order%>
+	<%= f.submit %>
+	<% end %>
+<% end %>
+</div>
 <script type="text/javascript" charset="utf-8">
+var last_updated = new Number();
+
 function startup(){
 	$('.ui-resizable-handle').css('background-color','#ABABAB');
 	
@@ -49,6 +60,12 @@ function startup(){
     $('img.stopped',this).removeClass('started-hover');
   });
 
+	<% unless current_user.active_interval.nil? %>
+	last_updated = <%=current_user.active_interval.start.to_f.to_i * 1000%>;
+	createTimer();
+	<% end %>
+	document.title = 'Timer';
+
 }
 
 
@@ -56,11 +73,16 @@ function leadingZero(x){
 	y=(x>9)?x:'0'+x;
 	return y;
 }
-
-var last_updated =Number();
-
+if (!Date.now) {
+    Date.now = function() {
+        return (new Date()).getTime();
+    };
+}
 function tick() {
-		  progress = Math.floor((Date.now() - last_updated) / 1000);
+		  d = Date.now();
+//			console.log(d);
+		  progress = Math.floor((d - last_updated) / 1000);
+//			console.log(progress);
 			hours = Math.floor(progress / (60*60));
 			minutes = Math.floor((progress / 60) % (60*60));
 			seconds = progress % 60;
@@ -69,21 +91,11 @@ function tick() {
 			document.title = "<%=@task.title%> (" + leadingZero(hours) + ":" + leadingZero(minutes) + ")";
 			<% end %>
    }
+// 1230744744937
+// 1230744705000
 function createTimer()
 {
 	$('#timer').show();
 	setInterval("tick()",1000);
 }
-<% unless current_user.active_interval.nil? %>
-last_updated = <%=current_user.active_interval.start.to_f.to_i * 1000%>;
-createTimer();
-<% end %>
-			document.title = 'Timer';
 </script>
-<% content_for :save_module do %>
-	<% remote_form_for :task, :url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')" do |f|%>
-	<%= hidden_field_tag :order%>
-	<%= f.submit %>
-	<% end %>
-<% end %>
-</div>

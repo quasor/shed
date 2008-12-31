@@ -28,6 +28,8 @@ class UsersController < ApplicationController
     # find all open intervals not for this task and close them
     @intervals = current_user.intervals.find(:all, :conditions => {:end => nil})      
     @interval = current_user.active_intervals.first
+    @current_task = @interval.task unless @interval.nil?
+    
 
     unless params[:task_id].blank?
       @task = current_user.tasks.find(params[:task_id]) 
@@ -43,9 +45,14 @@ class UsersController < ApplicationController
     @intervals.each {|i| i.end = DateTime.now;i.save! }
 
     flash[:notice] = ''
-    respond_to do |format|
-      format.html {} 
-      format.xml  { render :xml => @user }
+
+    unless params[:task_id].blank?
+      redirect_to current_user
+    else
+      respond_to do |format|
+        format.html {} 
+        format.xml  { render :xml => @user }
+      end
     end
   end
 

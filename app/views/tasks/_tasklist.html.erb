@@ -8,8 +8,8 @@
 				<% if task.type.nil? %>
 						<% if task.user_id == current_user.id && !@timer.nil?%>
 							<div id="timer_link_<%=task.id%>">
-								<% form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}"}) do |f| %>
-									<%= f.check_box :completed, :style => "position:absolute;right:4px;", :onclick => "$('#complete_task_#{task.id}').submit();"%>
+								<% form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "position:absolute;right:4px;"}) do |f| %>
+									<%= f.check_box :completed, :onclick => "$('#complete_task_#{task.id}').submit();"%>
 								<% end %>
 								<%unless task.completed?%>
 									<%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped') + '" src="/images/space.gif" align="absmiddle" border="0"> ' + 
