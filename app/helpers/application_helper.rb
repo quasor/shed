@@ -29,7 +29,7 @@ module ApplicationHelper
       end
 	  else 
 	    s = s + "My Tasks"
-	  s = s + "</a>"
     end
+	  s = s + "</a>"
   end
 end
