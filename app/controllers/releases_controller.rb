@@ -41,9 +41,11 @@ class ReleasesController < ApplicationController
   # POST /releases.xml
   def create
     @release = Release.new(params[:release])
-
+    
     respond_to do |format|
-      if @release.save        
+      if @release.save      
+        @release.move_to_child_of(Task.root)
+          
         flash[:notice] = 'Release was successfully created.'
         format.html { redirect_to(root_path) }
         format.xml  { render :xml => @release, :status => :created, :location => @release }

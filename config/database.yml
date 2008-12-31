@@ -7,10 +7,11 @@
 #  timeout: 5000
 development:
     adapter: mysql
-    database: shed_development
-    username: root
-    password: 
-    host: 127.0.0.1
+    #shed_development
+    database: schedule_production 
+    username: andrew
+    password: andrew
+    host: bigmac.local
     
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

@@ -26,8 +26,8 @@ module TasksHelper
       durations = []
       100.times do |i|
         user_end_dates = {}
-        tasks_raw = root.full_set
-        #duration = root.full_set.collect(&:monte_estimate).sum
+        tasks_raw = root.all_children
+        #duration = root.all_children.collect(&:monte_estimate).sum
         #durations.push duration
         
         tasks_raw.each do |task|

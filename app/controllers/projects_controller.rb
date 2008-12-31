@@ -43,7 +43,7 @@ class ProjectsController < ApplicationController
     @project = Project.new(params[:project])
 
     respond_to do |format|
-      if @project.save
+      if !params[:parent_id].blank? && @project.save
         
         unless (params[:parent_id].blank?)
           @project.move_to_child_of(Task.find(params[:parent_id]))

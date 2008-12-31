@@ -4,6 +4,7 @@ class TasksController < ApplicationController
   before_filter :login_required
   def index
     @day_in_pixels = 10
+    @tasks = []
     
     unless params[:filter].blank?
       unless params[:filter][:user_id].blank?
@@ -53,9 +54,10 @@ class TasksController < ApplicationController
         task.move_to_bottom
       end
     end
-    t = Task.root
-    t.updated_at = Time.now
-    t.save
+    Task.roots.each do |t|
+      t.updated_at = Time.now
+      t.save
+    end
     
     rebuild_schedule
     
@@ -230,7 +232,7 @@ class TasksController < ApplicationController
         # walk the schedule once
         user_end_dates = {}
         projections={}
-        tasks = Task.root.full_set
+        tasks = Task.root.all_children
         tasks.each do |task|
           unless task.user.nil? || task.completed? 
             user_end_dates[task.user.id] ||= Date.today.work_day(0)
@@ -262,8 +264,8 @@ class TasksController < ApplicationController
       end
       
     end
-    def rebuild_schedule(force = false)
-       @root = Task.root # replace this later with a local root
+    def rebuild_schedule(force = false, root = Task.root)
+       @root = root # replace this later with a local root
 
         @total_calendar_days = 0
 
@@ -272,7 +274,7 @@ class TasksController < ApplicationController
           @tasks = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Task.count}-#{Task.last.id}#{Date.today}"+suffix) do
             user_end_dates = {}
             tasks = []
-            @tasks_raw = Task.root.full_set
+            @tasks_raw = Task.root.all_children
             # Compute start times for each task
             @tasks_raw.each do |task|
               unless task.user.nil? || task.completed? 
@@ -288,13 +290,17 @@ class TasksController < ApplicationController
             end
             tasks
           end
-          @tasks = @root.full_set
+          @tasks = @root.all_children
+          unless @tasks.empty?
+            end_dates = @tasks.collect(&:end) 
+            unless end_dates.compact.empty?
+              @total_calendar_days = end_dates.max - Date.today 
 
-          @total_calendar_days = @tasks.collect(&:end).max - Date.today 
-
-          Rails.cache.fetch("run_sim_#{@root.cache_key}#{Date.today}") do 
-            run_simulation
-          end 
+              Rails.cache.fetch("run_sim_#{@root.cache_key}#{Date.today}") do 
+                run_simulation
+              end 
+            end
+          end
 
         end
     end
