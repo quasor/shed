@@ -57,7 +57,8 @@ a:hover { color: #fff; background-color:#000; }
 
 #schedule {overflow:hidden;}
 .button_link { background-color:#ABFF8F; padding:1px 5px 1px 5px; text-decoration:none; border:1px solid #777;}
-#header { width:100%;height:36px; background-color:#232323; position:absolute; top:0px; left:0px; color:#BC793F;}
+#header { width:100%;height:36px; background-color:#232323; position:absolute; top:0px; left:0px; color:#AFD534;}
+#header a:hover {color:#000;background-color:#AFD534;}
 #main { position:absolute; top:36px;}
 #header h1 {padding-top:0em; color:white;font-family:Helvetica,Arial; line-height:10px;}
 #header a {color:white;}
@@ -135,7 +136,6 @@ img.started {
 }
 
 
-#header a:hover {color:#0080FF;background-color:#232323;}
 
 body {overflow:hidden;}
 .completed {color:#777;;}
