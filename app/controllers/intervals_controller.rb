@@ -31,6 +31,8 @@ class IntervalsController < ApplicationController
       format.html # new.html.erb
       format.xml  { render :xml => @interval }
     end
+  rescue
+    redirect_to intervals_path
   end
 
   # GET /intervals/1/edit

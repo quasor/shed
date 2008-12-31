@@ -19,4 +19,17 @@ module ApplicationHelper
       link_to node.title, :p => node.id
     end 
   end
+  def link_to_current_task(name = nil)
+  	s = "<a href=\"javascript:newwindow=window.open('#{user_path(current_user,:timer=> true, :task_id => current_user.current_task)}','','resizable=1,toolbar=0,location=0,status=0,menubar=0,scrollbars=1,width=275,height=450');newwindow.focus();\" id=\"timer-link\">"
+    if current_user.current_task
+      if name == nil
+	      s = s + "Task In Progress: " + current_user.current_task.title
+      else
+        s = s + name
+      end
+	  else 
+	    s = s + "My Tasks"
+	  "</a>"
+    end
+  end
 end

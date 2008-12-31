@@ -16,12 +16,8 @@
   <tr <% if interval.end.nil? %>class="started"<%end%>>
 		<td><%=h interval.task.title %></td>
     <td style="font-size:16px;"><%=h interval.start.strftime("%I:%M%p") %> - <%=h interval.end.strftime("%I:%M%p") unless interval.end.nil? %></td>
-		<td><%unless interval.end.nil?%><%= pretty_duration(interval)%><%else%><span>In Progress</span><%end%></td>
-    <td><%= link_to 'Edit', edit_interval_path(interval) %> <%= link_to 'Delete', interval, :confirm => 'Are you sure?', :method => :delete %></td>
+		<td><%unless interval.end.nil?%><%= pretty_duration(interval)%><%else%><%=link_to_current_task('In Progress')%><%end%></td>
+    <td><%unless interval.end.nil?%><%= link_to 'Edit', edit_interval_path(interval) %> <%= link_to 'Delete', interval, :confirm => 'Are you sure?', :method => :delete %><%end%></td>
   </tr>
 <% end %>
 </table>
-
-<br />
-
-<%= link_to 'New interval', new_interval_path %>

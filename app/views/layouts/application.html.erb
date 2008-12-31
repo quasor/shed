@@ -33,10 +33,7 @@
 			<div style="padding-right:2em;padding-left:0.5em;float:left;padding-top:.75em;font-size:12px">
 				<b><%= link_to_unless_current @timer.nil? ? 'Schedule' : '', root_path %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
 				<b><%= link_to_unless_current 'Time Spent', intervals_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
-				<b><a href="javascript:newwindow=window.open('<%=user_path(current_user,:timer=> true, :task_id => current_user.current_task)%>','','resizable=1,toolbar=0,location=0,status=0,menubar=0,scrollbars=1,width=275,height=450');newwindow.focus();" id="timer-link">
-				<% if current_user.current_task%><%= "Task In Progress: " + current_user.current_task.title %> <%else%>My Tasks<%end%>
-				</a>	
-			</b>
+				<b><%= link_to_current_task %></b>
 			</div>
 		<% end %>
 
