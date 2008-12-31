@@ -43,8 +43,8 @@
 	-->
 			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
 
-			    <td><%=h task.start.to_s(:mdy) unless task.completed?%></td>
-			    <td><%=h (task.end.to_s(:mdy)) unless task.completed?%></td>
+			    <td><%=h(task.start.to_s(:mdy)) unless task.completed?%></td>
+			    <td><%=h(task.end.to_s(:mdy)) unless task.completed?%></td>
 
 					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? %>
