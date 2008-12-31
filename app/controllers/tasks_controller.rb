@@ -10,44 +10,23 @@ class TasksController < ApplicationController
         session[:user_id] = params[:filter][:user_id]
       end
     end
-    @root = Task.root # replace this later with a local root
-    
-    @total_calendar_days = 0
+   
+   rebuild_schedule(params[:force] == "true") 
+   
+   unless params[:u].blank?
+     user_id = params[:u].to_i
+     @tasks.delete_if {|t| t.user_id != user_id && t.type.nil? }   
+   end
 
-    unless @root.nil?
-      
-      @tasks = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Task.count}-#{Task.last.id}") do
-        user_end_dates = {}
-        tasks = []
-        @tasks_raw = Task.root.full_set
-        # Compute start times for each task
-        @tasks_raw.each do |task|
-          unless task.user.nil? || task.completed? 
-            user_end_dates[task.user.id] ||= Date.today.work_day(0)
-            task.start = user_end_dates[task.user.id].work_day(0)
-            task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate)
-            task.save
-          else 
-            task.start = Date.today
-          end
-        
-          tasks.push task if params[:u].blank? || task.user.id == params[:u].to_i
-        end
-        tasks
-      end
-      @tasks = @root.full_set
-      
-      @total_calendar_days = @tasks.collect(&:end).max - Date.today 
-      
-      Rails.cache.fetch("run_sim_#{@root.cache_key}") do 
-        run_simulation
-      end 
-
-    end
-    
+   unless params[:p].blank?
+     project_id = params[:p].to_i
+     @tasks.delete_if {|t| t.parent_id != project_id && t.type.nil? }   
+   end
     
     if Release.count == 0
       flash[:warning] = 'Your schedule is empty'
+    else
+      flash[:notice] = "Last updated at #{Task.root.updated_at.to_s()}"
     end
     respond_to do |format|
       format.html # index.html.erb
@@ -63,6 +42,25 @@ class TasksController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @task }
+    end
+  end
+
+  def reorder
+    @order = params[:order].scan(/\d+/)
+    unless @order.empty?
+      @order.each do |id|
+        task = Task.find id
+        task.move_to_bottom
+      end
+    end
+    t = Task.root
+    t.updated_at = Time.now
+    t.save
+    
+    rebuild_schedule
+    
+    render :update do |page|
+      page.replace_html 'flash', :partial => 'refresh'
     end
   end
 
@@ -109,7 +107,7 @@ class TasksController < ApplicationController
   # PUT /tasks/1
   # PUT /tasks/1.xml
   def update
-    @task = Task.find(params[:id])
+    @task = current_user.tasks.find(params[:id])
 
     respond_to do |format|
       if @task.update_attributes(params[:task] || params[:project])
@@ -121,6 +119,24 @@ class TasksController < ApplicationController
         format.xml  { render :xml => @task.errors, :status => :unprocessable_entity }
       end
     end
+  end
+  
+  def complete
+    @task = current_user.tasks.find(params[:id])
+    @task.intervals.active.each {|i| i.end = DateTime.now;i.save! }
+
+    respond_to do |format|
+      if @task.update_attributes(params[:task] || params[:project])
+        flash[:notice] = 'Task was successfully updated.'
+        format.html { redirect_to(user_path(current_user, :timer => true)) }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @task.errors, :status => :unprocessable_entity }
+      end
+    end
+
+    
   end
 
   # DELETE /tasks/1
@@ -239,11 +255,48 @@ class TasksController < ApplicationController
 
       end
       projection_collection.each_pair do |k,v|
-        v.sort!
+        v.compact!
+        v.sort! 
         logger.info "!!!!!#{v.size} dates #{v.join "\n"}"
         Projection.create(:task_id => k, :start => v[10], :end => v[95])
       end
       
+    end
+    def rebuild_schedule(force = false)
+       @root = Task.root # replace this later with a local root
+
+        @total_calendar_days = 0
+
+        unless @root.nil?
+          suffix = force ? Time.now.to_s : ""
+          @tasks = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Task.count}-#{Task.last.id}#{Date.today}"+suffix) do
+            user_end_dates = {}
+            tasks = []
+            @tasks_raw = Task.root.full_set
+            # Compute start times for each task
+            @tasks_raw.each do |task|
+              unless task.user.nil? || task.completed? 
+                user_end_dates[task.user.id] ||= Date.today.work_day(0)
+                task.start = user_end_dates[task.user.id].work_day(0)
+                task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate)
+                task.save
+              else 
+                task.start = Date.today
+              end
+
+              tasks.push task if params[:u].blank? || task.user.id == params[:u].to_i
+            end
+            tasks
+          end
+          @tasks = @root.full_set
+
+          @total_calendar_days = @tasks.collect(&:end).max - Date.today 
+
+          Rails.cache.fetch("run_sim_#{@root.cache_key}#{Date.today}") do 
+            run_simulation
+          end 
+
+        end
     end
     # end of class
 end

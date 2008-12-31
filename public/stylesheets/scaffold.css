@@ -12,7 +12,7 @@ pre {
 }
 
 a { color: #000; }
-a:visited { color: #666; }
+a:visited { color: #000; }
 a:hover { color: #fff; background-color:#000; }
 
 .fieldWithErrors {
@@ -52,7 +52,6 @@ a:hover { color: #fff; background-color:#000; }
 }
 
 .unassigned { color : red;}
-.project { font-weight : bold;}
 .st { border:1px solid #ccc;border-collapse:collapse;}
 .st td {border:1px solid #ccc; margin:0px}
 
@@ -62,10 +61,20 @@ a:hover { color: #fff; background-color:#000; }
 #main { position:absolute; top:36px;}
 #header h1 {padding-top:0em; color:white;font-family:Helvetica,Arial; line-height:10px;}
 #header a {color:white;}
-#leftcol  { width:297px; left: 0px;  top:36px;position:absolute; border:0px solid green; overflow:hidden; z-index:2;}
+#leftcol  { width:297px; left: 0px;  top:36px;position:absolute; border:0px solid green; overflow:auto; z-index:10;background-color:white;;}
 #rightcol { width:1135px;left: 300px;top:36px;position:absolute; border:0px solid red; overflow:auto;}
 .srow {height:2.0em;background-color:white;}
 .srow2 {height:2.0em;}
+ul {padding:0px;margin:0px;cursor:move;}
+.lirow {cursor:move;height:2.0em;border-top:1px solid #ccc; margin:0px;line-height:1.5em;margin-top:-1px;cursor:move;overflow:hidden; width:100%;}
+.lirow:hover {cursor:move}
+.lirow a {display:block;}
+.lirow a.button_link {display:inline;}
+.stopped:hover {background-color:#E3FCD0;color:#000;}
+.started {background-color:#E3FCD0;}
+.started:hover {background-color:#F78989;color:#000;}
+/*.stopped a {color:#4A851E;}*/
+
 .srow:hover {background-color:#FFF0CB;}
 div.t_title { width:298px;overflow:hidden;}
 .st td {padding-left:3px;padding-right:3px;line-height:1.5em;}
@@ -75,3 +84,58 @@ table td {text-align:left;}
 h1 { padding-top:1em;}
 body {}
 .big {font-size:125%;}
+#task_submit {margin-top:10px;}
+.sortHelper
+{
+	border: 3px dashed #666;
+	width: auto !important;
+}
+.help { color: #666; font-size:80%;}
+.Project {
+	font-weight:bold; border-top:1px solid black;font-size:12px;height:21px;
+}
+.Release {font-weight:bold;font-size:14px;height:21px;}
+
+img.plus {
+	background: url(/images/sprites.png) no-repeat scroll -192px -96px;
+	height:20px;
+	width:20px;
+}
+img.minus {
+	background: url(/images/sprites.png) no-repeat scroll -216px -96px;
+	height:20px;
+	width:20px;
+}
+.completed img.item {
+	background: url(/images/sprites.png) no-repeat scroll 0px 0px;
+	height:20px;
+	width:20px;
+}
+
+img.item {
+	height:20px;
+	width:20px;
+}
+
+img.stopped {
+	height:20px;
+	width:20px;
+}
+
+img.stopped-hover {
+	background: url(/images/sprites.png) no-repeat scroll -552px -96px;
+	height:20px;
+	width:20px;
+}
+
+img.started {
+	background: url(/images/sprites.png) no-repeat scroll -528px -96px;
+	height:20px;
+	width:20px;
+}
+
+
+#header a:hover {color:#0080FF;background-color:#232323;}
+
+body {overflow:hidden;}
+.completed {color:#777;;}

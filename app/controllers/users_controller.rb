@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   # GET /users
   # GET /users.xml
+  before_filter :login_required
   def index
     @users = User.find(:all)
 
@@ -12,11 +13,38 @@ class UsersController < ApplicationController
 
   # GET /users/1
   # GET /users/1.xml
+  # display the user's timers
   def show
     @user = User.find(params[:id])
+    @timer = !params[:timer].blank?
 
+    unless @user == current_user || admin?
+      returning redirect_to(current_user)
+    end
+
+    @tasks = Task.root.full_set
+    @tasks.delete_if {|t| t.user_id != @user.id && t.type.nil? }   
+    
+    # find all open intervals not for this task and close them
+    @intervals = current_user.intervals.find(:all, :conditions => {:end => nil})      
+    @interval = current_user.active_intervals.first
+
+    unless params[:task_id].blank?
+      @task = current_user.tasks.find(params[:task_id]) 
+      @interval = @task.intervals.active.first    
+      if @interval.nil?
+        @interval = Interval.new(:start => DateTime.now, :user_id => current_user.id) 
+        @task.intervals << @interval
+      end 
+      @current_task = @task
+    end
+
+    @intervals = @intervals - [@interval] if params[:stop].blank?
+    @intervals.each {|i| i.end = DateTime.now;i.save! }
+
+    flash[:notice] = ''
     respond_to do |format|
-      format.html # show.html.erb
+      format.html {} 
       format.xml  { render :xml => @user }
     end
   end

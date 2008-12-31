@@ -5,7 +5,7 @@ class Task < ActiveRecord::Base
   belongs_to :user
   has_many :intervals
   has_many :projections
-
+  before_save {|r| r.low = 0 if r.low.blank?}
   #validates_presence_of :low
   validates_presence_of :title
   #validates_presence_of :user
@@ -26,12 +26,52 @@ class Task < ActiveRecord::Base
     velocities ||= DEFAULT_VELOCITIIES 
     velocity = velocities[rand(velocities.size)]
     e = estimate / velocity
-    # puts "Choosing estimate #{estimate }/ velocity #{velocity} = #{e}"
+    puts "Choosing estimate #{estimate }/ velocity #{velocity} = #{e}"
     e
   end
   def deleteable?
     children.nil? || children.size == 0
   end
+  
+  # A leaf folder does not have any children. Return true if no
+  # children exist for this folder.
+  # This method does not require a database query.
+  def leaf?
+    self.all_children_count == 0
+  end
+
+  # Return true if this folder has no contents - either folders
+  # or bookmarks.
+  def empty?
+    self.leaf?
+  end
+
+  # In the statement:
+  #   @folder.ancestor_of(@other_folder)
+  # The result is true if @other_folder is within the sub-tree of
+  # @folder.
+  # The result is false if @other_folder is outside @folder's sub-tree or if
+  # @folder == @other_folder.
+  # This method does not require a database query.
+  def ancestor_of?(descendant)
+    self.lft < descendant.lft && self.rgt > descendant.rgt
+  end
+
+  # In the statement:
+  #   @folder.descendant_of(@other_folder)
+  # The result is true if @other_folder is a direct ancestor of @folder.
+  # Otherwise, false.
+  # This method does not require a database query.
+  def descendant_of?(ancestor)
+    self.lft > ancestor.lft && self.rgt < ancestor.rgt
+  end
+  
+  def status
+    s = []
+    s.push "completed" if self.completed?
+    s.join ' '
+  end
+  
 end
 
 

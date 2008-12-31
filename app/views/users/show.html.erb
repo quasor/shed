@@ -1,18 +1,88 @@
-<p>
-  <b>Name:</b>
-  <%=h @user.name %>
-</p>
+<style type="text/css" media="screen">
+  .running #timer {background-color: #CCFFBF; border: solid 1px #2AB400}
+	#timer {text-align:right;height: 30px; padding: 2px; border: 1px solid #B42A00; background-color: #FFCEBF; margin-bottom: 2px;}
+	#timer #timer-display {font: bold 32px arial, sans-serif; letter-spacing: -1px; line-height: 28px; color: #333}
+	#timer #timer-display small {font-size: 14px; letter-spacing: 0}
+	#timer #total-display {background-color: #FF8D6F; padding: 4px 2px 2px 2px; text-align: left; font: bold 16px arial, sans-serif; line-height: 11px}
+	#timer #total-display label {font: normal 10px arial; line-height: 8px; padding-right: 3px}
+	.running #timer #total-display {background-color: #8eff6f}
+	body {overflow:auto;}
+	.completed img.item {
+		background: transparent;
+		height:20px;
+		width:20px;
+	}
+	
+</style>
+<div id="stopwatch" class="<%unless @task.nil?%>running<%end%>" style="position:absolute;top:0px;left:0px;width:100%">
+<div id="timer">
+	<span id="timer-display">00:00<small>.00</small></span>
+</div>
+</div>
+<div style="position:relative;top:34px;">
+	<%= render :partial => 'tasks/tasklist'%>
+<script type="text/javascript" charset="utf-8">
+function startup(){
+	$('.ui-resizable-handle').css('background-color','#ABABAB');
+	
+	<% Project.all.each do |project| %>
+	$('#taskList<%=project.id%>').sortable({
+		axis: "y",
+		stop: function(e,ui) {
+			$('#order').val( $('#taskList<%=project.id%>').sortable('serialize', {"key":''}));
+			$('#task_submit').show();
+			
+		}
+	});
+	<% end if false %>
+	$('#task_submit').hide();
 
-<p>
-  <b>Login:</b>
-  <%=h @user.login %>
-</p>
+  $('a.stopped').hover(function() {
+    	$('img.stopped',this).addClass('stopped-hover');
+  	}, function() {
+    $('img.stopped',this).removeClass('stopped-hover');
+  });
+  $('a.started').hover(function() {
+    	$('img.stopped',this).addClass('started-hover');
+  	}, function() {
+    $('img.stopped',this).removeClass('started-hover');
+  });
 
-<p>
-  <b>Efficiency:</b>
-  <%=h @user.efficiency %>
-</p>
+}
 
 
-<%= link_to 'Edit', edit_user_path(@user) %> |
-<%= link_to 'Back', users_path %>
+function leadingZero(x){
+	y=(x>9)?x:'0'+x;
+	return y;
+}
+
+var last_updated =Number();
+
+function tick() {
+		  progress = Math.floor((Date.now() - last_updated) / 1000);
+			hours = Math.floor(progress / (60*60));
+			minutes = Math.floor((progress / 60) % (60*60));
+			seconds = progress % 60;
+			$("#timer-display").html(leadingZero(hours) + ":" + leadingZero(minutes) + '<small>.'+leadingZero(seconds)+'</small>');
+			<% unless @task.nil? %>
+			document.title = "<%=@task.title%> (" + leadingZero(hours) + ":" + leadingZero(minutes) + ")";
+			<% end %>
+   }
+function createTimer()
+{
+	$('#timer').show();
+	setInterval("tick()",1000);
+}
+<% unless current_user.active_interval.nil? %>
+last_updated = <%=current_user.active_interval.start.to_f.to_i * 1000%>;
+createTimer();
+<% end %>
+			document.title = 'Timer';
+</script>
+<% content_for :save_module do %>
+	<% remote_form_for :task, :url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')" do |f|%>
+	<%= hidden_field_tag :order%>
+	<%= f.submit %>
+	<% end %>
+<% end %>
+</div>

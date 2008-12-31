@@ -80,7 +80,7 @@ class ProjectsController < ApplicationController
   # DELETE /projects/1.xml
   def destroy
     @project = Project.find(params[:id])
-    @project.destroy
+    @project.destroy if @project.leaf?
 
     respond_to do |format|
       format.html { redirect_to(projects_url) }

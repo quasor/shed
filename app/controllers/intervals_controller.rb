@@ -2,7 +2,7 @@ class IntervalsController < ApplicationController
   # GET /intervals
   # GET /intervals.xml
   def index
-    @intervals = Interval.find(:all)
+    @intervals = current_user.intervals.reverse
 
     respond_to do |format|
       format.html # index.html.erb
@@ -65,7 +65,7 @@ class IntervalsController < ApplicationController
     respond_to do |format|
       if @interval.update_attributes(params[:interval])
         flash[:notice] = 'Interval was successfully updated.'
-        format.html { redirect_to(@interval) }
+        format.html { redirect_to(intervals_path) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }

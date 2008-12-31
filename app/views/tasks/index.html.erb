@@ -1,29 +1,9 @@
 <% unless @tasks.empty? %>
-<div id="leftcol" class="resizeable">
-		<table class="st" id="schedule">
-		<thead>
-			<tr class="srow">
-				<td>Title</td>
-			</tr>
-	  </thead>
-		<% @tasks.each do |task| %>
-	  <tr class="srow">
-			<td style="overflow:hidden"><nobr><% (task.level * 4).times do -%>&nbsp;<%end%><span <%if task.completed?%>style="text-decoration:line-through"<%end%>>
-					<%#=link_to_remote task.title, :update => "progress_dialog", :complete => "$('interval_hours').focus();", :url => new_interval_path(:task_id => task.id), :html => {:class => :hideul} %> 
-					<% if task.type.nil? %>
-						<%=link_to task.title, new_interval_path(:task_id => task.id), :html => {:class => :hideul} %> 
-					<% else %>
-						<%=link_to task.title, edit_task_path(task), :html => {:class => :hideul} %> 
-					<% end %>
-					<% if task.type == "Release"%><%=  link_to 'New Project', new_project_path(:parent_id => task.id) %>
-					<% elsif task.type == "Project"%><%=  link_to '+ New Task', new_task_path(:parent_id => task.id), :class => 'button_link' %>
-					<%= link_to "++ Bulk", {:controller => 'tasks', :action => 'bulknew', :project_id => task.id}, {:class => 'button_link'}%>
-					<% end %>
-					</nobr>
-				</td>
-		  </tr>
-		<% end %>
-		</table>
+<div id="leftcol" class="resizeable" onscroll="scrollDiv('rightcol','leftcol')">
+		<div class="st">
+			<div style="height:20px;border-top:1px solid white">Title</div>
+			<%= render :partial => 'tasklist'%>
+		</div>
 
 </div>
 <div id="rightcol" onscroll="scrollDiv('leftcol','rightcol')">
@@ -113,13 +93,32 @@ function startup()
 	$('#leftcol').resizable({ 
 	    handles: "e",
 	    stop: function(e, ui) { 
-//				$('#rightcol').width( );
 				$('#rightcol').animate({
 					left: $('#leftcol').width(),
 					width: $(window).width() - $('#leftcol').width(),
-					}, 1);
+					}, 500);
 	    }, 
 	});	
+
+	$('.ui-resizable-handle').css('background-color','#ABABAB');
+	<% Project.all.each do |project| %>
+	$('#taskList<%=project.id%>').sortable({
+		axis: "y",
+		stop: function(e,ui) {
+			$('#order').val( $('#taskList<%=project.id%>').sortable('serialize', {"key":''}));
+			$('#task_submit').show();
+			
+		}
+	});
+	<% end %>
+	$('#task_submit').hide();
+
+     $('a.stopped').hover(function() {
+       $('img.stopped',this).addClass('stopped-hover');
+     }, function() {
+       $('img.stopped',this).removeClass('stopped-hover');
+     });
+  
 }
 
 function scrollDiv(lckDiv, scrDiv)
@@ -129,102 +128,22 @@ function scrollDiv(lckDiv, scrDiv)
 
 }
 
-window.size = function()
-{
-	var w = 0;
-	var h = 0;
-
-	//IE
-	if(!window.innerWidth)
-	{
-		//strict mode
-		if(!(document.documentElement.clientWidth == 0))
-		{
-			w = document.documentElement.clientWidth;
-			h = document.documentElement.clientHeight;
-		}
-		//quirks mode
-		else
-		{
-			w = document.body.clientWidth;
-			h = document.body.clientHeight;
-		}
-	}
-	//w3c
-	else
-	{
-		w = window.innerWidth;
-		h = window.innerHeight;
-	}
-	return {width:w,height:h};
-}
-
 function Resize()
 {
-	$('#rightcol').css('height',window.size().height - 36);
-	$('#leftcol').css('height',window.size().height - 36 - 16);
-	$('#rightcol').css('width',window.size().width - 303);
-	
-//	$('a-col').style.height = window.size().height - 20 + "px";
-//	$('map_canvas').style.width = window.size().width - 255 + "px";
-	}
+	$('#rightcol').css('height',$(window).height() - 36);
+	$('#leftcol').css('height',$(window).height() - 36 - 16);
+	$('#rightcol').css('width',$(window).width() - 303);	
+}
 if (window.attachEvent) {
     window.attachEvent("onresize", function() {setTimeout("Resize()",50);} );
 } else {
     window.addEventListener("resize", function() {setTimeout("Resize()",50);}, false);
 }	
 </script>
+<% content_for :save_module do %>
+	<% remote_form_for :task, :url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')" do |f|%>
+	<%= hidden_field_tag :order%>
+	<%= f.submit %>
+	<% end %>
 <% end %>
-<% unless @want_table.nil?%>
-<script type="text/javascript" charset="utf-8">
-//{key:"account",label:"Account Number", sortable:true, resizeable:true, width:20},
-//{key:"quantity",label:"Quantity",formatter:YAHOO.widget.DataTable.formatNumber,sortable:true},
-//{key:"amount",label:"Amount Due",formatter:YAHOO.widget.DataTable.formatCurrency,sortable:true}
-
-YAHOO.util.Event.addListener(window, "load", function() {
-    YAHOO.example.EnhanceFromMarkup = new function() {
-        var myColumnDefs = [
-					{key:"title",label:"Title", sortable:false, resizeable:true, width:300},
-					{key:"section",label:"Section", sortable:false, width:150},
-					{key:"low",label:"Low", sortable:false},
-					{key:"high",label:"High", sortable:false},
-					{key:"estimate",label:"Estimate", sortable:false},
-					{key:"sim",label:"Sim", sortable:false},
-					{key:"user",label:"User", sortable:false, width:100},
-					{key:"start",label:"Start", sortable:false,formatter:YAHOO.widget.DataTable.formatDate},
-					{key:"end",label:"End", sortable:false,formatter:YAHOO.widget.DataTable.formatDate},
-					{key: "gantt", label:""},
-					
-        ];
-
-        this.parseNumberFromCurrency = function(sString) {
-            // Remove dollar sign and make it a float
-            return parseFloat(sString.substring(1));
-        };
-// {key:"title", parser:"date"}
-        this.myDataSource = new YAHOO.util.DataSource(YAHOO.util.Dom.get("schedule"));
-        this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_HTMLTABLE;
-        this.myDataSource.responseSchema = {
-            fields: [
-							{key:"title"}, 
-							{key:"section"},
-							{key:"low"}, 
-							{key:"high"}, 
-							{key:"estimate"}, 
-							{key:"sim"}, 
-							{key:"user"}, 
-							{key:"start", parser:"date"}, 
-							{key:"end", parser:"date"}, 
-							{key: "gantt"}
-            ]
-        };
-
-        this.myDataTable = new YAHOO.widget.DataTable("markup", myColumnDefs, this.myDataSource,
-                {caption:"Solidschedule"}
-        );
-    };
-});
-
-</script>
 <% end %>
-

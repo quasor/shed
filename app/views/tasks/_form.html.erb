@@ -1,12 +1,15 @@
 <h1>
 	<%= f.text_field :title, :class => :big%>
 </h1>
-<p>
-  <%= f.label :owner %><br />
-	<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
-</p>
 <div style="float:left">
 <% if @task.type.nil?%>
+
+<p>
+  <%= f.label :estimate %><span></span><br />
+  <%= f.text_field :low %>
+</p>
+
+<% unless @task.new_record?%>
 <p>
   <%= f.label :low %><br />
   <%= f.text_field :low %>
@@ -15,9 +18,14 @@
   <%= f.label :high %><br />
   <%= f.text_field :high %>
 </p>
+<% end %>
 <p>
   <%= f.check_box :completed %>
   <%= f.label :completed %> 
+</p>
+<p>
+  <%= f.label :owner %><br />
+	<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
 </p>
 <% else %>
 <p>
@@ -39,7 +47,7 @@
 </div>
 <div style="float:left; padding-left:20px">
 <p>
-  <%= f.label :description %><br />
+  <%= f.label :description %> <span class="help">(optional)</span><br />
   <%= f.text_area :description, :rows => 7 %>
 </p>
 </div>
