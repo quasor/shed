@@ -26,4 +26,4 @@ config.action_view.cache_template_loading            = true
 
 config.action_controller.session_store = :mem_cache_store
 config.action_controller.cache_store = :mem_cache_store
-config.cache_store = :mem_cache_store, 'localhost:11211'#, :namespace => 'schedule'
+#config.cache_store = :mem_cache_store, 'localhost:11211'#, :namespace => 'schedule'
