@@ -27,4 +27,4 @@ production:
     database: schedule_production
     username: andrew
     password: andrew
-    host: 127.0.0.1
+    host: bigmac.local

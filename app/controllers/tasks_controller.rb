@@ -3,7 +3,7 @@ class TasksController < ApplicationController
   # GET /tasks.xml
   before_filter :login_required
   def index
-    @day_in_pixels = 10
+    @day_in_pixels = 16
     @tasks = []
     
     unless params[:filter].blank?
@@ -148,7 +148,7 @@ class TasksController < ApplicationController
   # DELETE /tasks/1
   # DELETE /tasks/1.xml
   def destroy
-    @task = current_user.tasks.find(params[:id])
+    @task = (admin? ? Task : current_user.tasks).find(params[:id])
     @task.destroy
 
     respond_to do |format|
@@ -236,13 +236,13 @@ class TasksController < ApplicationController
       
     end
     def rebuild_schedule(force = false)
-       @root = Task.root # replace this later with a local root
+        @root = Task.root # replace this later with a local root
 
         @total_calendar_days = 0
 
         unless @root.nil?
           suffix = force ? rand(20).to_s : ""
-          @tasks = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Task.count}-#{Task.last.id}#{Date.today}"+suffix) do
+          Rails.cache.fetch("tasks__#{@root.cache_key}-#{Task.count}-#{Task.last.id}#{Date.today}"+suffix) do
             user_end_dates = {}
             tasks = []
             @tasks_raw = Task.root.all_children
@@ -259,14 +259,15 @@ class TasksController < ApplicationController
 
               tasks.push task if params[:u].blank? || task.user.id == params[:u].to_i
             end
-            tasks
           end
+          
+          # done with the rebuild...
           
           @tasks = Task.root.all_children
           unless @tasks.empty?
             end_dates = @tasks.collect(&:end) 
             unless end_dates.compact.empty?
-              @total_calendar_days = end_dates.compact.max - Date.today 
+              @total_calendar_days = [end_dates.compact.max - Date.today,28].max 
 
               Rails.cache.fetch("run_sim_#{@root.cache_key}#{Date.today}") do 
                 run_simulation

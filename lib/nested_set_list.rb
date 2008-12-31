@@ -1,4 +1,7 @@
 module NestedSetList
+  def first_item?
+    parent.nil? or parent.lft==self.lft-1
+  end
   def first?
     parent.nil? or parent.lft==self.lft-1
   end

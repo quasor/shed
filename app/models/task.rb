@@ -1,6 +1,8 @@
+require 'nested_set_list'
 class Task < ActiveRecord::Base
   acts_as_nested_set
   acts_as_taggable_on :tags
+  include NestedSetList
 
   belongs_to :user
   has_many :intervals, :dependent => :destroy
@@ -10,7 +12,6 @@ class Task < ActiveRecord::Base
   validates_presence_of :title
   #validates_presence_of :user
   
-  include NestedSetList
   DEFAULT_VELOCITIIES = [0.72, 0.75, 0.81, 0.88, 1.8, 0.92, 0.94, 1.01, 1.21, 0.68]
   def estimate
     if !low.blank? and !high.blank?
