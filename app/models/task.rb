@@ -3,8 +3,8 @@ class Task < ActiveRecord::Base
   acts_as_taggable_on :tags
 
   belongs_to :user
-  has_many :intervals
-  has_many :projections
+  has_many :intervals, :dependent => :destroy
+  has_many :projections, :dependent => :destroy
   before_save {|r| r.low = 0 if r.low.blank?}
   #validates_presence_of :low
   validates_presence_of :title

@@ -25,7 +25,6 @@ class IntervalsController < ApplicationController
   # GET /intervals/new.xml
   def new
     @interval = Interval.new
-    @task = Task.find params[:task_id]
     @interval.task = @task
     respond_to do |format|
       format.html # new.html.erb

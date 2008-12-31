@@ -83,7 +83,11 @@ class TasksController < ApplicationController
 
   # GET /tasks/1/edit
   def edit
-    @task = Task.find(params[:id])
+    if admin?
+      @task = Task.find(params[:id]) 
+    else
+      @task = Task.find(params[:id]) 
+    end
   end
 
   # POST /tasks
@@ -144,7 +148,7 @@ class TasksController < ApplicationController
   # DELETE /tasks/1
   # DELETE /tasks/1.xml
   def destroy
-    @task = Task.find(params[:id])
+    @task = current_user.tasks.find(params[:id])
     @task.destroy
 
     respond_to do |format|
@@ -188,40 +192,7 @@ class TasksController < ApplicationController
     redirect_to root_path
   end 
 
-  # meuselect is the id of currently selected menu
-    def showmenu(menuselect)
-      if menuselect
-        @menuselect = Task.find(menuselect.to_i)
-        selectpath = @menuselect.self_and_ancestors
-      else
-        @menuselect = nil
-        selectpath = []
-      end
-      parents = (selectpath.map{|m| m.parent}+[@menuselect]).uniq-[nil]
-      parents_sql_filter = parents.empty? ? '' : " OR parent_id IN (#{parents.map{|p| p.id}.join(',')})"
 
-      # retrieve only the menus that need to be open
-      allmenus = Task.find(:all, :conditions => "(parent_id IS NULL #{parents_sql_filter})", :order => 'lft')
-      # mark where to open and close html lists
-      @menus = []
-      allmenus.each_index { |i|
-          @menus[i] = {:indent => allmenus[i].level, 
-                       :title  => allmenus[i].title,
-                       :children_count => allmenus[i].all_children_count,
-                       :id => allmenus[i].id,
-                       }
-          @menus[i][:selected] =  allmenus[i] == @menuselect
-      }
-        allmenus[1..-1].each_index { |i|
-          @menus[i][:open] = @menus[i][:indent] > @menus[i-1][:indent]
-          @menus[i][:close] = [0, @menus[i][:indent] - @menus[i+1][:indent]].max
-        }
-      @menus.first[:open] = true 
-      @menus.last[:open] = false
-      @menus.first[:close] = 0
-      @menus.last[:close] = 1
-
-    end
     private
     
     def run_simulation
