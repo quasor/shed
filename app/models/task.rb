@@ -26,7 +26,7 @@ class Task < ActiveRecord::Base
     velocities ||= DEFAULT_VELOCITIIES 
     velocity = velocities[rand(velocities.size)]
     e = estimate / velocity
-    puts "Choosing estimate #{estimate }/ velocity #{velocity} = #{e}"
+    #puts "Choosing estimate #{estimate }/ velocity #{velocity} = #{e}"
     e
   end
   def deleteable?

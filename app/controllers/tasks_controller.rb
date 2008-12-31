@@ -51,7 +51,7 @@ class TasksController < ApplicationController
     unless @order.empty?
       @order.each do |id|
         task = Task.find id
-        task.move_to_bottom
+        task.move_to_bottom if task.type.nil?
       end
     end
     Task.roots.each do |t|
@@ -225,6 +225,7 @@ class TasksController < ApplicationController
     private
     
     def run_simulation
+      logger.warn 'running simulation...'
       durations = []
       #Projection.destroy_all
       projection_collection = {}
@@ -253,24 +254,23 @@ class TasksController < ApplicationController
           projection_collection[project.id].push max_end_date
         end
 
-        durations.push (user_end_dates.values.max - Date.today)
+        durations.push(user_end_dates.values.max - Date.today)
 
       end
       projection_collection.each_pair do |k,v|
         v.compact!
         v.sort! 
-        logger.info "!!!!!#{v.size} dates #{v.join "\n"}"
         Projection.create(:task_id => k, :start => v[10], :end => v[95])
       end
       
     end
-    def rebuild_schedule(force = false, root = Task.root)
-       @root = root # replace this later with a local root
+    def rebuild_schedule(force = false)
+       @root = Task.root # replace this later with a local root
 
         @total_calendar_days = 0
 
         unless @root.nil?
-          suffix = force ? Time.now.to_s : ""
+          suffix = force ? rand(20).to_s : ""
           @tasks = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Task.count}-#{Task.last.id}#{Date.today}"+suffix) do
             user_end_dates = {}
             tasks = []

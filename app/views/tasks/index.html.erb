@@ -54,6 +54,7 @@
 						<% end %>
 					</td>
 			    <td><%= link_to 'E', edit_task_path(task) %></td>
+					<td><%= link_to 'X', task, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n", :method => :delete%></td>
 				<%else %>
 				<td colspan="7">
 					Due <%= task.due %>  
