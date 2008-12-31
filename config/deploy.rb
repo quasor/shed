@@ -1,4 +1,3 @@
-require 'mongrel_cluster/recipes'
 set :application, "schedule.ectdev.com"
 set :repository, "git@github.com:quasor/shed.git"
 set :scm, :git
