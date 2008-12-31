@@ -83,10 +83,12 @@ function tick() {
 //			console.log(d);
 		  progress = Math.floor((d - last_updated) / 1000);
 //			console.log(progress);
-			hours = Math.floor(progress / (60*60));
-			minutes = Math.floor((progress / 60) % (60*60));
+			days = Math.floor(progress / (60*60*24));
+			hours = Math.floor(progress / (60*60) % 24);
+			minutes = Math.floor((progress / 60) % (60));
 			seconds = progress % 60;
-			$("#timer-display").html(leadingZero(hours) + ":" + leadingZero(minutes) + '<small>.'+leadingZero(seconds)+'</small>');
+			dstr = days > 0 ? (days + "d "): ""
+			$("#timer-display").html(dstr + leadingZero(hours) + ":" + leadingZero(minutes) + '<small>.'+leadingZero(seconds)+'</small>');
 			<% unless @task.nil? %>
 			document.title = "<%=@task.title%> (" + leadingZero(hours) + ":" + leadingZero(minutes) + ")";
 			<% end %>

@@ -31,8 +31,8 @@
 					<% if task.type == "Release"%>
 						<%=  link_to 'New Project', new_project_path(:parent_id => task.id),:class => 'button_link' %>
 					<% elsif task.type == "Project"%>
-						<%=  link_to '+', new_task_path(:parent_id => task.id), :class => 'button_link' %>
-						<%= link_to "++", {:controller => 'tasks', :action => 'bulknew', :project_id => task.id}, {:class => 'button_link'}%>
+						<%=  link_to '+', new_task_path(:parent_id => task.id), :class => 'button_link', :title => 'New Task' %>
+						<%= link_to "++", {:controller => 'tasks', :action => 'bulknew', :project_id => task.id}, {:class => 'button_link', :title => 'Bulk Add Multiple Tasks'}%>
 					<% end %>
 				<% end %>
 			</li>
