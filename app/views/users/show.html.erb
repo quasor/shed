@@ -20,7 +20,8 @@
 </div>
 </div>
 <div style="position:relative;top:34px;">
-	<%= render :partial => 'tasks/tasklist'%>
+	<%= render :partial => 'tasks/tasklist', :locals => { :skip_completed => false}%>
+	<%= render :partial => 'tasks/tasklist', :locals => { :skip_completed => true }%>
 <script type="text/javascript" charset="utf-8">
 function startup(){
 	$('.ui-resizable-handle').css('background-color','#ABABAB');

@@ -70,8 +70,8 @@ ul {padding:0px;margin:0px;cursor:move;}
 .lirow:hover {cursor:move}
 .lirow a {display:block;}
 .lirow a.button_link {display:inline;}
-.stopped:hover {background-color:#E3FCD0;color:#000;}
-.started {background-color:#E3FCD0;}
+.stopped:hover {background-color:#CCFFBF;color:#000;}
+.started {background-color:#EFC492;}
 .started:hover {background-color:#F78989;color:#000;}
 /*.stopped a {color:#4A851E;}*/
 

@@ -2,7 +2,7 @@
 <div id="leftcol" class="resizeable" onscroll="scrollDiv('rightcol','leftcol')">
 		<div class="st">
 			<div style="height:20px;border-top:1px solid white">Title</div>
-			<%= render :partial => 'tasklist'%>
+			<%= render :partial => 'tasklist', :locals => {:skip_completed => nil}%>
 		</div>
 
 </div>
