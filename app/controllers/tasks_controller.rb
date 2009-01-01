@@ -47,20 +47,33 @@ class TasksController < ApplicationController
   end
 
   def reorder
+    
     @order = params[:order].scan(/\d+/)
-    unless @order.empty?
-      @order.each do |id|
-        task = Task.find id
-        task.move_to_bottom if task.type.nil?
+    @tasks = Task.find @order
+    
+    unless @tasks.empty? || @tasks.size < 2
+      logger.info @order.collect { |i| Task.find(i).title }.join ','
+      @order.delete_if { |i| !Task.find(i).type.nil? }
+      @order.each_with_index do |o,i|
+        task = Task.find o
+        unless i == 0
+          puts "moving #{@order[i]} to right of #{@order[i-1]}"
+          preceeding_task = Task.find @order[i-1]
+          task.move_to_right_of preceeding_task if task.type.nil?
+        else 
+          puts "move to top"
+          #task.move_to_top if task.type.nil?
+        end
       end
-    end
-    Task.roots.each do |t|
-      t.updated_at = Time.now
-      t.save
-    end
+
+      Task.roots.each do |t|
+        t.updated_at = Time.now
+        t.save
+      end
     
-    rebuild_schedule
-    
+      rebuild_schedule
+    end
+        
     render :update do |page|
       page.replace_html 'flash', :partial => 'refresh'
     end

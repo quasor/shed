@@ -36,8 +36,6 @@ class ApplicationController < ActionController::Base
   end
 
   private
-	  USER_NAME = 'sandy'
-	  PASSWORD = 'mttpower'
 	def authenticate
 		session[:attempted_auth] = false
 		if current_user.nil? and session[:attempted_auth] == false

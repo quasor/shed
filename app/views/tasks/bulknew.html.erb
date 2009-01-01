@@ -1,3 +1,6 @@
+<style type="text/css" media="screen">
+	body {overflow:auto;}
+</style>
 <h1>Bulk Add Tasks</h1>
 <% form_for :bulk_tasks, :url => bulk_new_task_path do |f| %>
 <input type="hidden" id="project_id" name="project_id" value="<%= params[:project_id]%>">

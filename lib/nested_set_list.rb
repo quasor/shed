@@ -25,9 +25,9 @@ module NestedSetList
     move_to_right_of( lower_item ) if lower_item
   end
   def move_to_top
-    move_to_left_of( self_and_siblings.first )
+    move_to_left_of( self_and_siblings.first ) unless first?
   end
   def move_to_bottom
-    move_to_right_of( self_and_siblings.last )
+    move_to_right_of( self_and_siblings.last ) unless last?
   end
 end

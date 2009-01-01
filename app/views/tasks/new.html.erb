@@ -1,3 +1,6 @@
+<style type="text/css" media="screen">
+	body {overflow:auto;}
+</style>
 <% form_for(@task) do |f| %>
   <%= f.error_messages %>
 	<%= render :partial => 'form', :locals => {:f => f}%>
