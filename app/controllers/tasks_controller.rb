@@ -3,7 +3,7 @@ class TasksController < ApplicationController
   # GET /tasks.xml
   before_filter :login_required
   def index
-    @day_in_pixels = 16
+    @day_in_pixels = 32
     @tasks = []
     
     unless params[:filter].blank?

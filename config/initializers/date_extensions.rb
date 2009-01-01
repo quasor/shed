@@ -33,14 +33,15 @@ class Date
 #    results = dates.collect {|d| [d.wday == 0 || d.wday == 6 || holidays.include?(d), d]}
 #    results.find_all { |r| r[0] == false }[days.to_i][1] + days.modulo(1)
 #  end
-
+end
+class Date
   def work_day(days)
     if days.nil?
       return nil
     end
-    if days == 0 #|| (self.day_fraction + days < 1 && )
-      return self # => + days.modulo(1)
-    end
+    #if days == 0 #|| (self.day_fraction + days < 1 && )
+    #  return self # => + days.modulo(1)
+    #end
     
     d = self
     
@@ -50,16 +51,21 @@ class Date
     wdays = [0,6]
     
     d = d + days.modulo(1)
-    
+    holiday_count = 0
     while (true)
       # if we've found a work day and enough time has passed return it
       unless d.wday == 0 || d.wday == 6 || holidays.include?(d)
-        break if d - self >= days
+        # unless it's a holiday or a weekend test to see if we're done
+        if d - self - holiday_count >= days
+          break 
+        end
+      else
+        holiday_count = holiday_count + 1
       end
       d = d + 1
     end
-    if d.wday == 1 and self.day_fraction == 0 and (d - 3 > self)
-      d - 3 #back track the weekend
+    if d.wday == 1 and self.day_fraction == 0 and (d - 2 > self)
+      d - 2 #back track the weekend
     else
       d
     end

@@ -34,8 +34,11 @@
 				<% if current_user.login == 'sanuras' %>
 					Rarrr! Love you!<%= image_tag "Dino_orange_36x36.png", :align => "absmiddle"%>
 				<% else %>
-					<%=@quote_of_the_day%><%= image_tag "Dino_green_36.png", :align => "absmiddle"%>
+					<%=@quote_of_the_day%><%= image_tag "Dino_green_36.png", :align => "absmiddle", :onmouseover => "$('#bigguy').show();", :onmouseout => "$('#bigguy').hide();" %>
 				<% end %>
+			</span>
+			<span id="bigguy" style="display:none;float:right;z-index:2000;position:absolute;right:128px;top:32px">
+				<%= image_tag "Dino_green_512x512.png", :align => "absmiddle" %>				
 			</span>
 			<span style="float:right;text-align:right;padding-right:8px;">
 			<%= "Welcome #{session[:username]}" unless session[:username].blank?%>
