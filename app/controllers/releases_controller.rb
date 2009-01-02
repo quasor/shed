@@ -40,6 +40,7 @@ class ReleasesController < ApplicationController
   # POST /releases
   # POST /releases.xml
   def create
+    Task.create(:title => 'ECT') if Task.root.nil?
     @release = Release.new(params[:release])
     
     respond_to do |format|

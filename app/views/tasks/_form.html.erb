@@ -5,24 +5,17 @@
 <% if @task.type.nil?%>
 
 <p>
-  <%= f.label :estimate %><span></span><br />
-  <%= f.text_field :low %>
+  <%= f.label :estimate %> <br />
+  <%= f.text_field :estimate, :class => :big %><br/>
+<span class="help" style="font-size:12px">e.g. &nbsp; 0.5h,&nbsp; 1-2 hours,&nbsp; 5h - 1d,&nbsp; 2days</span>
 </p>
 
 <% unless @task.new_record?%>
 <p>
-  <%= f.label :low %><br />
-  <%= f.text_field :low %>
-</p>
-<p>
-  <%= f.label :high %><br />
-  <%= f.text_field :high %>
-</p>
-<% end %>
-<p>
   <%= f.check_box :completed %>
   <%= f.label :completed %> 
 </p>
+<% end %>
 <p>
   <%= f.label :owner %><br />
 	<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>

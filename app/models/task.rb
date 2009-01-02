@@ -7,26 +7,58 @@ class Task < ActiveRecord::Base
   belongs_to :user
   has_many :intervals, :dependent => :destroy
   has_many :projections, :dependent => :destroy
-  before_save {|r| r.low = 0 if r.low.blank?}
   #validates_presence_of :low
   validates_presence_of :title
   #validates_presence_of :user
   
   DEFAULT_VELOCITIIES = [0.72, 0.75, 0.81, 0.88, 1.8, 0.92, 0.94, 1.01, 1.21, 0.68]
-  def estimate
+  def estimate_days
     if !low.blank? and !high.blank?
       ((low + 4*(low + ((high-low) * 0.66 )) + high)/6.0).round(2)
     elsif !low.blank?
-      low.to_f
+     low.to_f
     elsif low.blank? && high.blank?
-      0
+      0.0
+    end
+  end
+
+  WORKING_HOURS_PER_DAY = 8
+  
+  def string_to_days(string)
+    unless string.nil?
+        # look for h in e.g. 1-2h or 1h-2 = 1h-2h
+        # 1-2 = 1d - 2d
+        default_unit = self.estimate.scan("h").empty? ? 1 : WORKING_HOURS_PER_DAY
+        days = 0.0
+        string.downcase.scan(/(\d*\.*\d)\s?([h|d]?)/).each do |part|
+        n_unit = case part[1]
+          when "h" : WORKING_HOURS_PER_DAY
+          when "d" : 1
+          else default_unit
+        end
+        days = days + (part[0].to_f / n_unit)
+      end 
+      days
+    end
+  end
+
+  def low
+    unless self.estimate.nil?
+      l,h = self.estimate.split "-" 
+      string_to_days(l)
+    end
+  end
+  def high
+    unless self.estimate.nil?
+      l,h = self.estimate.split "-"
+      string_to_days(h)      
     end
   end
 
   def monte_estimate()
     velocities ||= DEFAULT_VELOCITIIES 
     velocity = velocities[rand(velocities.size)]
-    e = estimate / velocity
+    e = estimate_days / velocity
     #puts "Choosing estimate #{estimate }/ velocity #{velocity} = #{e}"
     e
   end
@@ -68,9 +100,23 @@ class Task < ActiveRecord::Base
   end
   
   def status
-    s = []
-    s.push "completed" if self.completed?
-    s.join ' '
+    "completed" if self.completed?
+  end
+    
+  def formatted_estimate_part(part)
+    days = "#{part.div(1)}d"
+    hours = part.modulo(1) > 0 ? " #{part.modulo(1)*8}h" : ""
+    (days + " " + hours).strip
+  end
+
+  def formatted_estimate
+    low_str = formatted_estimate_part(self.low)
+    high_str = formatted_estimate_part(self.high)
+    unless high_str.blank?
+      low_str + " - " + high_str
+    else
+      low_str
+    end
   end
   
 end

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20081230074656) do
+ActiveRecord::Schema.define(:version => 20090102043509) do
 
   create_table "holidays", :force => true do |t|
     t.date     "holiday"
@@ -31,9 +31,11 @@ ActiveRecord::Schema.define(:version => 20081230074656) do
     t.integer  "task_id"
     t.date     "start"
     t.date     "end"
-    t.integer  "confidence", :limit => 10, :precision => 10, :scale => 0
+    t.float    "confidence",    :default => 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "user_id"
+    t.integer  "simulation_id"
   end
 
   create_table "taggings", :force => true do |t|
@@ -57,8 +59,8 @@ ActiveRecord::Schema.define(:version => 20081230074656) do
     t.string   "title"
     t.string   "type"
     t.text     "description"
-    t.integer  "low",             :limit => 10, :precision => 10, :scale => 0
-    t.integer  "high",            :limit => 10, :precision => 10, :scale => 0
+    t.float    "low_estimate_cache"
+    t.float    "high_estimate_cache"
     t.boolean  "completed"
     t.integer  "user_id"
     t.date     "start"
@@ -70,12 +72,13 @@ ActiveRecord::Schema.define(:version => 20081230074656) do
     t.string   "cached_tag_list"
     t.date     "due"
     t.date     "end"
+    t.string   "estimate"
   end
 
   create_table "users", :force => true do |t|
     t.string   "name"
     t.string   "login"
-    t.integer  "efficiency", :limit => 10, :precision => 10, :scale => 0
+    t.float    "efficiency", :default => 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

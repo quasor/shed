@@ -1,9 +1,10 @@
 <% @tasks.each do |task| %>
 	<% if (skip_completed.nil? || skip_completed == task.completed?) || !task.type.nil?%>
+		
 		<% if task.type == "Project" %>
-			<%unless task.first_item?%></ul><%end%>
+			<%if !task.first_item?%></ul><%end%>
 		<% end %>
-		<li id="task_<%=task.id%>" class="lirow <%=task.status%> <%=task.type%><%=" mine" if task.user_id == current_user%>">
+		<li id="task_<%=task.read_attribute('id')%>" class="lirow <%=task.status%> <%=task.type%><%=" mine" if task.user_id == current_user%>">
 				<%#=link_to_remote task.title, :update => "progress_dialog", :complete => "$('interval_hours').focus();", :url => new_interval_path(:task_id => task.id), :html => {:class => :hideul} %> 
 				<% if task.type.nil? %>
 						<% if task.user_id == current_user.id && !@timer.nil?%>
