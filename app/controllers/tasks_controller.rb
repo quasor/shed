@@ -176,6 +176,7 @@ class TasksController < ApplicationController
   def destroy
     @task = (admin? ? Task : current_user.tasks).find(params[:id])
     @task.destroy
+    Rails.cache.increment "dirty"
 
     respond_to do |format|
       format.html { redirect_to(tasks_url) }
