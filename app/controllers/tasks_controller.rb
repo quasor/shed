@@ -291,7 +291,7 @@ class TasksController < ApplicationController
         @dirty = Rails.cache.fetch("dirty") { 1 }
         unless @root.nil?
           suffix = force ? rand(20).to_s : ""
-          t = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Task.count}-#{Task.last.id}#{@dirty}"+suffix) do #
+          t = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Date.today}#{@dirty}"+suffix) do #
             user_end_dates = {}
             tasks = []
             @tasks_raw = Task.root.all_children
