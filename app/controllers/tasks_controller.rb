@@ -3,7 +3,7 @@ class TasksController < ApplicationController
   # GET /tasks.xml
   before_filter :login_required
   def index
-    @day_in_pixels = 32
+    @day_in_pixels = 16
     @tasks = []
     
     unless params[:filter].blank?
@@ -13,6 +13,10 @@ class TasksController < ApplicationController
     end
    
    @tasks = rebuild_schedule(params[:force] == "true") 
+   
+   @holidays = Rails.cache.fetch("Holiday.all.holiday") do
+     Holiday.find(:all, :select => :holiday).collect(&:holiday)
+   end
    
    unless params[:u].blank?
      user_id = params[:u].to_i
@@ -199,7 +203,9 @@ class TasksController < ApplicationController
         unless @project.nil? || @low.blank?
           @user = User.find_by_name(r[0].strip) || User.find_by_login(r[0].strip)
           @user_id = @user.id unless @user.nil?
-          @task = Task.new(:title => r[2].strip, :estimate => r[3] +  ' - ' + r[4], :user_id => @user_id)
+          e = r[3]
+          e = r[3] +  ' - ' + r[4] unless r[4].nil?
+          @task = Task.new(:title => r[2].strip, :estimate => e, :user_id => @user_id)
           @task.tag_list = r[1] unless r[1].blank?
           @task.save! 
           @task.move_to_child_of(@project)
@@ -258,7 +264,7 @@ class TasksController < ApplicationController
           @project_user_date_collection[project.id][user_id].push max_end_date
         end
       end
-
+      
       durations.push(user_end_dates.values.max - Date.today)
 
     end
@@ -277,7 +283,14 @@ class TasksController < ApplicationController
       end
     end
 
-    @user_ids = user_ids
+    Release.all.each do |release|
+      projections = release.children.collect {|project| project.projections.rollup.last }
+      unless projections.empty?
+        s = projections.collect(&:start).max
+        e = projections.collect(&:end).max
+        Projection.create(:task_id => release.id, :start => s, :end => e)      
+      end
+    end
 
     #render :inline => "<%= debug @project_date_collection%><%= debug @project_user_date_collection[112][1] %><%= debug @user_ids%>"
     
@@ -316,7 +329,7 @@ class TasksController < ApplicationController
           unless alltasks.empty?
             end_dates = alltasks.collect(&:end) 
             unless end_dates.compact.empty?
-              @total_calendar_days = [end_dates.compact.max - Date.today,14].max + 14
+              @total_calendar_days = [end_dates.compact.max - Date.today,14].max + 60
             end
             Rails.cache.fetch("run_sim_#{Date.today}#{@dirty}") do 
               run_simulation

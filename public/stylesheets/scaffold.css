@@ -80,6 +80,10 @@ ul {padding:0px;margin:0px;cursor:move;}
 div.t_title { width:298px;overflow:hidden;}
 .st td {padding-left:3px;padding-right:3px;line-height:1.5em;}
 .ganttbar {height:1em; background-color: #74A5FF;position:absolute;margin-top:0.25em;border:0px solid black;}
+.ganttbar_p {height:1em; background-color: #B2F980;position:absolute;margin-top:0.25em;}
+.ganttbar_s {height:1em; background-color: #647c47;position:absolute;margin-top:0.25em;}
+.ganttbar_warn {height:1em; background-color: #E57878;position:absolute;margin-top:0.25em;}
+
 table td {text-align:left;}
 .hideul {text-decoration:none;}
 h1 { padding-top:1em;}

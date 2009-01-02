@@ -1,6 +1,8 @@
 class ReleasesController < ApplicationController
   # GET /releases
   # GET /releases.xml
+  before_filter :login_required
+  before_filter :authorized
   def index
     @releases = Release.find(:all)
 
@@ -13,12 +15,7 @@ class ReleasesController < ApplicationController
   # GET /releases/1
   # GET /releases/1.xml
   def show
-    @release = Release.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @release }
-    end
+    redirect_to releases_path
   end
 
   # GET /releases/new
@@ -59,7 +56,7 @@ class ReleasesController < ApplicationController
 
   # PUT /releases/1
   # PUT /releases/1.xml
-  def update
+  def update    
     @release = Release.find(params[:id])
 
     respond_to do |format|
@@ -77,7 +74,7 @@ class ReleasesController < ApplicationController
   # DELETE /releases/1
   # DELETE /releases/1.xml
   def destroy
-    @release = Release.find(params[:id])
+    @release = Releases.find(params[:id])
     @release.destroy
 
     respond_to do |format|

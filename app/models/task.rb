@@ -54,6 +54,17 @@ class Task < ActiveRecord::Base
       string_to_days(h)      
     end
   end
+  
+  def due_date
+    d = nil
+    n = self
+    while (!n.nil?)
+      d = n.due
+      break unless d.nil?
+      n = self.parent
+    end
+    d
+  end
 
   def monte_estimate()
     velocities ||= DEFAULT_VELOCITIIES 

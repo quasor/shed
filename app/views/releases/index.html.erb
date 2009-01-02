@@ -8,7 +8,7 @@
   <tr>
 		<td><%= release.title %></td>
     <td><%= link_to 'Edit', edit_release_path(release) %></td>
-    <td><%= link_to 'Destroy', release, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= link_to 'Destroy', release, :confirm => 'Are you sure?', :method => :delete if release.leaf?%></td>
   </tr>
 <% end %>
 </table>

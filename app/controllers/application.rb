@@ -14,7 +14,9 @@ class ApplicationController < ActionController::Base
   # filter_parameter_logging :password
 
   def authorized
-	  admin?
+	  unless admin?
+	    redirect_to root_path
+	  end
   end
   def login_required
 	  authenticate

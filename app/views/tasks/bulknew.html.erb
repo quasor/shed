@@ -6,9 +6,11 @@
 <input type="hidden" id="project_id" name="project_id" value="<%= params[:project_id]%>">
 <b>Add tasks, one per line, comma separated in the format:</b><br />
 <div>
-[Owner], [Section / Category], [Task Title], [Low Estimate], [High Estimate (optional)]<br>
+[Owner], [Section / Category], [Task Title], [Estimate], [High Estimate (optional)]<br>
 e.g.<br>
-Peter Sommer, Meetings Context, Add meeting id to cookie (and supporting functions), 1, 1.5
+Peter, Meetings Context, Add meeting id to cookie (and supporting functions), 1, 1.5
+Tristan, Map UI, Place markers for CCDs, 2 - 3h
+
 </div>
 <%= text_area_tag 'tasks', '', :rows => 20, :cols => 120, :style => 'font-family: courier;' %>
 <br><%= f.submit 'Save' %> or <%= link_to 'Back', :back%>
