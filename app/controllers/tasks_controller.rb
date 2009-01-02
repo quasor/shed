@@ -287,9 +287,9 @@ class TasksController < ApplicationController
     Release.all.each do |release|
       projections = release.children.collect {|project| project.projections.rollup.last }
       unless projections.empty?
-        s = projections.collect(&:start).max
-        e = projections.collect(&:end).max
-        Projection.create(:task_id => release.id, :start => s, :end => e)      
+        s = projections.collect(&:start).compact.max
+        e = projections.collect(&:end).compact.max
+        Projection.create(:task_id => release.id, :start => s, :end => e) unless s.nil? || e.nil?
       end
     end
 
