@@ -48,8 +48,8 @@
 	-->
 			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
 
-			    <td><%=h task.start unless task.completed?%></td>
-			    <td><%=h task.end unless task.completed?%></td>
+			    <td><nobr><%=h task.start unless task.completed?%></nobr></td>
+			    <td><nobr><%=h task.end unless task.completed?%></nobr></td>
 
 					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || task.start.nil? || task.end.nil? %>
