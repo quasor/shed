@@ -56,7 +56,7 @@ class Task < ActiveRecord::Base
   end
   
   def due_date
-    self.due || self.parent.due || self.parent.parent.due
+    self.due || ( !self.parent.nil? && self.parent.due) || (!self.parent.parent.nil? && self.parent.parent.due)
   end
 
   def monte_estimate()
