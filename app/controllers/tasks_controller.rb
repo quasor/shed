@@ -124,6 +124,7 @@ class TasksController < ApplicationController
         unless (params[:parent_id].blank?)
           @task.move_to_child_of(Task.find(params[:parent_id]))
         end
+        Rails.cache.increment "dirty"
         flash[:notice] = 'Task was successfully created.'
         format.html { redirect_to(tasks_url(:p => params[:parent_id] ? params[:parent_id].to_i : nil)) }
         format.xml  { render :xml => @task, :status => :created, :location => @task }
