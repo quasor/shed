@@ -56,14 +56,7 @@ class Task < ActiveRecord::Base
   end
   
   def due_date
-    d = nil
-    n = self
-    while (!n.nil?)
-      d = n.due
-      break unless d.nil?
-      n = self.parent
-    end
-    d
+    self.due || self.parent.due || self.parent.parent.due
   end
 
   def monte_estimate()
