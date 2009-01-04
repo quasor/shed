@@ -32,4 +32,13 @@ module ApplicationHelper
     end
 	  s = s + "</a>"
   end
+  
+  def link_to(*args, &block)
+    if block_given?
+      concat super(capture(&block), *args), block.binding
+    else
+      super(*args)
+    end
+  end
+
 end

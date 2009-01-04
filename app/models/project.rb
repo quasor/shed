@@ -1,4 +1,4 @@
 class Project < Task
-  include NestedSetList
+#  include NestedSetList
   validates_uniqueness_of :title
 end

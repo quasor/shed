@@ -22,7 +22,7 @@ class UsersController < ApplicationController
       returning redirect_to(current_user)
     end
 
-    @tasks = Task.root.all_children
+    @tasks = Task.root.descendants
     @tasks.delete_if {|t| t.user_id != @user.id && t.type.nil? }   
     
     # find all open intervals not for this task and close them

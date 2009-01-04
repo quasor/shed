@@ -1,6 +1,3 @@
-<% @tasks.each do |task| %>
-	<% if (skip_completed.nil? || skip_completed == task.completed?) || !task.type.nil?%>
-		
 		<% if task.type == "Project" %>
 			<%if !task.first?%></ul><%end%>
 		<% end %>
@@ -26,13 +23,17 @@
 						<% else %>
 				  		<img class="item" src="/images/space.gif" align="absmiddle"><%= task.title%>
 						<% end %>				
+				<% elsif task.type == "Project"%>
+					<% link_to(:p => task.id) do%>
+						<img class="<%=session[:tree_nav][task.id] == true ? 'minus' : 'plus'%>" src="/images/space.gif" align="absmiddle" border="0"><%= task.title %>
+				  <% end %>
 				<% else %>
 						<%= task.title%>
 				<% end %>
 			
 				<%if @timer.nil?%>
 					<% if task.type == "Release"%>
-						<%=  link_to 'New Project', new_project_path(:parent_id => task.id),:class => 'button_link' %>
+						<%=  link_to 'New Project', new_project_path(:parent_id => task.id),:class => 'small' %>
 					<% elsif task.type == "Project"%>
 						<%=  link_to '+', new_task_path(:parent_id => task.id), :class => 'button_link', :title => 'New Task' %>
 						<%= link_to "++", {:controller => 'tasks', :action => 'bulknew', :project_id => task.id}, {:class => 'button_link', :title => 'Bulk Add Multiple Tasks'}%>
@@ -42,6 +43,4 @@
 			<% if task.type == "Project" %>
 			<%unless task.first?%></ul><%end%><ul id="taskList<%=task.id%>">
 			<% end %>
-		<% end %>
-<% end %>
 </ul>

@@ -2,7 +2,8 @@
 <div id="leftcol" class="resizeable" onscroll="scrollDiv('rightcol','leftcol')">
 		<div class="st">
 			<div style="height:20px;border-top:1px solid white">Title <b><%= link_to "Show All Tasks", root_path unless params[:p].blank?%></b></div>
-			<%= render :partial => 'tasklist', :locals => {:skip_completed => nil}%>
+			<%#= render :partial => 'tasklist', :locals => {:skip_completed => nil}%>
+			<%= render :partial => 'task', :collection => @tasks%>
 		</div>
 
 </div>

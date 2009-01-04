@@ -1,4 +1,4 @@
-require 'nested_set_list'
+#require 'nested_set_list'
 class Task < ActiveRecord::Base
   acts_as_nested_set
   acts_as_taggable_on :tags
@@ -67,43 +67,17 @@ class Task < ActiveRecord::Base
     e
   end
   def deleteable?
-    children.nil? || children.size == 0
+    leaf?
   end
   
   # A leaf folder does not have any children. Return true if no
   # children exist for this folder.
   # This method does not require a database query.
-  def leaf?
-    self.all_children_count == 0
-  end
 
   # Return true if this folder has no contents - either folders
   # or bookmarks.
-  def empty?
-    self.leaf?
-  end
-
-  # In the statement:
-  #   @folder.ancestor_of(@other_folder)
-  # The result is true if @other_folder is within the sub-tree of
-  # @folder.
-  # The result is false if @other_folder is outside @folder's sub-tree or if
-  # @folder == @other_folder.
-  # This method does not require a database query.
-  def ancestor_of?(descendant)
-    self.lft < descendant.lft && self.rgt > descendant.rgt
-  end
-
-  # In the statement:
-  #   @folder.descendant_of(@other_folder)
-  # The result is true if @other_folder is a direct ancestor of @folder.
-  # Otherwise, false.
-  # This method does not require a database query.
-  def descendant_of?(ancestor)
-    self.lft > ancestor.lft && self.rgt < ancestor.rgt
-  end
   
-  def status
+  def self.status
     "completed" if self.completed?
   end
     

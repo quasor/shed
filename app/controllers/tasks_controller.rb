@@ -20,13 +20,19 @@ class TasksController < ApplicationController
    
    unless params[:u].blank?
      user_id = params[:u].to_i
-#     @tasks.delete_if {|t| t.user_id != user_id && t.type.nil? }   
+     @tasks.delete_if {|t| t.user_id != user_id && t.type.nil? }   
    end
 
+   h = {}
+   Project.all.collect { |p| h[1] = true }
+   session[:tree_nav] ||= h
+
    unless params[:p].blank?
-     project_id = params[:p].to_i
-#     @tasks.delete_if {|t| t.parent_id != project_id && t.type.nil? }   
+     session[:tree_nav][params[:p].to_i] = !session[:tree_nav][params[:p].to_i]
    end
+
+   @tasks.delete_if { |t| !session[:tree_nav][t.parent_id] && t.type.nil?}   
+    
     
     if Release.count == 0
       flash[:warning] = 'Your schedule is empty'
@@ -230,11 +236,12 @@ class TasksController < ApplicationController
     @project_date_collection = {}
     @project_user_date_collection = {}
     user_ids = []
-    100.times do |i|
+    @sim_count = 3
+    @sim_count.times do |i|
       # walk the schedule once
       user_end_dates = {}
       projections={}
-      tasks = Task.root.all_children
+      tasks = Task.root.descendants
       tasks.each do |task|
         unless task.user.nil? || task.completed? 
           user_end_dates[task.user.id] ||= Date.today.work_day(0)
@@ -274,14 +281,14 @@ class TasksController < ApplicationController
     @project_date_collection.each_pair do |k,v|
       v.compact!
       v.sort! 
-      Projection.create(:task_id => k, :start => v[10], :end => v[95])
+      Projection.create(:task_id => k, :start => v[v.size*0.10], :end => v[v.size*0.95])
     end
     
     @project_user_date_collection.each do |pid,hash|
       hash.each_pair do |k,v|
         v.compact!
         v.sort! 
-        Projection.create(:task_id => pid, :user_id => k, :start => v[10], :end => v[95])
+        Projection.create(:task_id => pid, :user_id => k, :start => v[v.size*0.10], :end => v[v.size*0.95])
       end
     end
 
@@ -309,7 +316,7 @@ class TasksController < ApplicationController
           t = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Date.today}#{@dirty}"+suffix) do #
             user_end_dates = {}
             tasks = []
-            @tasks_raw = Task.root.all_children
+            @tasks_raw = Task.root.descendants
             # Compute start times for each task
             @tasks_raw.each do |task|
               unless task.user.nil? || task.completed? 
@@ -327,7 +334,7 @@ class TasksController < ApplicationController
           
           # done with the rebuild...
           
-          alltasks = Task.root.all_children
+          alltasks = Task.root.descendants
           unless alltasks.empty?
             end_dates = alltasks.collect(&:end) 
             unless end_dates.compact.empty?
