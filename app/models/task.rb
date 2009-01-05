@@ -34,7 +34,7 @@ class Task < ActiveRecord::Base
         # 1-2 = 1d - 2d
         default_unit = self.estimate.scan("h").empty? ? 1 : WORKING_HOURS_PER_DAY
         days = 0.0
-        string.downcase.scan(/(\d*\.*\d)\s?([h|d]?)/).each do |part|
+        string.downcase.scan(/(\d*\.*\d*)\s?([h|d]?)/).each do |part|  
         n_unit = case part[1]
           when "h" : WORKING_HOURS_PER_DAY
           when "d" : 1

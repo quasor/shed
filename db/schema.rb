@@ -20,28 +20,28 @@ ActiveRecord::Schema.define(:version => 20090102043509) do
   create_table "intervals", :force => true do |t|
     t.datetime "start"
     t.datetime "end"
-    t.integer  "user_id"
-    t.integer  "task_id"
+    t.integer  "user_id",    :limit => 11
+    t.integer  "task_id",    :limit => 11
     t.integer  "hours",      :limit => 10, :precision => 10, :scale => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "projections", :force => true do |t|
-    t.integer  "task_id"
+    t.integer  "task_id",       :limit => 11
     t.date     "start"
     t.date     "end"
-    t.float    "confidence",    :default => 0.0
+    t.float    "confidence",                  :default => 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "user_id"
-    t.integer  "simulation_id"
+    t.integer  "user_id",       :limit => 11
+    t.integer  "simulation_id", :limit => 11
   end
 
   create_table "taggings", :force => true do |t|
-    t.integer  "tag_id"
-    t.integer  "taggable_id"
-    t.integer  "tagger_id"
+    t.integer  "tag_id",        :limit => 11
+    t.integer  "taggable_id",   :limit => 11
+    t.integer  "tagger_id",     :limit => 11
     t.string   "tagger_type"
     t.string   "taggable_type"
     t.string   "context"
@@ -62,11 +62,11 @@ ActiveRecord::Schema.define(:version => 20090102043509) do
     t.float    "low_estimate_cache"
     t.float    "high_estimate_cache"
     t.boolean  "completed"
-    t.integer  "user_id"
+    t.integer  "user_id",             :limit => 11
     t.date     "start"
-    t.integer  "parent_id"
-    t.integer  "lft"
-    t.integer  "rgt"
+    t.integer  "parent_id",           :limit => 11
+    t.integer  "lft",                 :limit => 11
+    t.integer  "rgt",                 :limit => 11
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "cached_tag_list"
