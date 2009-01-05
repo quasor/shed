@@ -71,6 +71,8 @@ ul {padding:0px;margin:0px;cursor:move;}
 .lirow:hover {cursor:move}
 .lirow a.startstop {display:block;}
 .lirow a.button_link {display:inline;font-size:10px;margin-bottom:4px}
+a.stopped {display:block;}
+a.started {display:block;}
 .stopped:hover {background-color:#CCFFBF;color:#000;}
 .started {background-color:#EFC492;}
 .started:hover {background-color:#F78989;color:#000;}
