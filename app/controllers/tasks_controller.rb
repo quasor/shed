@@ -17,27 +17,12 @@ class TasksController < ApplicationController
    @holidays = Rails.cache.fetch("Holiday.all.holiday") do
      Holiday.find(:all, :select => :holiday).collect(&:holiday)
    end
-   
-   unless params[:u].blank?
-     user_id = params[:u].to_i
-     @tasks.delete_if {|t| t.user_id != user_id && t.type.nil? }   
-   end
-
-   h = {}
-   Project.all.collect { |p| h[1] = true }
-   session[:tree_nav] ||= h
-
-   unless params[:p].blank?
-     session[:tree_nav][params[:p].to_i] = !session[:tree_nav][params[:p].to_i]
-   end
-
-   @tasks.delete_if { |t| !session[:tree_nav][t.parent_id] && t.type.nil?}   
     
     
     if Release.count == 0
       flash[:warning] = 'Your schedule is empty'
     else
-      flash[:notice] = "Last updated at #{Task.root.updated_at.to_s()}"
+      # flash[:notice] = "Last updated at #{Task.root.updated_at.to_s()}"
     end
     respond_to do |format|
       format.html # index.html.erb

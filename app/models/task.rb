@@ -24,6 +24,10 @@ class Task < ActiveRecord::Base
 
   WORKING_HOURS_PER_DAY = 8
   
+  def task?
+    self.type.nil?
+  end
+  
   def string_to_days(string)
     unless string.nil?
         # look for h in e.g. 1-2h or 1h-2 = 1h-2h

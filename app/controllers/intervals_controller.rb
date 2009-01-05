@@ -2,7 +2,12 @@ class IntervalsController < ApplicationController
   # GET /intervals
   # GET /intervals.xml
   def index
-    @intervals = current_user.intervals.reverse
+    unless params[:user_id].blank?
+      @user = User.find params[:user_id] 
+    else
+      @user = current_user
+    end
+    @intervals = @user.intervals.reverse
 
     respond_to do |format|
       format.html # index.html.erb

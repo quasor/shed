@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   # GET /users
   # GET /users.xml
   before_filter :login_required
+  before_filter :authorized, :except => [:show]
   def index
     @users = User.find(:all)
 
@@ -24,7 +25,7 @@ class UsersController < ApplicationController
 
     @tasks = Task.root.descendants
     @tasks.delete_if {|t| t.user_id != @user.id && t.type.nil? }   
-    
+        
     # find all open intervals not for this task and close them
     @intervals = current_user.intervals.find(:all, :conditions => {:end => nil})      
     @interval = current_user.active_intervals.first

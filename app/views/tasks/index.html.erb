@@ -1,7 +1,7 @@
 <% unless @tasks.empty? %>
 <div id="leftcol" class="resizeable" onscroll="scrollDiv('rightcol','leftcol')">
 		<div class="st">
-			<div style="height:20px;border-top:1px solid white">Title <b><%= link_to "Show All Tasks", root_path unless params[:p].blank?%></b></div>
+			<div style="height:20px;border-top:1px solid white"><b><%= link_to "Filtered - Show All Tasks", root_path, {:style=>'color:#E98C44'} unless params[:p].blank? && params[:u].blank?%></b></div>
 			<%#= render :partial => 'tasklist', :locals => {:skip_completed => nil}%>
 			<%= render :partial => 'task', :collection => @tasks%>
 		</div>
@@ -24,31 +24,26 @@
 			  <td>
 						<div style="position:relative; margin-left:0px">				
 							<% @milestones = Release.all.collect(&:due)%>
-							<% for i in 0..@total_calendar_days%>
-							<% d = Date.today + i%>
-							<!-- oi: <%= d %> -->
-							<div style="position:absolute;top:1em;left:<%= @day_in_pixels * i %>px;height:<%= @tasks.size * 2.5%>em;width:<%=@day_in_pixels-1%>px;
-							<% if d.wday == 0 || d.wday == 6 %>background-color:#777;opacity:0.5;<% elsif @milestones.include? d%>border-right:2px dotted #900;<%end %>border-left:1px solid #ccc;">
-								<span style="position:absolute;top:-1.5em;left:-<%=1%>px;z-index:10;font-weight:normal;font-size:11px;padding-left:2px; border-left:1px solid #ccc"><%= d.strftime('%m/%d') if d.wday == 1%></span>
-								
-							</div>
-							<% end %>
+							<% for i in 0..@total_calendar_days-%>
+							<% d = Date.today + i -%>
+							<div style="position:absolute;top:1em;left:<%= @day_in_pixels * i %>px;height:<%= @tasks.size * 2.5%>em;width:<%=@day_in_pixels-1%>px;<% if d.wday == 0 || d.wday == 6 %>background-color:#777;opacity:0.5;<% elsif @milestones.include? d%>border-right:2px dotted #900;<%end %>border-left:1px solid #ccc;"><span style="position:absolute;top:-1.5em;left:-<%=1%>px;z-index:10;font-weight:normal;font-size:11px;padding-left:2px; border-left:1px solid #ccc"><%= d.strftime('%m/%d') if d.wday == 1%></span></div>
+							<% end -%>
 						</div>
 				</td>
 			</tr>
 	  </thead>
 		<% for task in @tasks %>
+		<% if (params[:p].blank? || task.parent_id == params[:p].to_i) && 
+					(params[:u].blank? || task.user_id == params[:u].to_i) || !task.type.nil?%>
+		
 	  <tr class="srow">
 				<% unless task.type == "Release" or task.type == "Project"%>
 			    <td nowrap><%=h task.tag_list %></td>
 			    <td><%=h task.low %></td>
 			    <td><%=h task.high %></td>
 			    <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td>
-	<!--
-		 		  <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td>
-	-->
+					<!-- <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td> -->
 			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
-
 			    <td><nobr><%=h task.start unless task.completed?%></nobr></td>
 			    <td><nobr><%=h task.end unless task.completed?%></nobr></td>
 
@@ -82,6 +77,7 @@
 					<% end %>
 				<% end %>
 		  </tr>
+		<% end %>
 		<% end %>
 	<% if false %>
 			<tr>
@@ -142,8 +138,8 @@ function startup()
 function scrollDiv(lckDiv, scrDiv)
 {
 	document.getElementById(lckDiv).scrollTop = document.getElementById(scrDiv).scrollTop;
-	//document.getElementById(lckDiv).scrollLeft = document.getElementById(scrDiv).scrollLeft;
-
+<% if false%>	//document.getElementById(lckDiv).scrollLeft = document.getElementById(scrDiv).scrollLeft;
+<% end %>
 }
 
 function Resize()

@@ -101,7 +101,7 @@ body {}
 }
 .Project a {text-decoration:none; display:inline; font-size:14px;}
 
-.Release {font-weight:bold;font-size:14px;height:20px;}
+.Release {font-weight:bold;font-size:14px;height:21px;}
 
 img.plus {
 	background: url(/images/sprites.png) no-repeat scroll -192px -96px;

@@ -1,46 +1,42 @@
-		<% if task.type == "Project" %>
-			<%if !task.first?%></ul><%end%>
-		<% end %>
-		<li id="task_<%=task.read_attribute('id')%>" class="lirow <%#=task.status%> <%=task.type%><%=" mine" if task.user_id == current_user%>">
-				<%#=link_to_remote task.title, :update => "progress_dialog", :complete => "$('interval_hours').focus();", :url => new_interval_path(:task_id => task.id), :html => {:class => :hideul} %> 
-				<% if task.type.nil? %>
-						<% if task.user_id == current_user.id && !@timer.nil?%>
-							<div id="timer_link_<%=task.id%>">
-								<% form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "position:absolute;right:4px;"}) do |f| %>
-									<%= f.check_box :completed, :onclick => "$('#complete_task_#{task.id}').submit();"%>
-								<% end %>
-								<%unless task.completed?%>
-									<%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped') + '" src="/images/space.gif" align="absmiddle" border="0"> ' + 
+<% if (params[:p].blank? || task.parent_id == params[:p].to_i) && 
+			(params[:u].blank? || task.user_id == params[:u].to_i) || !task.type.nil? -%>
+		<li id="task_<%=task.read_attribute('id') -%>" class="lirow <%="completed" if task.completed? -%> <%=task.type -%><%=" mine" if task.user_id == current_user -%>">
+				<% if task.type.nil? 
+					-%><% if task.user_id == current_user.id && !@timer.nil? 
+						-%><div id="timer_link_<%=task.id -%>">
+								<% form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "position:absolute;right:4px;"}) do |f| -%>
+									<%= f.check_box :completed, :onclick => "$('#complete_task_#{task.id}').submit();" -%>
+								<% end -%>
+								<%unless task.completed? -%><%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped') + '" src="/images/space.gif" align="absmiddle" border="0"> ' + 
 										task.title, user_path(current_user, 
 										:task_id => (@current_task == task ? nil : task.id), 
 										:stop => (@current_task == task ? true : nil), 
 										:timer =>params[:timer]), 
-										:class => "hideul #{(task == @current_task ? 'started' : 'stopped')}" unless task.completed?%>
-						  		<%else%><img class="item" src="/images/space.gif" align="absmiddle"><%= task.title%><%end%>
+										:class => "hideul #{(task == @current_task ? 'started' : 'stopped')}" unless task.completed? -%>
+						  		<%else -%><img class="item" src="/images/space.gif" align="absmiddle"><%= task.title -%><%end -%>
 							</div>
-						<% elsif task.user_id == current_user.id %>
-			  			<img class="item" src="/images/space.gif" align="absmiddle"><%= link_to task.title, edit_task_path(task), :style => 'display:inline'%>
-						<% else %>
-				  		<img class="item" src="/images/space.gif" align="absmiddle"><%= task.title%>
-						<% end %>				
-				<% elsif task.type == "Project"%>
-					<% link_to(:p => task.id) do%>
-						<img class="<%=session[:tree_nav][task.id] == true ? 'minus' : 'plus'%>" src="/images/space.gif" align="absmiddle" border="0"><%= task.title %>
-				  <% end %>
-				<% else %>
-						<%= task.title%>
-				<% end %>
-			
+						<% elsif task.user_id == current_user.id -%>
+			  			<img class="item" src="/images/space.gif" align="absmiddle"><%= link_to task.title, edit_task_path(task), :style => 'display:inline' -%>
+						<% else -%>
+				  		<img class="item" src="/images/space.gif" align="absmiddle"><%= task.title -%>
+						<% end -%>				
+				<% elsif task.type == "Project" -%>
+					<% link_to(:p => task.id) do -%>
+						<%= task.title -%>
+				  <% end -%>
+				<% else -%>
+						<%= task.title-%>
+				<% end -%>			
 				<%if @timer.nil?%>
 					<% if task.type == "Release"%>
-						<%=  link_to 'New Project', new_project_path(:parent_id => task.id),:class => 'small' %>
+						<%=  link_to 'New Project', new_project_path(:parent_id => task.id),:class => 'small' -%>
 					<% elsif task.type == "Project"%>
-						<%=  link_to '+', new_task_path(:parent_id => task.id), :class => 'button_link', :title => 'New Task' %>
+						<%=  link_to '+', new_task_path(:parent_id => task.id), :class => 'button_link', :title => 'New Task' -%>
 						<%= link_to "++", {:controller => 'tasks', :action => 'bulknew', :project_id => task.id}, {:class => 'button_link', :title => 'Bulk Add Multiple Tasks'}%>
-					<% end %>
-				<% end %>
+					<% end -%>
+				<% end -%>
 			</li>
-			<% if task.type == "Project" %>
+			<% if task.type == "Project" -%>
 			<%unless task.first?%></ul><%end%><ul id="taskList<%=task.id%>">
-			<% end %>
-</ul>
+			<% end -%>
+<% end -%>
