@@ -221,7 +221,7 @@ class TasksController < ApplicationController
     @project_date_collection = {}
     @project_user_date_collection = {}
     user_ids = []
-    @sim_count = 3
+    @sim_count = 100
     @sim_count.times do |i|
       # walk the schedule once
       user_end_dates = {}
