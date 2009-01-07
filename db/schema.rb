@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090102043509) do
+ActiveRecord::Schema.define(:version => 20090105083935) do
 
   create_table "holidays", :force => true do |t|
     t.date     "holiday"
@@ -81,6 +81,7 @@ ActiveRecord::Schema.define(:version => 20090102043509) do
     t.float    "efficiency", :default => 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "loginkey"
   end
 
 end

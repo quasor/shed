@@ -1,0 +1,94 @@
+<% @day_in_pixels = 8%>
+<% unless @tasks.empty? %>
+		<table class="st" id="schedule">
+		<thead>
+			<tr class="srow2">
+				<td>Task</td>
+				<td>Section</td>
+		    <td>Low</td>
+		    <td>High</td>
+		    <td>Estimate</td>
+<!--
+		    <td>Sim</td> 
+-->
+		    <td>Owner</td>
+		    <td>Start</td>
+		    <td>End</td>
+			  <td>
+						<div style="position:relative; margin-left:0px">				
+							<% @milestones = Release.all.collect(&:due)%>
+							<% for i in 0..@total_calendar_days-%>
+							<% d = Date.today + i -%>
+							<div style="position:absolute;top:1em;left:<%= @day_in_pixels * i %>px;height:<%= @tasks.size * 2.5%>em;width:<%=@day_in_pixels-1%>px;<% if d.wday == 0 || d.wday == 6 %>background-color:#777;opacity:0.5;<% elsif @milestones.include? d%>border-right:2px dotted #900;<%end %>border-left:1px solid #ccc;"><span style="position:absolute;top:-1.5em;left:-<%=1%>px;z-index:10;font-weight:normal;font-size:11px;padding-left:2px; border-left:1px solid #ccc"><%= d.strftime('%m/%d') if d.wday == 1%></span></div>
+							<% end -%>
+						</div>
+				</td>
+			</tr>
+	  </thead>
+	  <tbody>
+		<% for task in @tasks %>
+		<% if (params[:p].blank? || task.parent_id == params[:p].to_i) && 
+					(params[:u].blank? || task.user_id == params[:u].to_i) || !task.type.nil?%>
+		
+	  <tr class="srow">
+				<% unless task.type == "Release" or task.type == "Project"%>
+					<td nowrap><%=task.title%></td>
+			    <td nowrap><%=h task.tag_list %></td>
+			    <td><%=h task.low %></td>
+			    <td><%=h task.high %></td>
+			    <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td>
+					<!-- <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td> -->
+			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
+			    <td><nobr><%=h task.start unless task.completed?%></nobr></td>
+			    <td><nobr><%=h task.end unless task.completed?%></nobr></td>
+
+					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
+						<% unless task.completed? || task.start.nil? || task.end.nil? %>
+						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">							
+							<span title="<%= task.start.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" style="width:<%= @day_in_pixels * (task.end.to_date - task.start.to_date) %>px; left:<%= @day_in_pixels * (task.start - Date.today) %>px"></span>					
+						</div>
+						<% end %>
+					</td>
+			    <td><%= link_to 'E', edit_task_path(task) %></td>
+					<td><%= link_to 'X', task, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n", :method => :delete%></td>
+				<%else # Releases and Projects:%>
+				<td><nobr>
+					<% if task.type == "Release"%>
+					<b><span style="font-size:110%"><%=task.title%></span></b>
+					<% elsif task.type == "Project"%>
+						<%=  button_to task.title, new_task_path(:parent_id => task.id), :title => 'New Task'%>
+					<% end %>
+					</nobr>
+					</td>
+				<td colspan="7"><nobr>
+					Due <%= task.due_date %>  
+					<% unless task.projections.nil? || task.projections.empty?%>
+					<% start_p = task.projections.rollup.last.start %>
+					<% end_p = task.projections.rollup.last.end %>
+						<b>ETA: <%= start_p%>  - <%= end_p %></b>
+					<% end %>
+					</nobr></td>
+					<% unless task.projections.nil? || task.projections.empty?%>
+					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
+						<% unless task.completed? || start_p.nil? || end_p.nil? %>
+						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">							
+							<span class="ganttbar_s" style="width:<%= @day_in_pixels * (start_p - Date.today) %>px; left:<%= @day_in_pixels * (0) %>px"></span>					
+							<span class="ganttbar_p" style="width:<%= @day_in_pixels * (end_p - start_p) %>px; left:<%= @day_in_pixels * (start_p - Date.today) %>px"></span>					
+						</div>
+						<% end %>
+					</td>
+					<% end %>
+				<% end %>
+		  </tr>
+		<% end %>
+		<% end %>
+		<tr><td colspan="9"></td></tr>
+		</tbody>
+		</table>
+
+				
+<% else %>
+<h1>Create a new release	</h1>
+<%= link_to "New Release", new_release_path%>
+<% end %>
+

@@ -1,7 +1,8 @@
 class TasksController < ApplicationController
   # GET /tasks
   # GET /tasks.xml
-  before_filter :login_required
+  before_filter :supports_iphone, :only => [:index]
+  before_filter :login_required, :except => [:redo]
   def index
     @day_in_pixels = 16
     @tasks = []
@@ -26,6 +27,7 @@ class TasksController < ApplicationController
     end
     respond_to do |format|
       format.html # index.html.erb
+      format.iphone 
       format.xml  { render :xml => @tasks }
     end
   end
@@ -66,7 +68,7 @@ class TasksController < ApplicationController
         t.save
       end
     
-      rebuild_schedule
+      rebuild_schedule(true)
     end
         
     render :update do |page|
@@ -129,7 +131,7 @@ class TasksController < ApplicationController
   # PUT /tasks/1
   # PUT /tasks/1.xml
   def update
-    @task = current_user.tasks.find(params[:id])
+    @task = Task.find(params[:id])
 
     respond_to do |format|
       if @task.update_attributes(params[:task] || params[:project])
@@ -213,6 +215,15 @@ class TasksController < ApplicationController
     redirect_to root_path
   end 
 
+  def redo
+    @dirty = Rails.cache.fetch("dirty") { 1 }
+    @rebuilt = false
+    Rails.cache.fetch("schedule_is_#{@dirty}") do
+       rebuild_schedule(true) 
+       @rebuilt = true
+    end
+    render :text => @rebuilt ? " #{Time.now} - Rebuild Complete" : " #{Time.now} - Using Cached Copy"
+  end
 
   def run_simulation
     logger.warn 'running simulation...'
@@ -295,10 +306,12 @@ class TasksController < ApplicationController
         @root = Task.root # replace this later with a local root
 
         @total_calendar_days = 0
-        @dirty = Rails.cache.fetch("dirty") { 1 }
         unless @root.nil?
-          suffix = force ? rand(20).to_s : ""
-          t = Rails.cache.fetch("tasks__#{@root.cache_key}-#{Date.today}#{@dirty}"+suffix) do #
+        if force
+          @root.updated_at = Time.now
+          @root.save!
+        end
+        t = Rails.cache.fetch("schedule_#{@root.cache_key}") do #
             user_end_dates = {}
             tasks = []
             @tasks_raw = Task.root.descendants

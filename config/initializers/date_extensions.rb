@@ -94,3 +94,5 @@ end
 def standard_deviation(population)
   Math.sqrt(variance(population))
 end
+
+

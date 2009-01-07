@@ -1,3 +1,4 @@
+require 'digest/sha1'
 class UsersController < ApplicationController
   # GET /users
   # GET /users.xml

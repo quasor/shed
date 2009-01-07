@@ -1,7 +1,7 @@
-<h1>
+<h1>New Task</h1>
+	<%= f.label :title %> <br />
 	<%= f.text_field :title, :class => :big%>
-</h1>
-<div style="float:left">
+<div>
 <% if @task.type.nil?%>
 
 <p>
@@ -16,10 +16,6 @@
   <%= f.label :completed %> 
 </p>
 <% end %>
-<p>
-  <%= f.label :owner %><br />
-	<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
-</p>
 <% else %>
 <p>
   <%= f.label :due %><br />
@@ -38,12 +34,16 @@
 	<%= hidden_field_tag :parent_id, params[:parent_id]%>
 </p>
 </div>
-<div style="float:left; padding-left:20px">
+<div>
 <p>
   <%= f.label :description %> <span class="help">(optional)</span><br />
   <%= f.text_area :description, :rows => 7 %>
 </p>
 </div>
+<p>
+  <%= f.label :owner %><br />
+	<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
+</p>
 <div style="clear:both"></div>
 <script type="text/javascript" charset="utf-8">
 	function startup()

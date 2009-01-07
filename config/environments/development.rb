@@ -4,9 +4,11 @@
 # every request.  This slows down response time but is perfect for development
 # since you don't have to restart the webserver when you make code changes.
 
-config.action_controller.perform_caching  = true
+config.action_controller.perform_caching  = false
+
 config.cache_classes = true
-config.cache_store = :mem_cache_store, '127.0.0.1:11211', {:namespace => "dev_with_caching"}
+# config.cache_store = :blackhole_store
+# config.cache_store = :mem_cache_store, '127.0.0.1:11211', {:namespace => "dev_with_caching"}
 
 # Log error messages when you accidentally call methods on nil.
 config.whiny_nils = true

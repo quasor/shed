@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  require 'digest/sha1'
   has_many :tasks
   has_many :intervals
   validates_uniqueness_of :login
@@ -14,6 +15,14 @@ class User < ActiveRecord::Base
     end
     i
   end
+  def update_login_key
+    s = Digest::SHA1.hexdigest('username' + self.login + rand(12345).to_s).to_s.reverse
+    self.loginkey = s
+    self.save
+  end
+
+  before_save {|r| r.loginkey = Digest::SHA1.hexdigest(r.login + rand(12345).to_s).to_s.reverse }
+
   def current_task
     active_intervals.first && active_intervals.first.task
   end

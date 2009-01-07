@@ -3,7 +3,6 @@
 
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
-
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
   protect_from_forgery # :secret => 'b82e2c5c2c0db4469ef45a24ed35131a'
@@ -50,5 +49,9 @@ class ApplicationController < ActionController::Base
 			#end
 		end
 	end
+	
+	def supports_iphone
+    request.format = :iphone if request.env["HTTP_USER_AGENT"] && request.env["HTTP_USER_AGENT"][/(Mobile\/.+Safari)/]
+  end
 
 end
