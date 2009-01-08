@@ -44,6 +44,7 @@ class Date
     #end
     
     d = self
+    c = self
     
     holidays = Rails.cache.fetch("Holiday.all.holiday") do
       Holiday.find(:all, :select => :holiday).collect(&:holiday)
@@ -51,12 +52,13 @@ class Date
     wdays = [0,6]
     
     d = d + days.modulo(1)
+    c = c + days.modulo(1)
     holiday_count = 0
     while (true)
       # if we've found a work day and enough time has passed return it
       unless d.wday == 0 || d.wday == 6 || holidays.include?(d)
         # unless it's a holiday or a weekend test to see if we're done
-        if d - self - holiday_count >= days
+        if d - c - holiday_count >= days.div(1)
           break 
         end
       else
@@ -64,7 +66,7 @@ class Date
       end
       d = d + 1
     end
-    if d.wday == 1 and self.day_fraction == 0 and (d - 2 > self)
+    if d.wday == 1 and d.day_fraction == 0 and (d - 2 > self)
       d - 2 #back track the weekend
     else
       d

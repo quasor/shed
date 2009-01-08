@@ -68,7 +68,7 @@ class TasksController < ApplicationController
         t.save
       end
     
-      rebuild_schedule(true)
+      rebuild_schedule
     end
         
     render :update do |page|
@@ -311,7 +311,9 @@ class TasksController < ApplicationController
           @root.updated_at = Time.now
           @root.save!
         end
-        t = Rails.cache.fetch("schedule_#{@root.cache_key}") do #
+        @dirty = Rails.cache.fetch("dirty") { 1 }
+        logger.info "###################################################### #{@dirty}"    
+        t = Rails.cache.fetch("schedule_#{@root.cache_key}#{@dirty}") do #
             user_end_dates = {}
             tasks = []
             @tasks_raw = Task.root.descendants
@@ -325,8 +327,6 @@ class TasksController < ApplicationController
               else 
                 task.start = Date.today
               end
-
-              tasks.push task if params[:u].blank? || task.user.id == params[:u].to_i
             end
           end
           
@@ -338,7 +338,7 @@ class TasksController < ApplicationController
             unless end_dates.compact.empty?
               @total_calendar_days = [end_dates.compact.max - Date.today,14].max + 60
             end
-            Rails.cache.fetch("run_sim_#{Date.today}#{@dirty}") do 
+            Rails.cache.fetch("run_sim_#{@root.cache_key}") do 
               run_simulation
             end 
           end
