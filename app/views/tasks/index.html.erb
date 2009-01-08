@@ -37,7 +37,7 @@
 	  <tr class="srow">
 				<% unless task.type == "Release" or task.type == "Project"%>
 			    <td nowrap><%=h task.tag_list %></td>
-			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?h or task.estimate.blank?%></td>
+			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?h or task.estimate.include? ?d or task.estimate.blank?%></td>
 			    <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td>
 					<!-- <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td> -->
 			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
