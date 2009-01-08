@@ -12,9 +12,7 @@
 		<thead>
 			<tr class="srow2">
 				<td>Section</td>
-		    <td>Low</td>
-		    <td>High</td>
-		    <td>Estimate</td>
+		    <td colspan="2">Estimate</td>
 <!--
 		    <td>Sim</td> 
 -->
@@ -39,8 +37,7 @@
 	  <tr class="srow">
 				<% unless task.type == "Release" or task.type == "Project"%>
 			    <td nowrap><%=h task.tag_list %></td>
-			    <td><%=h task.low %></td>
-			    <td><%=h task.high %></td>
+			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?d or task.estimate.blank?%></td>
 			    <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td>
 					<!-- <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td> -->
 			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
@@ -57,7 +54,7 @@
 			    <td><%= link_to 'E', edit_task_path(task) %></td>
 					<td><%= link_to 'X', task, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n", :method => :delete%></td>
 				<%else # Releases and Projects:%>
-				<td colspan="7"><nobr>
+				<td colspan="6"><nobr>
 					Due <%= task.due_date %>  
 					<% unless task.projections.nil? || task.projections.empty?%>
 					<% start_p = task.projections.rollup.last.start %>
