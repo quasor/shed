@@ -2,6 +2,7 @@
 class Task < ActiveRecord::Base
   acts_as_nested_set
   acts_as_taggable_on :tags
+  named_scope :by_user, lambda { |user_id| { :conditions => {:user_id => user_id} } }
   include NestedSetList
 
   belongs_to :user

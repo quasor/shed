@@ -179,21 +179,14 @@ class TasksController < ApplicationController
   end
     
   def bulk
+    Rails.cache.increment "dirty"
     @text = params[:tasks]
-    @rows = @text.split("\n").collect {|t| t.split(',') }
+    @rows = @text.chomp.strip.split("\n").collect {|t| t.split(',') }
     @tasks = []
     
     @rows.collect do |r|
       if r.size > 3
-        task = {
-          :user     => r[0],
-          :section  => r[1],
-          :title    => r[2],
-          :low      => r[3],
-          :high     => r[4],
-        }
-        logger.info task.inspect
-        @low = r[3]
+        @low = r[3].strip
         @project = Task.find params[:project_id]
         unless @project.nil? || @low.blank?
           @user = User.find_by_name(r[0].strip) || User.find_by_login(r[0].strip)
@@ -248,7 +241,7 @@ class TasksController < ApplicationController
           task.start = Date.today
         end
       end
-      
+      logger.warn "\n\n\n---------------------------------\n#{user_end_dates.inspect}"
       # use the estimates from the simulation to determine the end date of the project
       Project.all.each do |project|
         #project.projections.destroy_all
