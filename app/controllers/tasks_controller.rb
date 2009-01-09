@@ -1,4 +1,5 @@
 class TasksController < ApplicationController
+
   # GET /tasks
   # GET /tasks.xml
   before_filter :supports_iphone, :only => [:index]
@@ -6,15 +7,26 @@ class TasksController < ApplicationController
   def index
     @day_in_pixels = 16
     @tasks = []
-    
-    unless params[:filter].blank?
-      unless params[:filter][:user_id].blank?
-        session[:user_id] = params[:filter][:user_id]
-      end
-    end
-   
-   @tasks = rebuild_schedule(params[:force] == "true") 
-   
+
+    # init filters
+    session[:filter_by] ||= current_user.id
+    session[:filter] = params[:filter].to_i unless params[:filter].blank?
+    unless params[:u].blank?
+      session[:filter] = 3
+      session[:filter_by] = params[:u].to_i
+   end
+   @taskz = rebuild_schedule(params[:force] == "true") 
+   logger.info session[:filter]
+   if session[:filter] == FILTER_COMPLETED
+     @tasks = @taskz.collect {|task| task unless task.completed?}
+     @tasks.compact!
+   elsif session[:filter] == 3
+     @tasks = @taskz.collect {|task| task if task.user_id == session[:filter_by]}
+     @tasks.compact!     
+   else
+     @tasks = @taskz
+   end
+
    @holidays = Rails.cache.fetch("Holiday.all.holiday") do
      Holiday.find(:all, :select => :holiday).collect(&:holiday)
    end
@@ -290,7 +302,6 @@ class TasksController < ApplicationController
       end
     end
 
-    #render :inline => "<%= debug @project_date_collection%><%= debug @project_user_date_collection[112][1] %><%= debug @user_ids%>"
     
   end
     private

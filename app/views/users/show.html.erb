@@ -12,7 +12,6 @@
 		height:20px;
 		width:20px;
 	}
-	
 </style>
 
 <div id="stopwatch" class="<%unless @current_task.nil?%>running<%end%>" style="position:absolute;top:0px;left:0px;width:100%">
@@ -26,7 +25,6 @@
 	<p><b><%= link_to_function 'Close this window', "window.close();"%></b>
 	<% else %>
 	<%= render :partial => 'tasks/task', :collection => @tasks.active %>
-	<%#= render :partial => 'tasks/task', :collection => @tasks.complete %>
 	<% end %>
 <% content_for :save_module do %>
 	<% remote_form_for :task, :url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')" do |f|%>
@@ -85,11 +83,11 @@ if (!Date.now) {
 function tick() {
 		  d = Date.now();
 //			console.log(d);
-		  progress = Math.floor((d - last_updated) / 1000);
-			if (progress < 0)
+			if (d < last_updated)
 			{
-				progress = 0;
+				last_updated = d;
 			}
+		  progress = Math.floor((d - last_updated) / 1000);
 //			console.log(progress);
 			days = Math.floor(progress / (60*60*24));
 			hours = Math.floor(progress / (60*60) % 24);

@@ -1,3 +1,4 @@
+FILTER_COMPLETED = 2
 class Date
   def net_work_days_until(date1, date2=nil)
     if date2.nil?

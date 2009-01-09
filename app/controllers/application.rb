@@ -20,6 +20,9 @@ class ApplicationController < ActionController::Base
   def login_required
 	  authenticate
   end
+  def logged_in?
+	current_user.nil?	  
+  end
   def admin?
   	if current_user.nil?
   		false

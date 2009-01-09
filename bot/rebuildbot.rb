@@ -4,5 +4,5 @@ if ENV['RAILS_ENV'] == 'production'
 else
   puts `curl -s http://localhost:3000/tasks/redo`
 end
-sleep 1
+sleep 10
 end

@@ -32,7 +32,7 @@
 	  </thead>
 		<% for task in @tasks %>
 		<% if (params[:p].blank? || task.parent_id == params[:p].to_i) && 
-					(params[:u].blank? || task.user_id == params[:u].to_i) || !task.type.nil?%>
+			(params[:u].blank? || task.user_id == params[:u].to_i) || !task.type.nil?%>
 		
 	  <tr class="srow">
 				<% unless task.type == "Release" or task.type == "Project"%>
@@ -83,6 +83,7 @@
 		    <td><%= @durations[@durations.size * 0.05].round(3)%> - <%= @durations[@durations.size * 0.95].round(3)%></td>
 			</tr>
 	<% end %>
+		<tr><td colspan="9"></td></tr>
 		</table>
 </div>
 <div id="progress_dialog" style="display:none; background-color:blue; z-index:10">
