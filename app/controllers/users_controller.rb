@@ -25,7 +25,7 @@ class UsersController < ApplicationController
     end
 
     @tasks = Task.root.descendants
-    @tasks.delete_if {|t| t.user_id != @user.id && t.type.nil? }   
+    @tasks.delete_if {|t| (t.user_id != @user.id || task.completed?) && t.type.nil? }   
         
     # find all open intervals not for this task and close them
     @intervals = current_user.intervals.find(:all, :conditions => {:end => nil})      
