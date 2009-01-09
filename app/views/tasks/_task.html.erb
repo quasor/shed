@@ -16,7 +16,9 @@
 						  		<%else -%><img class="item" src="/images/space.gif" align="absmiddle"><%= task.title -%><%end -%>
 							</div>
 						<% elsif task.user_id == current_user.id -%>
-			  			<img class="item" src="/images/space.gif" align="absmiddle"><%= link_to task.title, edit_task_path(task), :style => 'display:inline' -%>
+			  			<img class="item" src="/images/space.gif" align="absmiddle">
+							<%= link_to_remote task.title, :url => edit_task_path(task)%>
+							<span id="edit_task_<%=task.id%>"></span>
 						<% else -%>
 				  		<img class="item" src="/images/space.gif" align="absmiddle"><%= task.title -%>
 						<% end -%>				

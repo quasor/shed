@@ -149,3 +149,4 @@ a.small:hover {text-decoration:none; color:#000; background-color:#fff;}
 
 body {overflow:hidden;}
 .completed {color:#777;;}
+.ui-sortable-helper {color:#000;background-color:#cfc;border:1px dashed #000; width:97%;opacity:0.65;}

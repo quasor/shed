@@ -1,7 +1,7 @@
 <% unless @tasks.empty? %>
 <div id="leftcol" class="resizeable" onscroll="scrollDiv('rightcol','leftcol')">
 		<div class="st">
-			<div style="height:20px;border-top:1px solid white"><b><%= link_to "Filtered - Show All Tasks", root_path, {:style=>'color:#E98C44'} unless params[:p].blank? && params[:u].blank?%></b></div>
+			<div style="height:21px;border-top:1px solid white"><b><%= link_to "Filtered - Show All Tasks", root_path, {:style=>'color:#E98C44'} unless params[:p].blank? && params[:u].blank?%></b></div>
 			<%#= render :partial => 'tasklist', :locals => {:skip_completed => nil}%>
 			<%= render :partial => 'task', :collection => @tasks%>
 		</div>
