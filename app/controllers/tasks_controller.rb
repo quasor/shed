@@ -224,7 +224,7 @@ class TasksController < ApplicationController
   def redo
     @dirty = Rails.cache.fetch("dirty") { 1 }
     @rebuilt = false
-    Rails.cache.fetch("schedule_is_#{@dirty}#{Date.today}#{ params[:force].blank? ? '' : Time.now.to_s(:cache) }", :expires_in => 5.minutes) do
+    Rails.cache.fetch("schedule_is_#{@dirty}#{Date.today}#{ params[:force].blank? ? '' : Time.now.to_s(:cache) }", :expires_in => 1.hour) do
        rebuild_schedule(true) 
        @rebuilt = true
     end
@@ -239,7 +239,7 @@ class TasksController < ApplicationController
     @project_date_collection = {}
     @project_user_date_collection = {}
     user_ids = []
-    @sim_count = 100
+    @sim_count = 10
     @task_projections = {}
     @sim_count.times do |i|
       # walk the schedule once
@@ -253,7 +253,7 @@ class TasksController < ApplicationController
           task_end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate)
           projections[task.id] = Projection.new(:start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
           @task_projections[task.id] ||= []
-          @task_projections[task.id].push Projection.create(:task_id => task.id, :start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
+          @task_projections[task.id].push Projection.new(:task_id => task.id, :start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
         else 
           task.start = Date.today
         end
@@ -306,19 +306,26 @@ class TasksController < ApplicationController
         Projection.create(:task_id => release.id, :start => s, :end => e, :simulation_id => @simulation.id) unless s.nil? || e.nil?
       end
     end
-#    @task_projections.each_pair do |task_id,projections|
+    @task_projections.each_pair do |task_id,projections|
 #        projections.each { |p| p.save! }
-#    end
-    
-    Task.active.each do |task|
-      prjs = task.projections.simulation(@simulation.id).sort_by{|p| p.start}
-      mid = prjs.size * 0.5
-      std_dev1 = prjs.size * 0.34
-      unless prjs.empty?
-        Projection.create(:task_id => task.id, :start => prjs[mid].start, :end => prjs[mid].end, :confidence => 1) # mean
-        Projection.create(:task_id => task.id, :start => prjs[mid-std_dev1].start, :end => prjs[mid+std_dev1].end, :confidence => 67) # mean
+      task = Task.find(task_id)
+      mid = projections.size * 0.5
+      std_dev1 = projections.size * 0.34
+      unless projections.empty? || !task.type.nil? || task.completed?
+        Projection.create(:task_id => task.id, :start => projections[mid].start, :end => projections[mid].end, :confidence => 1) # mean
+        Projection.create(:task_id => task.id, :start => projections[mid-std_dev1].start, :end => projections[mid+std_dev1].end, :confidence => 67) # mean
       end
     end
+    
+#    Task.active(true).each do |task|
+#      prjs = task.projections.simulation(@simulation.id).sort_by{|p| p.start}
+#      mid = prjs.size * 0.5
+#      std_dev1 = prjs.size * 0.34
+#      unless prjs.empty? || !task.type.nil? || task.completed?
+#        Projection.create(:task_id => task.id, :start => prjs[mid].start, :end => prjs[mid].end, :confidence => 1) # mean
+#        Projection.create(:task_id => task.id, :start => prjs[mid-std_dev1].start, :end => prjs[mid+std_dev1].end, :confidence => 67) # mean
+#      end
+#    end
     
     logger.info '---------------------- Completed simulation ---------------------- '
     
