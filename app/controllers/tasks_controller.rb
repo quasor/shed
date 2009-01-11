@@ -257,7 +257,7 @@ class TasksController < ApplicationController
           task_end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate)
           projections[task.id] = Projection.new(:start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
           @task_projections[task.id] ||= []
-          @task_projections[task.id].push Projection.new(:task_id => task.id, :start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
+          @task_projections[task.id].push Projection.new(:task_id => task.id, :start => task.start, :end => task_end == task.start ? (task_end + 1) : task_end, :simulation_id => @simulation.id) if task.type.nil?
         else 
           task.start = Date.today
         end
@@ -316,8 +316,8 @@ class TasksController < ApplicationController
       mid = projections.size * 0.5
       std_dev1 = projections.size * 0.34
       unless projections.empty? || !task.type.nil? || task.completed?
-        Projection.create(:task_id => task.id, :start => projections[mid].start, :end => projections[mid].end, :confidence => 1) # mean
-        Projection.create(:task_id => task.id, :start => projections[mid-std_dev1].start, :end => projections[mid+std_dev1].end, :confidence => 67) # mean
+        Projection.create(:task_id => task.id, :start => projections[mid].start, :end => projections[mid].end == projections[mid].start ? (projections[mid].end + 1) : projections[mid].end, :confidence => 1) # mean
+        Projection.create(:task_id => task.id, :start => projections[mid-std_dev1].start, :end => projections[mid+std_dev1].end == projections[mid-std_dev1].start ? (projections[mid+std_dev1].end + 1) : projections[mid+std_dev1].end, :confidence => 67) # mean
       end
     end
     
