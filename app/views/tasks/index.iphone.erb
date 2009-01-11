@@ -27,8 +27,6 @@
 	  </thead>
 	  <tbody>
 		<% for task in @tasks %>
-		<% if (params[:p].blank? || task.parent_id == params[:p].to_i) && 
-					(params[:u].blank? || task.user_id == params[:u].to_i) || !task.type.nil?%>
 		
 	  <tr class="srow">
 				<% unless task.type == "Release" or task.type == "Project"%>
@@ -38,7 +36,7 @@
 			    <td><%=h task.high %></td>
 			    <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td>
 					<!-- <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td> -->
-			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
+			    <td nowrap><%=task.user ? (link_to task.user.name, :filter_user => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
 			    <td><nobr><%=h task.start unless task.completed?%></nobr></td>
 			    <td><nobr><%=h task.end unless task.completed?%></nobr></td>
 
@@ -80,7 +78,6 @@
 					<% end %>
 				<% end %>
 		  </tr>
-		<% end %>
 		<% end %>
 		<tr><td colspan="9"></td></tr>
 		</tbody>

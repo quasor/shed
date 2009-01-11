@@ -47,27 +47,31 @@
 				<%= image_tag "Dino_green_512x512.png", :align => "absmiddle" %>				
 			</span>
 			<span style="float:right;text-align:right;padding-right:8px;">
-				<%= link_to_unless_current "Bookmark Me", login_path(:lkey => current_user.loginkey) unless current_user.nil? %>
+				<%= link_to_unless_current "Bookmark Link", login_path(:lkey => current_user.loginkey) unless current_user.nil? %>
 			</span>
+			<div style="float:left" id="save_module">
+			<%= yield :save_module%>
+			</div>
+			<div style="float:left;padding-left:3em;">
+				<p id="flash"><%= flash[:notice] %></p>
+				<p style="color: red"><%= flash[:warning] %></p>
+				<p style="color: #444"><%= flash[:light] %></p>
+			</div>
 			<div style="padding-right:2em;padding-left:0.5em;float:left;padding-top:.75em;font-size:12px">
 				<b><%= link_to_unless_current @timer.nil? ? 'Schedule' : '', root_path %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
 				<b><%= link_to_unless_current 'Time Spent', intervals_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
 				<b><%= link_to_current_task %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
 				<form style="display:inline" action="/" id='filter_form'>
-				<%=select_tag 'filter', options_for_select([['All Tasks',1], ['Active Tasks',2], ["Owner",3]],session[:filter]), :onchange =>"$('#filter_form').submit()" %>
-				</form><b>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
-				<b><%= link_to 'Rebuild Schedule', root_path(:force=>true) %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
+					<b>Filters:</b>
+					<%= link_to 'reset', root_path(:filter_tasks => 1, :filter_user => current_user.id, :filter_project => 0)%>
+				<%=select_tag 'filter_user', options_for_select([['All Users',0]]) + options_from_collection_for_select(User.all,:id,:name,session[:filter][:user].to_i), :onchange =>"$('#filter_form').submit()" %>
+				<%=select_tag 'filter_tasks', options_for_select([['All Tasks',0], ['Active Tasks',1]],session[:filter][:tasks]), :onchange =>"$('#filter_form').submit()" %>
+				<%=select_tag 'filter_project', options_for_select([['All Projects',0]]) + options_from_collection_for_select(Project.all,:id,:title,session[:filter][:project].to_i), :onchange =>"$('#filter_form').submit()" %>
+				</form>
 			</div>
+			
 		<% end %>
 
-		<div style="float:left" id="save_module">
-		<%= yield :save_module%>
-		</div>
-		<div style="float:left;padding-left:3em">
-			<p id="flash"><%= flash[:notice] %></p>
-			<p style="color: red"><%= flash[:warning] %></p>
-			<p style="color: #444"><%= flash[:light] %></p>
-		</div>
 	</div>
 	
 <% if false %>

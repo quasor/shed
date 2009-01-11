@@ -1,7 +1,7 @@
 <% unless @tasks.empty? %>
 <div id="leftcol" class="resizeable">
 		<div class="st">
-			<div style="height:21px;border-top:1px solid white"><b><%= link_to "Filtered - Show All Tasks", root_path, {:style=>'color:#E98C44'} unless params[:p].blank? && params[:u].blank?%></b>
+			<div style="height:21px;border-top:1px solid white">
 				<%= @task_intervals%>
 				</div>
 			<%#= render :partial => 'tasklist', :locals => {:skip_completed => nil}%>
@@ -26,7 +26,7 @@
 							<% @milestones = Release.all.collect(&:due)%>
 							<% for i in 0..@total_calendar_days-%>
 							<% d = Date.today + i -%>
-							<div style="position:absolute;top:1em;left:<%= @day_in_pixels * i %>px;height:<%= @tasks.size * 2.5%>em;width:<%=@day_in_pixels-1%>px;<% if d.wday == 0 || d.wday == 6 %>background-color:#777;opacity:0.5;<% elsif @milestones.include? d%>border-right:2px dotted #900;<%end %>border-left:1px solid #ccc;"><span style="position:absolute;top:-1.5em;left:-<%=1%>px;z-index:10;font-weight:normal;font-size:11px;padding-left:2px; border-left:1px solid #ccc"><%= d.strftime('%m/%d') if d.wday == 1%></span></div>
+							<div style="position:absolute;top:1em;left:<%= @day_in_pixels * i %>px;height:<%= @tasks.size * 2.5%>em;width:<%=@day_in_pixels-1%>px;<% if d.wday == 0 || d.wday == 6 %>background-color:#cdc;opacity:0.5;<% elsif @milestones.include? d%>border-right:2px dotted #900;<%end %>border-left:1px solid #ccc;"><span style="position:absolute;top:-1.5em;left:-<%=1%>px;z-index:10;font-weight:normal;font-size:11px;padding-left:2px; border-left:1px solid #ccc"><%= d.strftime('%m/%d') if d.wday == 1%></span></div>
 							<% end -%>
 						</div>
 				</td>
@@ -41,8 +41,6 @@
 		<% unless projection1.nil?%>
 		<% projection1.end = projection1.end + 1 if projection1.end == projection1.start%>
 		<% end %>
-		<% if (params[:p].blank? || task.parent_id == params[:p].to_i) && 
-			(params[:u].blank? || task.user_id == params[:u].to_i) || !task.type.nil?%>
 		
 	  <tr class="srow">
 				<% unless task.type == "Release" or task.type == "Project"%>
@@ -50,7 +48,7 @@
 			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?h or task.estimate.include? ?d or task.estimate.blank?%></td>
 			    <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td>
 					<!-- <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td> -->
-			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
+			    <td nowrap><%=task.user ? (link_to task.user.name, :filter_user => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
 			    <td><nobr><%=h task.start unless task.completed?%></nobr></td>
 			    <td><nobr><%=h task.end unless task.completed?%> 
 									  <% unless projection67.nil? %><% end %></nobr></td>
@@ -108,12 +106,6 @@
 <div id="progress_dialog" style="display:none; background-color:blue; z-index:10">
 	word
 </div>
-
-				
-<% else %>
-<h1>Create a new release	</h1>
-<%= link_to "New Release", new_release_path%>
-<% end %>
 
 <% if true %>
 
@@ -174,8 +166,8 @@ function scrollDiv(lckDiv, scrDiv)
 
 function Resize()
 {
-	$('#rightcol').css('height',$(window).height() - 36);
-	$('#leftcol').css('height',$(window).height() - 36 - 16);
+	$('#rightcol').css('height',$(window).height() - 48);
+	$('#leftcol').css('height',$(window).height() - 48 - 16);
 	$('#rightcol').css('width',$(window).width() - 303);	
 }
 if (window.attachEvent) {

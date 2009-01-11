@@ -7,23 +7,39 @@ class TasksController < ApplicationController
   def index
     @day_in_pixels = 16
     # init filters
-    session[:filter] ||= FILTER_COMPLETED
-    session[:filter_by] ||= current_user.id
-    session[:filter] = params[:filter].to_i unless params[:filter].blank?
-    unless params[:u].blank?
-      session[:filter] = 3
-      session[:filter_by] = params[:u].to_i
-   end
-   @taskz = rebuild_schedule(params[:force] == "true", true) 
-   if session[:filter] == FILTER_COMPLETED
-     @tasks = @taskz.collect {|task| task unless task.completed?}
-     @tasks.compact!
-   elsif session[:filter] == 3
-     @tasks = @taskz.collect {|task| task if task.user_id == session[:filter_by]}
-     @tasks.compact!     
-   else
-     @tasks = @taskz
-   end
+    session[:filter] ||= {}
+    session[:filter][:tasks] ||= 1
+    session[:filter][:user] ||= 0
+    session[:filter][:project] ||= 0
+    session[:filter][:tasks] = params[:filter_tasks].to_i unless params[:filter_tasks].blank?
+    session[:filter][:user] = params[:filter_user].to_i unless params[:filter_user].blank?
+    session[:filter][:project] = params[:filter_project].to_i unless params[:filter_project].blank?
+    @taskz = rebuild_schedule(params[:force] == "true", true) 
+    @taskz = Task.root.descendants
+    #if session[:filter][:tasks] == 1
+    #  @tasks = @taskz.collect {|task| task unless task.completed?}
+    #else
+    #  @tasks = @taskz
+    #end
+    @tasks = @taskz.collect do |task|
+      skip = false
+      if task.type.nil?
+        if session[:filter][:tasks] == 1 && task.completed? 
+          skip = true
+        end  
+        if session[:filter][:user] != 0 && session[:filter][:user] != task.user_id
+          skip = true
+        end  
+        if session[:filter][:project] != 0 && session[:filter][:project] != task.parent_id
+          skip = true
+        end  
+      end
+      if skip
+        logger.info 'skipping task...'
+      end
+      task unless skip
+    end
+    @tasks.compact!
 
    @tasks ||= []
 
@@ -69,7 +85,7 @@ class TasksController < ApplicationController
         unless i == 0
           puts "moving #{@order[i]} to right of #{@order[i-1]}"
           preceeding_task = Task.find @order[i-1]
-          task.move_to_right_of preceeding_task if task.type.nil?
+          task.move_to_right_of preceeding_task if task.type.nil? && (admin? || current_user.id == task.user_id)
         else 
           puts "move to top"
           #task.move_to_top if task.type.nil?
@@ -350,8 +366,7 @@ class TasksController < ApplicationController
         @dirty = Rails.cache.fetch("dirty") { 1 }
         Release.all
         Project.all
-        t = Rails.cache.fetch("schedule_#{@root.cache_key}#{@dirty}", :expires_in => 1.hour ) do #
-            
+        t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
             user_end_dates = {}
             tasks = []
             @tasks_raw = Task.root.descendants
@@ -378,8 +393,8 @@ class TasksController < ApplicationController
               @total_calendar_days = [end_dates.compact.max - Date.today,14].max + 60
             end
           end
-          t
         end
+        t
     end
     # end of class
 end
