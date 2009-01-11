@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090111025606) do
+ActiveRecord::Schema.define(:version => 20090111091951) do
 
   create_table "holidays", :force => true do |t|
     t.date     "holiday"
@@ -31,7 +31,7 @@ ActiveRecord::Schema.define(:version => 20090111025606) do
     t.integer  "task_id",       :limit => 11
     t.date     "start"
     t.date     "end"
-    t.float    "confidence",                  :default => 0.0
+    t.integer  "confidence",    :limit => 11, :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id",       :limit => 11

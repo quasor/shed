@@ -6,7 +6,6 @@ class TasksController < ApplicationController
   before_filter :login_required, :except => [:redo]
   def index
     @day_in_pixels = 16
-
     # init filters
     session[:filter] ||= FILTER_COMPLETED
     session[:filter_by] ||= current_user.id
@@ -32,6 +31,7 @@ class TasksController < ApplicationController
      Holiday.find(:all, :select => :holiday).collect(&:holiday)
    end
     
+   @simulation = Simulation.last
     
     if Release.count == 0
       flash[:warning] = 'Your schedule is empty'
@@ -224,7 +224,7 @@ class TasksController < ApplicationController
   def redo
     @dirty = Rails.cache.fetch("dirty") { 1 }
     @rebuilt = false
-    Rails.cache.fetch("schedule_is_#{@dirty}") do
+    Rails.cache.fetch("schedule_is_#{@dirty}#{Date.today}#{ params[:force].blank? ? '' : Time.now.to_s(:cache) }", :expires_in => 5.minutes) do
        rebuild_schedule(true) 
        @rebuilt = true
     end
@@ -253,7 +253,7 @@ class TasksController < ApplicationController
           task_end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate)
           projections[task.id] = Projection.new(:start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
           @task_projections[task.id] ||= []
-          @task_projections[task.id].push Projection.new(:task_id => task.id, :start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
+          @task_projections[task.id].push Projection.create(:task_id => task.id, :start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
         else 
           task.start = Date.today
         end
@@ -306,18 +306,20 @@ class TasksController < ApplicationController
         Projection.create(:task_id => release.id, :start => s, :end => e, :simulation_id => @simulation.id) unless s.nil? || e.nil?
       end
     end
-    @task_projections.each_pair do |task_id,projections|
-      # Save the projections for this task
-      projections.each { |p| p.save! }
-      task = Task.find task_id
-      starts = projections.collect {|p| p.start }
-      ends = projections.collect {|p| p.end }
-      starts.sort!
-      ends.sort!
-      l = starts.size * 0.10
-      h = starts.size * 0.95
-      task.update_attributes(:best_start => starts[l], :worst_start => starts[h], :best_end => ends[l], :worst_end => ends[h] )
+#    @task_projections.each_pair do |task_id,projections|
+#        projections.each { |p| p.save! }
+#    end
+    
+    Task.active.each do |task|
+      prjs = task.projections.simulation(@simulation.id).sort_by{|p| p.start}
+      mid = prjs.size * 0.5
+      std_dev1 = prjs.size * 0.34
+      unless prjs.empty?
+        Projection.create(:task_id => task.id, :start => prjs[mid].start, :end => prjs[mid].end, :confidence => 1) # mean
+        Projection.create(:task_id => task.id, :start => prjs[mid-std_dev1].start, :end => prjs[mid+std_dev1].end, :confidence => 67) # mean
+      end
     end
+    
     logger.info '---------------------- Completed simulation ---------------------- '
     
   end

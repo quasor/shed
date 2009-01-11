@@ -6,4 +6,5 @@ class Projection < ActiveRecord::Base
   named_scope :rollup, :conditions => {:user_id => nil}
   named_scope :rollup_by_user, lambda { |user_id| { :conditions => {:user_id => user_id} } }
   named_scope :simulation, lambda { |sim_id| { :conditions => {:simulation_id => sim_id} } }
+  named_scope :confidence, lambda { |c| { :conditions => {:confidence => c} } }
 end

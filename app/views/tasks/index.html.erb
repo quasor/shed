@@ -33,6 +33,8 @@
 			</tr>
 	  </thead>
 		<% for task in @tasks %>
+		<% projection1 = task.projections.confidence(1).last %>
+		<% projection67 = task.projections.confidence(67).last %>
 		<% if (params[:p].blank? || task.parent_id == params[:p].to_i) && 
 			(params[:u].blank? || task.user_id == params[:u].to_i) || !task.type.nil?%>
 		
@@ -44,16 +46,22 @@
 					<!-- <td><%=h task.monte_estimate.round(2) unless task.low.nil?%></td> -->
 			    <td nowrap><%=task.user ? (link_to task.user.name, :u => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
 			    <td><nobr><%=h task.start unless task.completed?%></nobr></td>
-			    <td><nobr><%=h task.end unless task.completed?%> <% unless params[:xray].blank? || task.best_start.nil? %>[<%=task.best_start%> - <%=task.worst_end%>]<% end %></nobr></td>
+			    <td><nobr><%=h task.end unless task.completed?%> 
+									  <% unless projection67.nil? %><% end %></nobr></td>
 
 					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || task.start.nil? || task.end.nil? %>
 						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">							
-							<span title="<%= task.start.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
+							<span title="<%=task.title %>: <%= task.start.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
 								style="width:<%= @day_in_pixels * (task.end.to_date - task.start.to_date) %>px; left:<%= @day_in_pixels * (task.start - Date.today) %>px"></span>					
-								<% unless params[:xray].blank? || task.best_start.nil?%><span class="ganttbar_r" 
-									style="width:<%= @day_in_pixels * (task.worst_end - task.best_start) %>px; left:<%= @day_in_pixels * (task.best_start - Date.today) %>px"></span>
+								<% unless projection67.nil?%>
+							<span class="ganttbar_r" title="<%=task.title %> - projected (95%): <%=projection67.start.to_s(:long)%> - <%=projection67.end.to_s(:long)%>"
+									style="width:<%= @day_in_pixels * (projection67.end - projection67.start) %>px; left:<%= @day_in_pixels * (projection67.start - Date.today) %>px"></span>
 								<% end %>					
+									<% unless projection1.nil?%>
+								<span class="ganttbar_o" title="<%=task.title %> - projected (mean): <%=projection1.start.to_s(:long)%> - <%=projection1.end.to_s(:long)%>"
+										style="width:<%= @day_in_pixels * (projection1.end - projection1.start) %>px; left:<%= @day_in_pixels * (projection1.start - Date.today) %>px"></span>
+									<% end %>					
 						</div>
 						<% end %>
 					</td>

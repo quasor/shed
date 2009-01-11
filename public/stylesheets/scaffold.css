@@ -82,7 +82,8 @@ a.started {display:block;}
 div.t_title { width:298px;overflow:hidden;}
 .st td {padding-left:3px;padding-right:3px;line-height:1.5em;}
 .ganttbar {height:1em; background-color: #74A5FF;position:absolute;margin-top:0.25em;border:0px solid black;z-index:3;}
-.ganttbar_r {height:1.4em; background-color: #777;position:absolute;margin-top:0.05em;border:0px solid black;z-index:2;opacity:0.35;}
+.ganttbar_r {height:1.4em; background-color: #777;position:absolute;margin-top:0.05em;border:0px solid black;z-index:1;opacity:0.35;}
+.ganttbar_o {height:1.2em; background-color: #222;position:absolute;margin-top:0.15em;border:0px solid black;z-index:2;opacity:0.35;}
 .ganttbar_p {height:1em; background-color: #b2f980;position:absolute;margin-top:0.25em;}
 .ganttbar_s {height:1em; background-color: #647c47;position:absolute;margin-top:0.25em;}
 .ganttbar_warn {height:1em; background-color: #e57878;position:absolute;margin-top:0.25em;}
