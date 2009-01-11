@@ -35,6 +35,12 @@
 		<% for task in @tasks %>
 		<% projection1 = task.projections.confidence(1).last %>
 		<% projection67 = task.projections.confidence(67).last %>
+		<% unless projection67.nil?%>
+		<% projection67.end = projection67.end + 1 if projection67.end == projection67.start%>
+		<% end %>
+		<% unless projection1.nil?%>
+		<% projection1.end = projection1.end + 1 if projection1.end == projection1.start%>
+		<% end %>
 		<% if (params[:p].blank? || task.parent_id == params[:p].to_i) && 
 			(params[:u].blank? || task.user_id == params[:u].to_i) || !task.type.nil?%>
 		
