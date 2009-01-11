@@ -1,0 +1,22 @@
+<style type="text/css" media="screen">
+	td {font-size:120%;}
+	td {border-bottom:1px solid #ccc;}
+	table {border-collapse:collapse;}
+</style>
+<table width="100%" border="0" cellpadding="0">
+<% current_day = nil%>
+<% for i in intervals %>
+	<% if current_day != i.start.to_date %>
+	<% current_day = i.start.to_date %>
+		<tr>
+			<td colspan=4><h2><%=h current_day.to_s(:short)%></h2></td>
+		</tr>
+	<% end %>
+  <tr <% if i.end.nil? %>class="started"<%end%>>
+		<td><%=link_to i.task.title, i.task %></td>
+    <td style="font-size:16px;"><%=h i.start.strftime("%I:%M%p") %> - <%=h i.end.strftime("%I:%M%p") unless i.end.nil? %></td>
+		<td><%unless i.end.nil?%><%= pretty_duration(i)%><%else%><%=link_to_current_task('In Progress')%><%end%></td>
+    <td><%unless i.end.nil?%><%= link_to 'Edit', edit_interval_path(i) %> <%= link_to 'Delete', i, :confirm => 'Are you sure?', :method => :delete %><%end%></td>
+  </tr>
+<% end %>
+</table>

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090109173912) do
+ActiveRecord::Schema.define(:version => 20090111025606) do
 
   create_table "holidays", :force => true do |t|
     t.date     "holiday"
@@ -38,6 +38,11 @@ ActiveRecord::Schema.define(:version => 20090109173912) do
     t.integer  "simulation_id", :limit => 11
   end
 
+  create_table "simulations", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "taggings", :force => true do |t|
     t.integer  "tag_id",        :limit => 11
     t.integer  "taggable_id",   :limit => 11
@@ -61,7 +66,7 @@ ActiveRecord::Schema.define(:version => 20090109173912) do
     t.text     "description"
     t.float    "low_estimate_cache"
     t.float    "high_estimate_cache"
-    t.boolean  "completed",                         :default => false
+    t.boolean  "completed"
     t.integer  "user_id",             :limit => 11
     t.date     "start"
     t.integer  "parent_id",           :limit => 11
@@ -73,6 +78,10 @@ ActiveRecord::Schema.define(:version => 20090109173912) do
     t.date     "due"
     t.date     "end"
     t.string   "estimate"
+    t.date     "best_start"
+    t.date     "worst_start"
+    t.date     "best_end"
+    t.date     "worst_end"
   end
 
   create_table "users", :force => true do |t|

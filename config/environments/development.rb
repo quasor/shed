@@ -7,8 +7,9 @@
 config.action_controller.perform_caching  = false
 
 config.cache_classes = true
+config.action_view.cache_template_loading = false
 # config.cache_store = :blackhole_store
-# config.cache_store = :mem_cache_store, '127.0.0.1:11211', {:namespace => "dev_with_caching"}
+config.cache_store = :mem_cache_store, '127.0.0.1:11211', {:namespace => "dev_with_caching"}
 
 # Log error messages when you accidentally call methods on nil.
 config.whiny_nils = true

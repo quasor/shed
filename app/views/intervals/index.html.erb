@@ -7,14 +7,14 @@
 <table width="100%" border="0" cellpadding="0">
 <% current_day = nil%>
 <% for interval in @intervals %>
-<% if current_day != interval.start.to_date %>
-<% current_day = interval.start.to_date %>
-	<tr>
-		<td colspan=4><h2><%=h current_day.to_s(:short)%></h2></td>
-	</tr>
-<% end %>
+	<% if current_day != interval.start.to_date %>
+	<% current_day = interval.start.to_date %>
+		<tr>
+			<td colspan=4><h2><%=h current_day.to_s(:short)%></h2></td>
+		</tr>
+	<% end %>
   <tr <% if interval.end.nil? %>class="started"<%end%>>
-		<td><%=h interval.task.title %></td>
+		<td><%=link_to interval.task.title, interval.task %></td>
     <td style="font-size:16px;"><%=h interval.start.strftime("%I:%M%p") %> - <%=h interval.end.strftime("%I:%M%p") unless interval.end.nil? %></td>
 		<td><%unless interval.end.nil?%><%= pretty_duration(interval)%><%else%><%=link_to_current_task('In Progress')%><%end%></td>
     <td><%unless interval.end.nil?%><%= link_to 'Edit', edit_interval_path(interval) %> <%= link_to 'Delete', interval, :confirm => 'Are you sure?', :method => :delete %><%end%></td>

@@ -6,17 +6,16 @@ class TasksController < ApplicationController
   before_filter :login_required, :except => [:redo]
   def index
     @day_in_pixels = 16
-    @tasks = []
 
     # init filters
+    session[:filter] ||= FILTER_COMPLETED
     session[:filter_by] ||= current_user.id
     session[:filter] = params[:filter].to_i unless params[:filter].blank?
     unless params[:u].blank?
       session[:filter] = 3
       session[:filter_by] = params[:u].to_i
    end
-   @taskz = rebuild_schedule(params[:force] == "true") 
-   logger.info session[:filter]
+   @taskz = rebuild_schedule(params[:force] == "true", true) 
    if session[:filter] == FILTER_COMPLETED
      @tasks = @taskz.collect {|task| task unless task.completed?}
      @tasks.compact!
@@ -26,6 +25,8 @@ class TasksController < ApplicationController
    else
      @tasks = @taskz
    end
+
+   @tasks ||= []
 
    @holidays = Rails.cache.fetch("Holiday.all.holiday") do
      Holiday.find(:all, :select => :holiday).collect(&:holiday)
@@ -231,6 +232,7 @@ class TasksController < ApplicationController
   end
 
   def run_simulation
+    @simulation = Simulation.create
     logger.warn 'running simulation...'
     durations = []
     #Projection.destroy_all
@@ -238,6 +240,7 @@ class TasksController < ApplicationController
     @project_user_date_collection = {}
     user_ids = []
     @sim_count = 100
+    @task_projections = {}
     @sim_count.times do |i|
       # walk the schedule once
       user_end_dates = {}
@@ -248,12 +251,14 @@ class TasksController < ApplicationController
           user_end_dates[task.user.id] ||= Date.today.work_day(0)
           task.start = user_end_dates[task.user.id].work_day(0)
           task_end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate)
-          projections[task.id] = Projection.new(:start => task.start, :end => task_end) if task.type.nil?
+          projections[task.id] = Projection.new(:start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
+          @task_projections[task.id] ||= []
+          @task_projections[task.id].push Projection.new(:task_id => task.id, :start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
         else 
           task.start = Date.today
         end
       end
-      logger.warn "\n\n\n---------------------------------\n#{user_end_dates.inspect}"
+      logger.warn "\n\n\n---------\n#{user_end_dates.inspect}"
       # use the estimates from the simulation to determine the end date of the project
       Project.all.each do |project|
         #project.projections.destroy_all
@@ -263,9 +268,9 @@ class TasksController < ApplicationController
 
         @project_user_date_collection[project.id] ||= {}
         @project_date_collection[project.id] ||= []
-
+        # init 
         user_ids.each {|user_id| @project_user_date_collection[project.id][user_id] ||= [] }
-
+        # find the max end (last task) for this project
         max_end_date = project.children.collect { |c| projections[c.id] }.flatten.compact.collect(&:end).max
         @project_date_collection[project.id].push max_end_date
 
@@ -282,14 +287,14 @@ class TasksController < ApplicationController
     @project_date_collection.each_pair do |k,v|
       v.compact!
       v.sort! 
-      Projection.create(:task_id => k, :start => v[v.size*0.10], :end => v[v.size*0.95])
+      Projection.create(:task_id => k, :start => v[v.size*0.10], :end => v[v.size*0.95], :simulation_id => @simulation.id)
     end
     
     @project_user_date_collection.each do |pid,hash|
       hash.each_pair do |k,v|
         v.compact!
         v.sort! 
-        Projection.create(:task_id => pid, :user_id => k, :start => v[v.size*0.10], :end => v[v.size*0.95])
+        Projection.create(:task_id => pid, :user_id => k, :start => v[v.size*0.10], :end => v[v.size*0.95], :simulation_id => @simulation.id)
       end
     end
 
@@ -298,17 +303,28 @@ class TasksController < ApplicationController
       unless projections.empty?
         s = projections.collect(&:start).compact.max
         e = projections.collect(&:end).compact.max
-        Projection.create(:task_id => release.id, :start => s, :end => e) unless s.nil? || e.nil?
+        Projection.create(:task_id => release.id, :start => s, :end => e, :simulation_id => @simulation.id) unless s.nil? || e.nil?
       end
     end
-
+    @task_projections.each_pair do |task_id,projections|
+      # Save the projections for this task
+      projections.each { |p| p.save! }
+      task = Task.find task_id
+      starts = projections.collect {|p| p.start }
+      ends = projections.collect {|p| p.end }
+      starts.sort!
+      ends.sort!
+      l = starts.size * 0.10
+      h = starts.size * 0.95
+      task.update_attributes(:best_start => starts[l], :worst_start => starts[h], :best_end => ends[l], :worst_end => ends[h] )
+    end
+    logger.info '---------------------- Completed simulation ---------------------- '
     
   end
     private
     
-    def rebuild_schedule(force = false)
+    def rebuild_schedule(force = false, fromUI = false)
         @root = Task.root # replace this later with a local root
-
         @total_calendar_days = 0
         unless @root.nil?
         if force
@@ -316,14 +332,17 @@ class TasksController < ApplicationController
           @root.save!
         end
         @dirty = Rails.cache.fetch("dirty") { 1 }
-        logger.info "###################################################### #{@dirty}"    
-        t = Rails.cache.fetch("schedule_#{@root.cache_key}#{@dirty}") do #
+        Release.all
+        Project.all
+        t = Rails.cache.fetch("schedule_#{@root.cache_key}#{@dirty}", :expires_in => 1.hour ) do #
+            
             user_end_dates = {}
             tasks = []
             @tasks_raw = Task.root.descendants
             # Compute start times for each task
             @tasks_raw.each do |task|
-              unless task.user.nil? || task.completed? 
+              unless task.user.nil? || task.completed?
+                # compute the schedule
                 user_end_dates[task.user.id] ||= Date.today.work_day(0)
                 task.start = user_end_dates[task.user.id].work_day(0)
                 task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate_days)
@@ -344,7 +363,7 @@ class TasksController < ApplicationController
             end
             Rails.cache.fetch("run_sim_#{@root.cache_key}") do 
               run_simulation
-            end 
+            end unless fromUI 
           end
           t
         end

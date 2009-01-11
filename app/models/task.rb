@@ -3,7 +3,7 @@ class Task < ActiveRecord::Base
   acts_as_nested_set
   acts_as_taggable_on :tags
   named_scope :by_user, lambda { |user_id| { :conditions => {:user_id => user_id} } }
-  named_scope :active, :conditions => {:completed => false}
+  named_scope :active, :conditions => {:completed => false, :type => nil}
   named_scope :complete, :conditions => {:completed => true}
   include NestedSetList
 
@@ -22,6 +22,20 @@ class Task < ActiveRecord::Base
      low.to_f
     elsif low.blank? && high.blank?
       0.0
+    end
+  end
+  
+  def estimate_duration
+    Duration.new((self.estimate_days * 8.hours))
+  end
+  
+  def velocity
+    ed = self.estimate_days
+    if self.completed? && ed > 0 && !self.intervals.empty?
+      act = self.intervals.collect {|i| i.to_seconds}.sum
+      est = ed * 8.hours
+      r = est / act
+      (0.05 <= r && r <= 20 ) ? r : nil
     end
   end
 
@@ -67,10 +81,14 @@ class Task < ActiveRecord::Base
   end
 
   def monte_estimate()
-    velocities ||= DEFAULT_VELOCITIIES 
+    velocities = Rails.cache.fetch("velocities_for_user_#{self.user_id}", :expires_in => 10.minutes) { 
+      self.user.tasks.map(&:velocity).compact 
+    }
+    velocities = velocities + DEFAULT_VELOCITIIES + DEFAULT_VELOCITIIES unless velocities.size > 20
+    #puts velocities
     velocity = velocities[rand(velocities.size)]
     e = estimate_days / velocity
-    #puts "Choosing estimate #{estimate }/ velocity #{velocity} = #{e}"
+    #puts "Choosing estimate #{estimate_days} / velocity #{velocity} = #{e}"
     e
   end
   def deleteable?
