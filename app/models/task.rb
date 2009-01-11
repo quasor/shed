@@ -35,7 +35,7 @@ class Task < ActiveRecord::Base
       act = self.intervals.collect {|i| i.to_seconds}.sum
       est = ed * 8.hours
       r = est / act
-      (0.05 <= r && r <= 20 ) ? r : nil
+      (0.20 <= r && r <= 20 ) ? r : nil
     end
   end
 
