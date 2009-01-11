@@ -10,7 +10,7 @@
 </p>
 <p>
   <b>Actual:</b>
-	<% s = @task.intervals.collect {|i| i.days}.sum %>
+	<% s = @task.intervals.collect {|i| i.to_f}.sum %>
 	<%= Duration.new(s)%>
 </p>
 <p>
