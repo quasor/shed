@@ -226,8 +226,12 @@ class TasksController < ApplicationController
     @rebuilt = false
     Rails.cache.fetch("schedule_is_#{@dirty}#{Date.today}#{ params[:force].blank? ? '' : Time.now.to_s(:cache) }", :expires_in => 1.hour) do
        rebuild_schedule(true) 
-       @rebuilt = true
+       @rebuilt = true       
     end
+    Rails.cache.fetch("run_sim_#{Task.root.cache_key}") do 
+      run_simulation
+      @rebuilt = true       
+    end 
     render :text => @rebuilt ? " #{Time.now} - Rebuild Complete" : " #{Time.now} - Using Cached Copy"
   end
 
@@ -239,7 +243,7 @@ class TasksController < ApplicationController
     @project_date_collection = {}
     @project_user_date_collection = {}
     user_ids = []
-    @sim_count = 10
+    @sim_count = 100
     @task_projections = {}
     @sim_count.times do |i|
       # walk the schedule once
@@ -370,9 +374,6 @@ class TasksController < ApplicationController
             unless end_dates.compact.empty?
               @total_calendar_days = [end_dates.compact.max - Date.today,14].max + 60
             end
-            Rails.cache.fetch("run_sim_#{@root.cache_key}") do 
-              run_simulation
-            end unless fromUI 
           end
           t
         end
