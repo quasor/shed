@@ -315,9 +315,12 @@ class TasksController < ApplicationController
       task = Task.find(task_id)
       mid = projections.size * 0.5
       std_dev1 = projections.size * 0.34
+      projections = projections.sort_by {|r| r.end }
+      starts = projections.collect(&:start).sort
+      ends = projections.collect(&:end).sort
       unless projections.empty? || !task.type.nil? || task.completed?
-        Projection.create(:task_id => task.id, :start => projections[mid].start, :end => projections[mid].end == projections[mid].start ? (projections[mid].end + 1) : projections[mid].end, :confidence => 1) # mean
-        Projection.create(:task_id => task.id, :start => projections[mid-std_dev1].start, :end => projections[mid+std_dev1].end == projections[mid-std_dev1].start ? (projections[mid+std_dev1].end + 1) : projections[mid+std_dev1].end, :confidence => 67) # mean
+        Projection.create(:task_id => task.id, :start => starts[mid], :end => ends[mid] == starts[mid] ? (ends[mid] + 1) : ends[mid], :confidence => 1) # mean
+        Projection.create(:task_id => task.id, :start => starts[mid-std_dev1], :end => ends[mid+std_dev1] == starts[mid-std_dev1] ? (ends[mid+std_dev1] + 1) : projections[mid+std_dev1].end, :confidence => 67) # mean
       end
     end
     
