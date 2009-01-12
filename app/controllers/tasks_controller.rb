@@ -9,7 +9,7 @@ class TasksController < ApplicationController
     # init filters
     session[:filter] ||= {}
     session[:filter][:tasks] ||= 1
-    session[:filter][:user] ||= 0
+    session[:filter][:user] ||= current_user.id
     session[:filter][:project] ||= 0
     session[:filter][:tasks] = params[:filter_tasks].to_i unless params[:filter_tasks].blank?
     session[:filter][:user] = params[:filter_user].to_i unless params[:filter_user].blank?
