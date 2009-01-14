@@ -3,8 +3,8 @@
   <%= f.error_messages %>
 	<%= render :partial => 'form', :locals => {:f => f}%>
   <p>
-		<%= link_to 'Back', tasks_path, :style => "float:right" %>
     <%= f.submit "Save" %>
   </p>
+    <%= link_to 'Back', tasks_path %>
 <% end %>
 
