@@ -2,7 +2,7 @@
 <% form_for(@task) do |f| %>
   <%= f.error_messages %>
 	<%= render :partial => 'form', :locals => {:f => f}%>
+    <%= link_to 'Back', tasks_path, :style=> 'float:right;' %>
 	<%= f.submit "Save", :id => 'submit' %>
-    <%= link_to 'Back', tasks_path %>
 <% end %>
 
