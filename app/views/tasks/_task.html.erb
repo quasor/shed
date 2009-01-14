@@ -22,10 +22,10 @@
 				<% end -%>				
 		<% elsif task.type == "Project" -%>
 			<% link_to(:filter_project => task.id) do -%>
-				<%= task.title -%>
+				<% (task.level*2).times do %>&nbsp;<%end%><%= task.title -%>
 		  <% end -%>
 		<% else -%>
-				<%= task.title-%>
+				<% (task.level*2).times do %>&nbsp;<%end%><%= task.title -%>
 		<% end -%>			
 		<%if @timer.nil?%>
 			<% if task.type == "Release"%>
