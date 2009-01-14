@@ -21,7 +21,7 @@
 		  		<img class="item" src="/images/space.gif" align="absmiddle"><%= task.title -%>
 				<% end -%>				
 		<% elsif task.type == "Project" -%>
-			<% link_to(:filter_project => task.id) do -%>
+			<% link_to(:filter_project => task.id, :filter_user => 0) do -%>
 				<% (task.level*2).times do %>&nbsp;<%end%><%= task.title -%>
 		  <% end -%>
 		<% else -%>
