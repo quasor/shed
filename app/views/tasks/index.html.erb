@@ -57,7 +57,7 @@
 						<% unless task.completed? || task.start.nil? || task.end.nil? %>
 						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">							
 							<span title="<%=task.title %>: <%= task.start.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
-								style="width:<%= @day_in_pixels * (task.end.to_date - task.start.to_date) %>px; left:<%= @day_in_pixels * (task.start - Date.today) %>px"></span>					
+								style="width:<%= @day_in_pixels * (task.end.to_date - task.start.to_date) %>px; left:<%= @day_in_pixels * (task.start.to_date - Date.today) %>px"></span>					
 								<% unless projection67.nil?%>
 							<span class="ganttbar_r" title="<%=task.title %> - projected (95%): <%=projection67.start.to_s(:long)%> - <%=projection67.end.to_s(:long)%>"
 									style="width:<%= @day_in_pixels * (projection67.end - projection67.start) %>px; left:<%= @day_in_pixels * (projection67.start - Date.today) %>px"></span>

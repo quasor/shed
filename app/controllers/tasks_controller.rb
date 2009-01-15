@@ -15,7 +15,7 @@ class TasksController < ApplicationController
     session[:filter][:user] = params[:filter_user].to_i unless params[:filter_user].blank?
     session[:filter][:project] = params[:filter_project].to_i unless params[:filter_project].blank?
     @taskz = rebuild_schedule(params[:force] == "true", true) 
-    @taskz = Task.root.descendants
+    #@taskz = Task.root.descendants
     #if session[:filter][:tasks] == 1
     #  @tasks = @taskz.collect {|task| task unless task.completed?}
     #else
@@ -366,7 +366,7 @@ class TasksController < ApplicationController
         @dirty = Rails.cache.fetch("dirty") { 1 }
         Release.all
         Project.all
-        t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
+        #t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
             user_end_dates = {}
             tasks = []
             @tasks_raw = Task.root.descendants
@@ -390,11 +390,11 @@ class TasksController < ApplicationController
           unless alltasks.empty?
             end_dates = alltasks.collect(&:end) 
             unless end_dates.compact.empty?
-              @total_calendar_days = [end_dates.compact.max - Date.today,14].max + 60
+              @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 60
             end
           end
-        end
-        t
+        #end
+        @tasks_raw
     end
     # end of class
 end

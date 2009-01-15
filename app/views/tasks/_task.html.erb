@@ -15,17 +15,17 @@
 					</div>
 				<% elsif task.user_id == current_user.id -%>
 	  			<img class="item" src="/images/space.gif" align="absmiddle">
-					<%= link_to_remote task.title, :url => edit_task_path(task)%>
+					<%= link_to task.title, edit_task_path(task)%>
 					<span id="edit_task_<%=task.id%>"></span>
 				<% else -%>
 		  		<img class="item" src="/images/space.gif" align="absmiddle"><%= task.title -%>
 				<% end -%>				
 		<% elsif task.type == "Project" -%>
-			<% link_to(:filter_project => task.id) do -%>
-				<%= task.title -%>
+			<% link_to(:filter_project => task.id, :filter_user => 0) do -%>
+				<% (task.level*2).times do %>&nbsp;<%end%><%= task.title -%>
 		  <% end -%>
 		<% else -%>
-				<%= task.title-%>
+				<% (task.level*2).times do %>&nbsp;<%end%><%= task.title -%>
 		<% end -%>			
 		<%if @timer.nil?%>
 			<% if task.type == "Release"%>
