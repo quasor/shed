@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
 
   def current_user
     unless session[:user_id].nil?
-      session[:user] ||= User.find session[:user_id]
+      @current_user ||= ((session[:user_id] && User.find_by_id(session[:user_id])) || 0)
     else
       nil
     end
