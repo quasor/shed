@@ -244,7 +244,7 @@ class TasksController < ApplicationController
        rebuild_schedule(true) 
        @rebuilt = true       
     end
-    Rails.cache.fetch("run_sim_#{Task.root.cache_key}") do 
+    Rails.cache.fetch("run_sim_#{Task.root.cache_key}#{@dirty}") do 
       run_simulation
       @rebuilt = true       
     end 
@@ -356,7 +356,7 @@ class TasksController < ApplicationController
     private
     
     def rebuild_schedule(force = false, fromUI = false)
-        @root = Task.root # replace this later with a local root
+        @root = Task.find current_user.team_id # replace this later with a local root
         @total_calendar_days = 0
         unless @root.nil?
         if force

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090112192353) do
+ActiveRecord::Schema.define(:version => 20090115070623) do
 
   create_table "holidays", :force => true do |t|
     t.date     "holiday"
@@ -87,10 +87,11 @@ ActiveRecord::Schema.define(:version => 20090112192353) do
   create_table "users", :force => true do |t|
     t.string   "name"
     t.string   "login"
-    t.float    "efficiency", :default => 0.0
+    t.float    "efficiency",               :default => 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "loginkey"
+    t.integer  "team_id",    :limit => 11
   end
 
 end

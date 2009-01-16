@@ -38,6 +38,15 @@ class Task < ActiveRecord::Base
       (0.20 <= r && r <= 20 ) ? r : nil
     end
   end
+  
+  def friendly_estimate
+    ed = self.estimate_days
+    if ed < 2
+      Duration.new(ed * 8.hours)
+    else
+      ed
+    end
+  end
 
   WORKING_HOURS_PER_DAY = 8
   
