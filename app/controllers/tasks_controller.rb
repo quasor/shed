@@ -378,7 +378,7 @@ class TasksController < ApplicationController
                 user_end_dates[task.user.id] ||= Date.today.work_day(0)
                 task.start = user_end_dates[task.user.id].work_day(0)
                 task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate_days)
-                task.save
+                task.save unless fromUI
               else 
                 task.start = Date.today
               end

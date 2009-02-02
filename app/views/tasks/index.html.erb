@@ -33,18 +33,20 @@
 			</tr>
 	  </thead>
 		<% for task in @tasks %>
+		<% if false %>
 		<% projection1 = task.projections.confidence(1).last %>
 		<% projection67 = task.projections.confidence(67).last %>
 		<% unless projection67.nil?%>
-		<% projection67.end = projection67.end + 1 if projection67.end == projection67.start%>
+			<% projection67.end = projection67.end + 1 if projection67.end == projection67.start%>
 		<% end %>
 		<% unless projection1.nil?%>
-		<% projection1.end = projection1.end + 1 if projection1.end == projection1.start%>
+			<% projection1.end = projection1.end + 1 if projection1.end == projection1.start%>
+		<% end %>
 		<% end %>
 		
 	  <tr class="srow">
 				<% unless task.type == "Release" or task.type == "Project"%>
-			    <td nowrap><%=h task.tag_list %></td>
+			    <td nowrap><%#=h task.tag_list %></td>
 			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?h or task.estimate.include? ?d or task.estimate.blank?%></td>
 			    <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td>
 			    <td nowrap><%=task.user ? (link_to task.user.name, :filter_user => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
