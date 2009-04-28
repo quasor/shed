@@ -44,6 +44,11 @@ class ReleasesController < ApplicationController
       if @release.save      
         @release.move_to_child_of(Task.root)
 
+	      Task.roots.each do |t|
+	        t.updated_at = Time.now
+	        t.save
+	      end
+
         flash[:notice] = 'Release was successfully created.'
         format.html { redirect_to(root_path) }
         format.xml  { render :xml => @release, :status => :created, :location => @release }

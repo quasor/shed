@@ -162,6 +162,11 @@ class TasksController < ApplicationController
           @task.move_to_child_of(Task.find(params[:parent_id]))
         end
         Rails.cache.increment "dirty"
+
+				t = Task.root
+	      t.updated_at = Time.now
+	      t.save
+
         flash[:notice] = 'Task was successfully created.'
         format.html { redirect_to current_user }
         format.xml  { render :xml => @task, :status => :created, :location => @task }
@@ -289,11 +294,13 @@ class TasksController < ApplicationController
   def redo
     @dirty = Rails.cache.fetch("dirty") { 1 }
     @rebuilt = false
-    Rails.cache.fetch("schedule_is_#{@dirty}#{Date.today}#{ params[:force].blank? ? '' : Time.now.to_s(:cache) }", :expires_in => 1.hour) do
+		@root = Task.root
+		@root.reload
+    Rails.cache.fetch("schedule_is_#{@root.cache_key}#{Date.today}", :expires_in => 1.hour) do
        rebuild_schedule(true) 
        @rebuilt = true       
     end
-    Rails.cache.fetch("run_sim_#{Task.root.cache_key}#{@dirty}") do 
+    Rails.cache.fetch("run_sim_#{Task.root.cache_key}") do 
       run_simulation
       @rebuilt = true       
     end 

@@ -48,6 +48,11 @@ class ProjectsController < ApplicationController
         unless (params[:parent_id].blank?)
           @project.move_to_child_of(Task.find(params[:parent_id]))
         end
+
+	      Task.roots.each do |t|
+	        t.updated_at = Time.now
+	        t.save
+	      end
         
         flash[:notice] = 'Project was successfully created.'
         format.html { redirect_to(root_path) }
