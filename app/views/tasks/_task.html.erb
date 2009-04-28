@@ -28,7 +28,7 @@
 								:timer =>params[:timer]), 
 									:class => "hideul", :title => 'Start the clock on this task' unless task.completed?
 								 -%>
-						<%= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} %>
+						<%= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} unless task.completed?%>
 								
 					</div>
 					<span class="task_label" id="<%="task_label_#{task.id}"%>">
@@ -36,7 +36,7 @@
 						<%= f.check_box :completed, :onclick => "this.form.onsubmit();", :style => 'cursor:hand' -%>
 					<% end -%>
 					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get, :update => "edit_task_#{task.id}",
-						:complete => "$('#title_task_#{task.id}').focus();")%>
+						:complete => "$('#task_title_#{task.id}').focus();")%>
 						<% unless task.estimate.blank? %><span class="estimate"><%= task.estimate %></span><% end %>
  					</span>
 							
