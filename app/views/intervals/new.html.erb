@@ -4,18 +4,8 @@
   <%= f.error_messages %>
 
 	<%= f.hidden_field :task_id %>
-	<% fields_for @interval.task do |task_fields| %>
-		<%= task_fields.check_box :completed %>
-				<span style="font-size:120%"><%= task_fields.label :completed%></span>
-	<% end %>
-	<div style="float:left">
-	  <h3><%= f.label :hours %> (Today)</h3> 
-		  <p>
-		    <%= f.text_field :hours, :autocomplete => :off %>
-		  </p>		
-	</div>
 	<div style="float:left; padding-left:2em">
-		<h3>Start / Stop (optional)</h3>
+		<h3>Start / Stop </h3>
 	  <p>
 	    <%= f.datetime_select :start %><br>
 	    <%= f.datetime_select :end %>

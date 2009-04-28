@@ -17,22 +17,28 @@ class UsersController < ApplicationController
   # GET /users/1.xml
   # display the user's timers
   def show
+		@title = "My Tasks"
     @user = User.find(params[:id])
-    @timer = !params[:timer].blank?
+    #@timer = !params[:timer].blank?
 
     unless @user == current_user || admin?
       returning redirect_to(current_user)
     end
 
     @tasks = Task.root.descendants
-    @tasks.delete_if {|t| (t.user_id != @user.id || t.completed?) && t.type.nil? }   
-        
+    @tasks.delete_if {|t| (t.user_id != @user.id || (t.completed? && !t.touched_today?)) && t.type.nil? }   
+    @project_ids = @tasks.collect { |t| t.parent_id }.uniq
+    @tasks.delete_if {|t| !@project_ids.include?(t.id) && t.type == "Project" }   
+		@this_sunday = Date.today - Date.today.cwday
+		
+    #@tasks.delete_if {|t| t.type.nil? && (t.start.to_date > Date.today  + 1.week) }   		
+
     # find all open intervals not for this task and close them
     @intervals = current_user.intervals.find(:all, :conditions => {:end => nil})      
     @interval = current_user.active_intervals.first
     @current_task = @interval.task unless @interval.nil?
     
-
+		# timer code
     unless params[:task_id].blank?
       @task = current_user.tasks.find(params[:task_id]) 
       @interval = @task.intervals.active.first    
@@ -43,9 +49,14 @@ class UsersController < ApplicationController
       @current_task = @task
     end
 
-    @intervals = @intervals - [@interval] if params[:stop].blank?
-    @intervals.each {|i| i.end = DateTime.now;i.save! }
-
+		@intervals = current_user.intervals
+    @intervals = @intervals - [@interval] if params[:stop] != "true" 
+		if params[:stop] == "true"
+			@current_task = nil  
+	    @intervals = current_user.intervals(true).find(:all, :conditions => {:end => nil})      
+    	@intervals.each {|i| i.end = DateTime.now;i.save! }
+		end
+		
     flash[:notice] = ''
 
     unless params[:task_id].blank?

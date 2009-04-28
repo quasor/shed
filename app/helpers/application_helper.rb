@@ -23,7 +23,7 @@ module ApplicationHelper
     end 
   end
   def link_to_current_task(name = nil)
-  	s = "<a href=\"javascript:newwindow=window.open('#{user_path(current_user,:timer=> true, :task_id => current_user.current_task)}','','resizable=1,toolbar=0,location=0,status=0,menubar=0,scrollbars=1,width=275,height=450');newwindow.focus();\" id=\"timer-link\">"
+  	s = "<a href=\"javascript:newwindow=window.open('#{user_path(current_user,:timer=> true, :task_id => current_user.current_task)}','','resizable=1,toolbar=0,location=0,status=0,menubar=0,scrollbars=1,width=800,height=450');newwindow.focus();\" id=\"timer-link\">"
     if current_user.current_task
       if name == nil
 	      s = s + "In Progress: " + truncate(current_user.current_task.title,20)

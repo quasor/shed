@@ -5,7 +5,7 @@
 				<%= @task_intervals%>
 				</div>
 			<%#= render :partial => 'tasklist', :locals => {:skip_completed => nil}%>
-			<%= render :partial => 'task', :collection => @tasks%>
+			<%= render :partial => 'task2', :collection => @tasks%>
 		</div>
 
 </div>
@@ -25,7 +25,7 @@
 						<div style="position:relative; margin-left:0px">				
 							<% @milestones = Release.all.collect(&:due)%>
 							<% for i in 0..@total_calendar_days-%>
-							<% d = Date.today + i -%>
+							<% d = @today + i -%>
 							<div style="position:absolute;top:1em;left:<%= @day_in_pixels * i %>px;height:<%= @tasks.size * 2.5%>em;width:<%=@day_in_pixels-1%>px;<% if d.wday == 0 || d.wday == 6 %>background-color:#cdc;opacity:0.5;<% elsif @milestones.include? d%>border-right:2px dotted #900;<%end %>border-left:1px solid #ccc;"><span style="position:absolute;top:-1.5em;left:-<%=1%>px;z-index:10;font-weight:normal;font-size:11px;padding-left:2px; border-left:1px solid #ccc"><%= d.strftime('%m/%d') if d.wday == 1%></span></div>
 							<% end -%>
 						</div>
@@ -50,22 +50,24 @@
 			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?h or task.estimate.include? ?d or task.estimate.blank?%></td>
 			    <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td>
 			    <td nowrap><%=task.user ? (link_to task.user.name, :filter_user => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
-			    <td><nobr><%=h task.start unless task.completed?%></nobr></td>
-			    <td><nobr><%=h task.end unless task.completed?%> 
-									  <% unless projection67.nil? %><% end %></nobr></td>
+			    <td><nobr><%=h task.start.to_date unless task.completed?%></nobr></td>
+			    <td><nobr><%=h task.end.to_date unless task.completed?%> 
+									  <% unless projection67.nil? %><% end %></nobr>
+										</td>
 
 					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || task.start.nil? || task.end.nil? %>
 						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">							
 							<span title="<%=task.title %>: <%= task.start.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
-								style="width:<%= @day_in_pixels * (task.end.to_date - task.start.to_date) %>px; left:<%= @day_in_pixels * (task.start.to_date - Date.today) %>px"></span>					
+								style="width:<%= @day_in_pixels * (task.end - task.start)%>px; left:
+								<%= @day_in_pixels * (task.start - @today)  %>px"></span>					
 								<% unless projection67.nil?%>
 							<span class="ganttbar_r" title="<%=task.title %> - projected (95%): <%=projection67.start.to_s(:long)%> - <%=projection67.end.to_s(:long)%>"
-									style="width:<%= @day_in_pixels * (projection67.end - projection67.start) %>px; left:<%= @day_in_pixels * (projection67.start - Date.today) %>px"></span>
+									style="width:<%= @day_in_pixels * (projection67.end - projection67.start) %>px; left:<%= @day_in_pixels * (projection67.start - @today) %>px"></span>
 								<% end %>					
 									<% unless projection1.nil?%>
 								<span class="ganttbar_o" title="<%=task.title %> - projected (mean): <%=projection1.start.to_s(:long)%> - <%=projection1.end.to_s(:long)%>"
-										style="width:<%= @day_in_pixels * (projection1.end - projection1.start) %>px; left:<%= @day_in_pixels * (projection1.start - Date.today) %>px"></span>
+										style="width:<%= @day_in_pixels * (projection1.end - projection1.start) %>px; left:<%= @day_in_pixels * (projection1.start - @today) %>px"></span>
 									<% end %>					
 						</div>
 						<% end %>
@@ -85,8 +87,8 @@
 					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || start_p.nil? || end_p.nil? %>
 						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">							
-							<span class="ganttbar_s" style="width:<%= @day_in_pixels * (start_p - Date.today) %>px; left:<%= @day_in_pixels * (0) %>px"></span>					
-							<span class="ganttbar_p" style="width:<%= @day_in_pixels * (end_p - start_p) %>px; left:<%= @day_in_pixels * (start_p - Date.today) %>px"></span>					
+							<span class="ganttbar_s" style="width:<%= @day_in_pixels * (start_p - @today) %>px; left:<%= @day_in_pixels * (0) %>px"></span>					
+							<span class="ganttbar_p" style="width:<%= @day_in_pixels * (end_p - start_p) %>px; left:<%= @day_in_pixels * (start_p - @today) %>px"></span>					
 						</div>
 						<% end %>
 					</td>

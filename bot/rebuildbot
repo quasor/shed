@@ -1,0 +1,4 @@
+while true
+  puts `curl -s http://s.ectdev.com/tasks/redo`
+  sleep 10
+end

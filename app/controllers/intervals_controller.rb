@@ -30,13 +30,14 @@ class IntervalsController < ApplicationController
   # GET /intervals/new.xml
   def new
     @interval = Interval.new
+		@task = Task.find params[:task_id]
     @interval.task = @task
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @interval }
     end
-  rescue
-    redirect_to intervals_path
+  #rescue
+  #  redirect_to intervals_path
   end
 
   # GET /intervals/1/edit
@@ -48,19 +49,33 @@ class IntervalsController < ApplicationController
   # POST /intervals.xml
   def create
     @interval = Interval.new(params[:interval])
+		unless params[:interval][:hours].blank?
+			@task = Task.find params[:interval][:task_id]
+			@task.intervals(true).find(:all, :conditions => {:start => Date.today..Date.today+1}).collect(&:destroy)
+			@interval.end = DateTime.now
+			@interval.start = DateTime.now - params[:interval][:hours].to_f.hours
+		end
     @interval.user = current_user
-
     respond_to do |format|
-      if @interval.save
+      if @interval.save!
         @interval.task.update_attributes(params[:task])
         flash[:notice] = 'Hours were successfully logged.'
         format.html { redirect_to(root_path) }
         format.xml  { render :xml => @interval, :status => :created, :location => @interval }
+				format.js {
+					render :update do |page|
+						@el = "interval_hours_#{@task.id}"
+						page[@el].val("#{@task.duration_friendly}")
+						page.visual_effect :highlight, @el						
+						
+					end
+				}
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @interval.errors, :status => :unprocessable_entity }
       end
     end
+		#@interval.task.intervals.
   end
 
   # PUT /intervals/1

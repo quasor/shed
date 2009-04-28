@@ -1,21 +1,23 @@
-<h1>New Task</h1>
-	<%= f.label :title %> <br />
+<% if @task.new_record? && !request.xhr?%>
+<h1></h1><%#= f.label :task %>
+<%end%>
+<% unless @task.new_record?%>
+  <%= f.check_box :completed %>
+<% end %>
+<% if @task.new_record?%>
 	<%= f.text_field :title, :class => :big%>
+<% else%>
+	<%= f.text_field :title, :class => :big, :id => "title_task_#{@task.id}"%>
+<% end %>
 <div>
 <% if @task.type.nil?%>
 
 <p>
-  <%= f.label :estimate %> <br />
-  <%= f.text_field :estimate, :class => :big %><br/>
-<span class="help" style="font-size:12px">e.g. &nbsp; 0.5h,&nbsp; 1-2 hours,&nbsp; 5h - 1d,&nbsp; 2days</span>
+	<%= f.label :estimate %><br>
+  <%= f.text_field :estimate, :class => :big %><br>
+	<span class="help"> Example: 0.5h,&nbsp; 1-2 hours,&nbsp; 5h - 1d,&nbsp; 2days </span>
 </p>
 
-<% unless @task.new_record?%>
-<p>
-  <%= f.check_box :completed %>
-  <%= f.label :completed %> 
-</p>
-<% end %>
 <% else %>
 <p>
   <%= f.label :due %><br />
@@ -41,13 +43,16 @@
 </p>
 </div>
 <p>
-  <%= f.label :owner %><br />
 	<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
 </p>
 <div style="clear:both"></div>
 <script type="text/javascript" charset="utf-8">
-	function startup()
-	{
-		$("input:visible:enabled:first").focus();
-	}
+function startup(){
+		<% if @task.new_record? %>
+		$("#title_task").focus();		
+		<% else %>
+		$("#title_task_#{@task.id}").focus();		
+		<% end %>
+		$('#task_label_<%= @task.id %>').hide();
+}
 </script>

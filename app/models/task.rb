@@ -28,6 +28,10 @@ class Task < ActiveRecord::Base
   def estimate_duration
     Duration.new((self.estimate_days * 8.hours))
   end
+
+	def touched_today?
+		updated_at.to_date == Date.today
+	end
   
   def velocity
     ed = self.estimate_days
@@ -38,6 +42,16 @@ class Task < ActiveRecord::Base
       (0.20 <= r && r <= 20 ) ? r : nil
     end
   end
+
+	def duration_friendly
+		s = ""
+		s = s + "#{duration.days}d " unless duration.days == 0
+		s = s + "#{duration.hours}h #{duration.minutes}m"
+	end
+	
+	def duration
+		Duration.new(self.intervals.find(:all, :conditions => {:end => Date.today..Date.today+1}).collect {|i| i.to_seconds}.sum)
+	end
   
   def friendly_estimate
     ed = self.estimate_days

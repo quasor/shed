@@ -48,6 +48,7 @@ class TasksController < ApplicationController
    end
     
    @simulation = Simulation.last
+	@today = Date.today
     
     if Release.count == 0
       flash[:warning] = 'Your schedule is empty'
@@ -113,10 +114,18 @@ class TasksController < ApplicationController
   def new
     @task = Task.new
     @task.user = current_user
-
+		@task.title = 'New Task' if request.xhr?
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @task }
+			format.js	{ 
+				render :update do |page|
+					page.insert_html :bottom, "edit_task_#{params[:parent_id]}", :partial => "new"
+					page["task_title"].focus
+					page["task_title"].select
+				end				
+				}
+
     end
   end
 
@@ -126,6 +135,10 @@ class TasksController < ApplicationController
       @task = Task.find(params[:id]) 
     else
       @task = Task.find(params[:id]) 
+    end
+    respond_to do |format|
+      format.html { render :layout => false }
+      format.js  { render :layout => false }
     end
   end
 
@@ -148,8 +161,16 @@ class TasksController < ApplicationController
         end
         Rails.cache.increment "dirty"
         flash[:notice] = 'Task was successfully created.'
-        format.html { redirect_to(tasks_url(:p => params[:parent_id] ? params[:parent_id].to_i : nil)) }
+        format.html { redirect_to current_user }
         format.xml  { render :xml => @task, :status => :created, :location => @task }
+				format.js { 
+					render :update do |page|
+						page.remove "new_task"
+						page.insert_html :bottom, "taskList#{params[:parent_id]}", :partial => @task
+						#page["task_#{@task.id}"].scrollTo
+						page.visual_effect :highlight, "task_#{@task.id}"						
+					end
+					}
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @task.errors, :status => :unprocessable_entity }
@@ -166,8 +187,14 @@ class TasksController < ApplicationController
       if @task.update_attributes(params[:task] || params[:project])
         Rails.cache.increment "dirty"
         flash[:notice] = 'Task was successfully updated.'
-        format.html { redirect_to(tasks_url(:p => @task.parent_id )) }
+        format.html { redirect_to current_user }
         format.xml  { head :ok }
+				format.js { 
+					render :update do |page|
+						page.replace "task_#{@task.id}", :partial => @task
+						page.visual_effect :highlight, "task_#{@task.id}"
+					end
+					}
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @task.errors, :status => :unprocessable_entity }
@@ -185,6 +212,12 @@ class TasksController < ApplicationController
         flash[:notice] = 'Task was successfully updated.'
         format.html { redirect_to(user_path(current_user, :timer => true)) }
         format.xml  { head :ok }
+				format.js { 
+					render :update do |page|
+						page.replace "task_#{@task.id}", :partial => @task
+						page.visual_effect :highlight, "task_#{@task.id}"
+					end
+					}
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @task.errors, :status => :unprocessable_entity }
@@ -367,7 +400,7 @@ class TasksController < ApplicationController
         @dirty = Rails.cache.fetch("dirty") { 1 }
         Release.all
         Project.all
-        #t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
+        t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
             user_end_dates = {}
             tasks = []
             @tasks_raw = Task.root.descendants
@@ -378,24 +411,29 @@ class TasksController < ApplicationController
                 user_end_dates[task.user.id] ||= Date.today.work_day(0)
                 task.start = user_end_dates[task.user.id].work_day(0)
                 task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate_days)
-                task.save unless fromUI
+									
+								task.start = task.start.to_datetime + task.start.day_fraction
+								task.end = task.end.to_datetime + task.end.day_fraction
+
+                task.save! #unless fromUI
               else 
-                task.start = Date.today
+                task.start = Date.today.to_datetime
               end
             end
           end
           
           # done with the rebuild...
           
-          alltasks = Task.root.descendants
-          unless alltasks.empty?
-            end_dates = alltasks.collect(&:end) 
-            unless end_dates.compact.empty?
-              @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 60
-            end
+        end
+        alltasks = Task.root.descendants
+        unless alltasks.empty?
+          end_dates = alltasks.collect(&:end) 
+          unless end_dates.compact.empty?
+            @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 60
           end
-        #end
-        @tasks_raw
+        end
+        #@tasks_raw
+				t
     end
     # end of class
 end

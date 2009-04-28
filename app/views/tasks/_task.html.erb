@@ -1,41 +1,58 @@
-<li id="task_<%=task.read_attribute('id') -%>" class="lirow <%="completed" if task.completed? -%> <%=task.type -%><%=" mine" if task.user_id == current_user -%>">
+<% if task.type == "Project" -%>
+<%unless task.first?%></ul><%end%>
+<% end -%>
+<li id="task_<%=task.read_attribute('id') -%>" class="lirow2 <%='started' if task == @current_task %><%="completed" if task.completed? -%> <%=task.type -%><%=" mine" if task.user_id == current_user -%>">
 		<% if task.type.nil? 
-			-%><% if task.user_id == current_user.id && !@timer.nil? 
-				-%><div id="timer_link_<%=task.id -%>">
-						<% form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "position:absolute;right:4px;"}) do |f| -%>
-							<%= f.check_box :completed, :onclick => "$('#complete_task_#{task.id}').submit();" -%>
-						<% end -%>
-						<%unless task.completed? -%><%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped') + '" src="/images/space.gif" align="absmiddle" border="0"> ' + 
-								task.title, user_path(current_user, 
+			-%><%if task.user_id == current_user.id -%>
+					<div style="position:absolute;right:12px">
+						<% 
+						@interval = Interval.new
+						@interval.task = task
+						%>
+						<% remote_form_for(@interval, 
+								:html => {:method => 'post', :id => "interval_task_#{task.id}", :style => "display:inline"}) do |f| -%>
+							<%= f.hidden_field :task_id %>
+							<%= f.text_field :hours, 
+								:value => "#{task.duration_friendly}",
+								:style=>"border:1px solid #777;margin-top:1px;width:5em;text-align:center;backround-color:none;", 
+								:id => "interval_hours_#{task.id}"-%>
+							<%= f.submit "save", :id => "save_btn_#{task.id}", :style => "display:none" %>
+							<% end unless task.completed?-%>
+						<%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped-hover') + '" src="/images/space.gif" align="absmiddle" border="0"> ',
+						 	 user_path(current_user, 
 								:task_id => (@current_task == task ? nil : task.id), 
 								:stop => (@current_task == task ? true : nil), 
-								:timer =>params[:timer]), 
-								:class => "hideul #{(task == @current_task ? 'started' : 'stopped')}" unless task.completed? -%>
-				  		<%else -%><img class="item" src="/images/space.gif" align="absmiddle"><%= task.title -%><%end -%>
+								:timer =>params[:timer]), :class => "hideul" unless task.completed?
+								 -%>
+						<%#= link_to image_tag("icons/clock_add.png", :border => 0, :align => "absmiddle"), %>
 					</div>
-				<% elsif task.user_id == current_user.id -%>
-	  			<img class="item" src="/images/space.gif" align="absmiddle">
-					<%= link_to task.title, edit_task_path(task)%>
-					<span id="edit_task_<%=task.id%>"></span>
+					<span class="task_label" id="<%="task_label_#{task.id}"%>">
+					<% remote_form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "display:inline"}) do |f| -%>
+						<%= f.check_box :completed, :onclick => "this.form.onsubmit();" -%>
+					<% end -%>
+					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get, :update => "edit_task_#{task.id}",
+						:complete => "$('#title_task_#{task.id}').focus();")%>
+						<% unless task.estimate.blank? %><span class="estimate"><%= task.estimate %></span><% end %>
+ 					</span>
+							
 				<% else -%>
 		  		<img class="item" src="/images/space.gif" align="absmiddle"><%= task.title -%>
 				<% end -%>				
 		<% elsif task.type == "Project" -%>
-			<% link_to(:filter_project => task.id, :filter_user => 0) do -%>
-				<% (task.level*2).times do %>&nbsp;<%end%><%= task.title -%>
-		  <% end -%>
+				<% (task.level).times do %>&nbsp;<%end%><%= task.title -%>
 		<% else -%>
-				<% (task.level*2).times do %>&nbsp;<%end%><%= task.title -%>
+				<% (task.level).times do %>&nbsp;<%end%><%= task.title -%>
 		<% end -%>			
 		<%if @timer.nil?%>
 			<% if task.type == "Release"%>
 				<%=  link_to 'New Project', new_project_path(:parent_id => task.id),:class => 'small' -%>
 			<% elsif task.type == "Project"%>
-				<%=  link_to '+', new_task_path(:parent_id => task.id), :class => 'button_link', :title => 'New Task' -%>
+				<%= link_to_remote '+', :url => new_task_path(:parent_id => task.id), :html => {:class => 'button_link', :title => 'New Task'} -%>
 				<%= link_to "++", {:controller => 'tasks', :action => 'bulknew', :project_id => task.id}, {:class => 'button_link', :title => 'Bulk Add Multiple Tasks'}%>
 			<% end -%>
 		<% end -%>
+		<span class="inline_edit" id="edit_task_<%=task.id%>"></span>
 	</li>
 	<% if task.type == "Project" -%>
-	<%unless task.first?%></ul><%end%><ul id="taskList<%=task.id%>">
+		<ul id="taskList<%=task.id%>">
 	<% end -%>

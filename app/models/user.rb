@@ -23,6 +23,7 @@ class User < ActiveRecord::Base
   end
 
   before_save {|r| r.loginkey = Digest::SHA1.hexdigest(r.login + rand(12345).to_s).to_s.reverse }
+  before_create {|r| r.team_id = Team.all.first.id }
 
   def current_task
     active_intervals.first && active_intervals.first.task
