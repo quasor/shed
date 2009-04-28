@@ -8,7 +8,6 @@
 	<%= f.text_field :title%>
 <% else%>
 	<%= f.text_field :title, :id => "task_title_#{@task.id}"%>
-	<%= link_to 'Delete', @task, :confirm => "About to delete #{@task.title}\n\nAre you sure you wish to delete this task?\n", :method => :delete%>
 <% end %>
 <div>
 <% if @task.type.nil?%>
