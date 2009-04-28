@@ -390,7 +390,7 @@ class TasksController < ApplicationController
     
     def rebuild_schedule(force = false, fromUI = false)
         @root = Task.root
-        @root = Task.find current_user.team_id unless current_user.nil? # replace this later with a local root
+        # @root = Task.find current_user.team_id unless current_user.nil? # replace this later with a local root
         @total_calendar_days = 0
         unless @root.nil?
         if force
