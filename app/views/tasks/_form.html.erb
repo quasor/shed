@@ -5,16 +5,17 @@
   <%= f.check_box :completed %>
 <% end %>
 <% if @task.new_record?%>
-	<%= f.text_field :title, :class => :big%>
+	<%= f.text_field :title%>
 <% else%>
-	<%= f.text_field :title, :class => :big, :id => "title_task_#{@task.id}"%>
+	<%= f.text_field :title, :id => "title_task_#{@task.id}"%>
+	<%= link_to 'Delete', @task, :confirm => "About to delete #{@task.title}\n\nAre you sure you wish to delete this task?\n", :method => :delete%>
 <% end %>
 <div>
 <% if @task.type.nil?%>
 
 <p>
 	<%= f.label :estimate %><br>
-  <%= f.text_field :estimate, :class => :big %><br>
+  <%= f.text_field :estimate%><br>
 	<span class="help"> Example: 0.5h,&nbsp; 1-2 hours,&nbsp; 5h - 1d,&nbsp; 2days </span>
 </p>
 
@@ -47,12 +48,12 @@
 </p>
 <div style="clear:both"></div>
 <script type="text/javascript" charset="utf-8">
-function startup(){
+//function startup(){
 		<% if @task.new_record? %>
 		$("#title_task").focus();		
 		<% else %>
 		$("#title_task_#{@task.id}").focus();		
 		<% end %>
-		$('#task_label_<%= @task.id %>').hide();
-}
+//}
+$('#task_label_<%= @task.id %>').hide();
 </script>

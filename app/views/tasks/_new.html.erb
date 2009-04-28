@@ -1,5 +1,5 @@
 <div id="new_task" class="lirow2">
-<% form_for(@task) do |f| %>
+<% remote_form_for(@task) do |f| %>
 	<%= render :partial => 'form', :locals => {:f => f}%>
 	<%= f.submit "Save", :id => 'submit' %>
 <% end %>

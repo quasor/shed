@@ -52,11 +52,11 @@ class UsersController < ApplicationController
 		@intervals = current_user.intervals
     @intervals = @intervals - [@interval] if params[:stop] != "true" 
 		if params[:stop] == "true"
-			@current_task = nil  
+	    @current_task = nil  
 	    @intervals = current_user.intervals(true).find(:all, :conditions => {:end => nil})      
-    	@intervals.each {|i| i.end = DateTime.now;i.save! }
+	    @intervals.each {|i| i.end = DateTime.now;i.save! }
 		end
-		
+
     flash[:notice] = ''
 
     unless params[:task_id].blank?

@@ -138,7 +138,9 @@ class TasksController < ApplicationController
     end
     respond_to do |format|
       format.html { render :layout => false }
-      format.js  { render :layout => false }
+      format.js  { 
+				render :layout => false 
+			}
     end
   end
 
@@ -169,6 +171,14 @@ class TasksController < ApplicationController
 						page.insert_html :bottom, "taskList#{params[:parent_id]}", :partial => @task
 						#page["task_#{@task.id}"].scrollTo
 						page.visual_effect :highlight, "task_#{@task.id}"						
+						# insert another:
+						@task = Task.new
+						@task.title = 'Another New Task'
+						@task.user = current_user
+						page.replace_html "edit_task_#{params[:parent_id]}", :partial => "new"
+						page["task_title"].focus
+						page["task_title"].select						
+						
 					end
 					}
       else
@@ -231,12 +241,18 @@ class TasksController < ApplicationController
   # DELETE /tasks/1.xml
   def destroy
     @task = (admin? ? Task : current_user.tasks).find(params[:id])
+		@task_id = @task.id
     @task.destroy
     Rails.cache.increment "dirty"
 
     respond_to do |format|
-      format.html { redirect_to(tasks_url) }
+      format.html { redirect_to(current_user) }
       format.xml  { head :ok }
+			format.js {
+				render :update do |page|
+					page.remove "task_#{@task_id}"
+				end
+			}
     end
   end
     
