@@ -61,6 +61,7 @@
 				<b><%= link_to_unless_current @timer.nil? ? 'Schedule' : '', root_path %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
 				<b><%= link_to_unless_current 'Time Spent', intervals_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
 				<b><%= link_to_unless_current 'My Tasks', current_user %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
+				<% if controller.controller_name == 'tasks'%>
 				<form style="display:inline" action="/" id='filter_form'>
 					<b>Filters:</b>
 					<%= link_to 'reset', root_path(:filter_tasks => 1, :filter_user => current_user.id, :filter_project => 0)%>
@@ -68,6 +69,7 @@
 				<%=select_tag 'filter_tasks', options_for_select([['All Tasks',0], ['Active Tasks',1]],session[:filter][:tasks]), :onchange =>"$('#filter_form').submit()" %>
 				<%=select_tag 'filter_project', options_for_select([['All Projects',0]]) + options_from_collection_for_select(Project.all,:id,:title,session[:filter][:project].to_i), :onchange =>"$('#filter_form').submit()" %>
 				</form>
+				<% end %>
 			</div>
 			
 		<% end %>

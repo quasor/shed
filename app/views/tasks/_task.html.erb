@@ -15,6 +15,7 @@
 							<%= f.text_field :hours, 
 								:value => "#{task.duration_friendly}",
 								:style=>"border:1px solid #777;margin-top:1px;width:5em;text-align:center;backround-color:none;", 
+								:onclick => "this.select();",
 								:id => "interval_hours_#{task.id}"-%>
 							<%= f.submit "save", :id => "save_btn_#{task.id}", :style => "display:none" %>
 							<% end unless task.completed?-%>
@@ -28,7 +29,7 @@
 					</div>
 					<span class="task_label" id="<%="task_label_#{task.id}"%>">
 					<% remote_form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "display:inline"}) do |f| -%>
-						<%= f.check_box :completed, :onclick => "this.form.onsubmit();" -%>
+						<%= f.check_box :completed, :onclick => "this.form.onsubmit();", :style => 'cursor:hand' -%>
 					<% end -%>
 					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get, :update => "edit_task_#{task.id}",
 						:complete => "$('#title_task_#{task.id}').focus();")%>

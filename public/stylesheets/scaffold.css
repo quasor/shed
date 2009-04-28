@@ -199,3 +199,4 @@ body {overflow:hidden;}
 }
 .lirow2.started {background-color:#CCFFBF;}
 .lirow2.started:hover {background-color:#F78989;color:#000;}
+select {font-size:11px;}
