@@ -215,6 +215,7 @@ body {overflow:hidden;}
 	background-color: #CED4DD;	
 }
 .lirow2.started {background-color:#CCFFBF;}
+.lirow2 a {text-decoration:none;}
 .lirow2.started:hover {background-color:#F78989;color:#000;}
 .lirow2:hover.Task {background-color:#D9E1F2;color:#000;}
 .lirow2:hover.Task.completed {background-color:#C7C8CF;}
