@@ -1,6 +1,6 @@
 
 
-body, p, ol, ul, td {
+body, p, ol, ul, td, textarea {
   font-family: "lucida grande", arial, helvetica, sans-serif;
   font-size:   11px;
 }
@@ -107,7 +107,7 @@ body {}
 }
 .Project a {text-decoration:none; display:inline; font-size:14px;}
 
-.lirow.Release {font-weight:bold;font-size:14px;height:21px;}
+.lirow.Release {font-weight:bold;font-size:14px;height:22px;}
 
 img.plus {
 	background: url(/images/sprites.png) no-repeat scroll -192px -96px;
@@ -183,7 +183,7 @@ body {overflow:hidden;}
 	background-color:white;
 	}
 .lirow2.Release, .lirow2.Project { width:100%; border:none; font-size:14px; background-color:#AAAEB6; margin-bottom:0px; padding:0px; height:auto;}
-.estimate {
+.taglist {
 	-moz-border-radius: 8px;
 	-webkit-border-radius: 8px;
 	border-radius:8px;
@@ -191,8 +191,24 @@ body {overflow:hidden;}
 	background-color: #DFE7F7;
 	padding-left:8px;
 	padding-right:8px;
-	font-size:9px;
+	font-size:10px;
 }
+.estimate {
+	-moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	border-radius:8px;
+	border: 1px solid #C7EAAD;	
+	background-color: #EDF6E0;
+	padding-left:8px;
+	padding-right:8px;
+	font-size:11px;
+}
+.completed .taglist
+{
+	border: 1px solid #B7BECB;	
+	background-color: #CED4DD;	
+}
+
 .completed .estimate
 {
 	border: 1px solid #B7BECB;	
@@ -200,4 +216,9 @@ body {overflow:hidden;}
 }
 .lirow2.started {background-color:#CCFFBF;}
 .lirow2.started:hover {background-color:#F78989;color:#000;}
+.lirow2:hover.Task {background-color:#D9E1F2;color:#000;}
+.lirow2:hover.Task.completed {background-color:#C7C8CF;}
+.lirow2:hover .estimate,.lirow2:hover .taglist {background-color:white;color:#000;}
 select {font-size:11px;}
+label {width:50px; display:block; float:left; height:32px;}
+textarea {font-size:10px;}

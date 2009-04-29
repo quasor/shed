@@ -3,7 +3,7 @@
 	  <%= f.error_messages %>
 		<%= render :partial => 'form', :locals => {:f => f}%>
 	  <p>
-	    <%= f.submit "Save", :id => 'submit' %>
+	    <%= f.submit "Save", :id => 'submit' %> or <%= link_to_function 'Cancel', "$('#task_label_#{@task.id}').show();$('#edit_task_#{@task.id}').html(\"\");"%>
 	  </p>
 	<% end %>
 <% else %>
@@ -11,9 +11,8 @@
 	  <%= f.error_messages %>
 		<%= render :partial => 'form', :locals => {:f => f}%>
 	  <p>
-	    <%= f.submit "Save", :id => 'submit' %>
+	    <%= f.submit "Save", :id => 'submit' %> or <%= link_to_function 'Cancel', "$('#task_label_#{@task.id}').show();$('#edit_task_#{@task.id}').html(\"\");"%>
 	  </p>
 	<% end %>
 <% end %>
-<%= link_to_function 'Cancel', "$('#task_label_#{@task.id}').show();$('#edit_task_#{@task.id}').html(\"\");"%>
 <%#= link_to_function 'Back', :back %>

@@ -2,20 +2,28 @@
 <h1></h1><%#= f.label :task %>
 <%end%>
 <% unless @task.new_record?%>
-  <%= f.check_box :completed %>
+<label><%= f.check_box :completed %></label>
+<%else%>
+<label><%= f.check_box :completed %></label>
 <% end %>
 <% if @task.new_record?%>
 	<%= f.text_field :title%>
 <% else%>
 	<%= f.text_field :title, :id => "task_title_#{@task.id}"%>
 <% end %>
+<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
 <div>
 <% if @task.type.nil?%>
 
 <p>
-	<%= f.label :estimate %><br>
+	<%= f.label :estimate %>
   <%= f.text_field :estimate%><br>
 	<span class="help"> Example: 0.5h,&nbsp; 1-2 hours,&nbsp; 5h - 1d,&nbsp; 2days </span>
+</p>
+
+<p>
+	<%= f.label :Tags %>
+  <%= f.text_field :tag_list%><br>
 </p>
 
 <% else %>
@@ -38,12 +46,11 @@
 </div>
 <div>
 <p>
-  <%= f.label :description %> <span class="help">(optional)</span><br />
-  <%= f.text_area :description, :rows => 7 %>
+  <%= f.label :notes %> 
+  <%= f.text_area :description, :rows => 2 %>
 </p>
 </div>
 <p>
-	<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
 </p>
 <div style="clear:both"></div>
 <script type="text/javascript" charset="utf-8">

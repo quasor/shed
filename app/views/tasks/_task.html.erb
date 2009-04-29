@@ -3,8 +3,9 @@
 <% end -%>
 <li id="task_<%=task.read_attribute('id') -%>" class="lirow2 <%='started' if task == @current_task %><%="completed" if task.completed? -%> <%=task.type -%><%="Task" if task.type.blank? -%><%=" mine" if task.user_id == current_user -%>">
 		<% if task.type.nil? 
-			-%><%if task.user_id == current_user.id -%>
-					<div style="position:absolute;right:12px">
+			-%>
+			  <%if task.user_id == current_user.id -%>
+					<div style="position:absolute;right:2px">
 						<% 
 						@interval = Interval.new
 						@interval.task = task
@@ -35,25 +36,25 @@
 					<% remote_form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "display:inline"}) do |f| -%>
 						<%= f.check_box :completed, :onclick => "this.form.onsubmit();", :style => 'cursor:hand' -%>
 					<% end -%>
-					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get, :update => "edit_task_#{task.id}",
-						:complete => "$('#task_title_#{task.id}').focus();")%>
+					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get)%>
 						<% unless task.estimate.blank? %><span class="estimate"><%= task.estimate %></span><% end %>
+						<% for tag in task.tag_list%>
+							<span class="taglist"><%= tag%></span>
+						<% end %>
  					</span>
 							
-				<% else -%>
-		  		<img class="item" src="/images/space.gif" align="absmiddle"><%= task.title -%>
 				<% end -%>				
 		<% elsif task.type == "Project" -%>
-				<% (task.level).times do %>&nbsp;<%end%><%= task.title -%>
+				<% (2*task.level).times do %>&nbsp;<%end%><%= task.title -%>
 		<% else -%>
-				<% (task.level).times do %>&nbsp;<%end%><%= task.title -%>
+				<% (2*task.level).times do %>&nbsp;<%end%><%= task.title -%>
 		<% end -%>			
 		<%if @timer.nil?%>
 			<% if task.type == "Release"%>
 				<%=  link_to 'New Project', new_project_path(:parent_id => task.id),:class => 'small' -%>
 			<% elsif task.type == "Project"%>
-				<%= link_to_remote '+', :url => new_task_path(:parent_id => task.id), :html => {:class => 'button_link', :title => 'New Task'} -%>
-				<%= link_to "++", {:controller => 'tasks', :action => 'bulknew', :project_id => task.id}, {:class => 'button_link', :title => 'Bulk Add Multiple Tasks'}%>
+				<%= link_to_remote image_tag("icons/add.png", :border => 0, :align => :absmiddle), :url => new_task_path(:parent_id => task.id), :html => {:class => 'hideul', :title => 'New Task'} -%>
+				<%#= link_to "++", {:controller => 'tasks', :action => 'bulknew', :project_id => task.id}, {:class => 'button_link', :title => 'Bulk Add Multiple Tasks'}%>
 			<% end -%>
 		<% end -%>
 		<span class="inline_edit" id="edit_task_<%=task.id%>"></span>

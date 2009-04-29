@@ -120,7 +120,7 @@ class TasksController < ApplicationController
       format.xml  { render :xml => @task }
 			format.js	{ 
 				render :update do |page|
-					page.insert_html :bottom, "edit_task_#{params[:parent_id]}", :partial => "new"
+					page.replace_html "edit_task_#{params[:parent_id]}", :partial => "new"
 					page["task_title"].focus
 					page["task_title"].select
 				end				
@@ -139,7 +139,11 @@ class TasksController < ApplicationController
     respond_to do |format|
       format.html { render :layout => false }
       format.js  { 
-				render :layout => false 
+				render :update do |page|
+					page.replace_html "edit_task_#{params[:id]}", :partial => "edit"
+					page["task_title"].focus
+					page["task_title"].select						
+				end
 			}
     end
   end
