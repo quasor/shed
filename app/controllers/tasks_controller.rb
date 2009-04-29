@@ -456,7 +456,7 @@ class TasksController < ApplicationController
         unless alltasks.empty?
           end_dates = alltasks.collect(&:end) 
           unless end_dates.compact.empty?
-            @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 60
+            @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 7
           end
         end
         #@tasks_raw
