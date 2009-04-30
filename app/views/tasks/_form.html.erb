@@ -2,9 +2,9 @@
 <h1></h1><%#= f.label :task %>
 <%end%>
 <% unless @task.new_record?%>
-<label><%= f.check_box :completed %></label>
+<label><%= f.check_box :completed if @task.type.nil?%></label>
 <%else%>
-<label><%= f.check_box :completed %></label>
+<label><%= f.check_box :completed if @task.type.nil?%></label>
 <% end %>
 <% if @task.new_record?%>
 	<%= f.text_field :title%>
@@ -30,7 +30,12 @@
 <p>
   <%= f.label :due %><br />
   <%= f.date_select :due %>
+	<% if @task.type == "Project"%>
+		<%= collection_select :neighbor, :project_id, @task.siblings, :id, :title, {:prompt => "Prioritize Below"} %> <span class="help">(optional)</span>
+	<% end %>
 </p>	
+
+
 <% end %>
 <% if false %>
 <!--- 

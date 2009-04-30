@@ -2,7 +2,8 @@ class ProjectsController < ApplicationController
   # GET /projects
   # GET /projects.xml
   def index
-    @projects = Project.find(:all)
+    @projects = Task.root.descendants
+		@projects.delete_if {|p| p.type != "Project"}
 
     respond_to do |format|
       format.html # index.html.erb
@@ -34,7 +35,7 @@ class ProjectsController < ApplicationController
 
   # GET /projects/1/edit
   def edit
-    @project = Project.find(params[:id])
+    @task = Project.find(params[:id])
   end
 
   # POST /projects
@@ -68,11 +69,17 @@ class ProjectsController < ApplicationController
   # PUT /projects/1.xml
   def update
     @project = Project.find(params[:id])
-
+		@neighbor = params[:neighbor][:project_id] unless params[:neighbor][:project_id].blank?
     respond_to do |format|
       if @project.update_attributes(params[:project])
+				unless @neighbor.nil?
+					@project.move_to_right_of Project.find(@neighbor)
+					@root = Task.root
+					@root.updated_at = Time.now
+          @root.save!
+				end
         flash[:notice] = 'Project was successfully updated.'
-        format.html { redirect_to(@project) }
+        format.html { redirect_to tasks_path }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }

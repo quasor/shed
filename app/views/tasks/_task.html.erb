@@ -45,7 +45,7 @@
 							
 				<% end -%>				
 		<% elsif task.type == "Project" -%>
-				<% (2*task.level).times do %>&nbsp;<%end%><%= task.title -%>
+				<% (2*task.level).times do %>&nbsp;<%end%><%= link_to task.title, edit_project_path(task) -%>
 		<% else -%>
 				<% (2*task.level).times do %>&nbsp;<%end%><%= task.title -%>
 		<% end -%>			

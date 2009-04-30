@@ -44,9 +44,10 @@ class Task < ActiveRecord::Base
   end
 
 	def duration_friendly
+		d = duration
 		s = ""
-		s = s + "#{duration.days}d " unless duration.days == 0
-		s = s + "#{duration.hours}h #{duration.minutes}m"
+		s = s + "#{d.days}d " unless d.days == 0
+		s = s + "#{d.hours}h #{d.minutes}m"
 	end
 	
 	def duration

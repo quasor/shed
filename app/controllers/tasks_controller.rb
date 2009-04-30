@@ -80,7 +80,7 @@ class TasksController < ApplicationController
     
     unless @tasks.empty? || @tasks.size < 2
       logger.info @order.collect { |i| Task.find(i).title }.join ','
-      @order.delete_if { |i| !Task.find(i).type.nil? }
+      #@order.delete_if { |i| !Task.find(i).type.nil? }
       @order.each_with_index do |o,i|
         task = Task.find o
         unless i == 0
@@ -182,7 +182,7 @@ class TasksController < ApplicationController
 						page.visual_effect :highlight, "task_#{@task.id}"						
 						# insert another:
 						@task = Task.new
-						@task.title = 'Another New Task'
+						@task.title = 'Another New Task (ESC to close)'
 						@task.user = current_user
 						page.replace_html "edit_task_#{params[:parent_id]}", :partial => "new"
 						page["task_title"].focus
@@ -456,7 +456,7 @@ class TasksController < ApplicationController
         unless alltasks.empty?
           end_dates = alltasks.collect(&:end) 
           unless end_dates.compact.empty?
-            @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 7
+            @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 7	
           end
         end
         #@tasks_raw

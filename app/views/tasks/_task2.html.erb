@@ -1,5 +1,8 @@
-<% if (task2.type == "Project" || task2.type == "Release") && @opened_ul -%>
-</ul><%@opened_ul = false%>
+<% if (task2.type == "Project") && @project_opened_ul == true-%>
+</ul><%@project_opened_ul = false%>
+<% end -%>
+<% if (task2.type == "Release") && @release_opened_ul == true-%>
+</ul><%@release_opened_ul = false%>
 <% end -%>
 <li style="padding-left:<%=task2.level*8%>px" id="task_<%=task2.read_attribute('id') -%>" class="lirow <%="completed" if task2.completed? -%> <%=task2.type -%><%=" mine" if task2.user_id == current_user -%>">
 		<% if task2.type.nil? 
@@ -36,7 +39,7 @@
 		  		<%if task2.completed?%><img class="item" src="/images/space.gif" align="absmiddle"><%end%><%= task2.title -%>
 				<% end -%>				
 		<% elsif task2.type == "Project" -%>
-			<span><%= task2.title -%></span>
+			<span><%= link_to task2.title, edit_project_path(task2) -%></span>
 		<% else -%>
 			<span><%= task2.title -%></span>
 		<% end -%>			
@@ -49,6 +52,9 @@
 			<% end -%>
 		<% end -%>
 	</li>
-	<% if task2.type == "Project" -%>
-		<ul id="taskList<%=task2.id%>"><%@opened_ul = true%>
+	<% if task2.type == "Release"-%>
+		<ul id="taskList<%=task2.id%>"><%@release_opened_ul = true%>
+	<% end -%>
+	<% if task2.type == "Project" || task2.type == "Release"-%>
+		<ul id="taskList<%=task2.id%>"><%@project_opened_ul = true%>
 	<% end -%>
