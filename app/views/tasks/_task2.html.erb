@@ -55,6 +55,6 @@
 	<% if task2.type == "Release"-%>
 		<ul id="taskList<%=task2.id%>"><%@release_opened_ul = true%>
 	<% end -%>
-	<% if task2.type == "Project" || task2.type == "Release"-%>
+	<% if task2.type == "Project"-%>
 		<ul id="taskList<%=task2.id%>"><%@project_opened_ul = true%>
 	<% end -%>
