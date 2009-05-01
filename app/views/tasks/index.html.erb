@@ -33,16 +33,16 @@
 			</tr>
 	  </thead>
 		<% for task in @tasks %>
-		<% if false %>
-		<% projection1 = task.projections.confidence(1).last %>
-		<% projection67 = task.projections.confidence(67).last %>
-		<% unless projection67.nil?%>
-			<% projection67.end = projection67.end + 1 if projection67.end == projection67.start%>
-		<% end %>
-		<% unless projection1.nil?%>
-			<% projection1.end = projection1.end + 1 if projection1.end == projection1.start%>
-		<% end %>
-		<% end %>
+			<% if false %>
+				<% projection1 = task.projections.confidence(1).last %>
+				<% projection67 = task.projections.confidence(67).last %>
+				<% unless projection67.nil?%>
+					<% projection67.end = projection67.end + 1 if projection67.end == projection67.start%>
+				<% end %>
+				<% unless projection1.nil?%>
+					<% projection1.end = projection1.end + 1 if projection1.end == projection1.start%>
+				<% end %>
+			<% end %>
 		
 	  <tr class="srow">
 				<% unless task.type == "Release" or task.type == "Project"%>
@@ -77,13 +77,13 @@
 				<%else # Releases and Projects:%>
 				<td colspan="6"><nobr>
 					Due <%= task.due_date %>  
-					<% unless task.projections.nil? || task.projections.empty?%>
+					<% unless task.projections.nil? || task.projections.empty? || true%>
 					<% start_p = task.projections.rollup.last.start %>
 					<% end_p = task.projections.rollup.last.end %>
 						<b>ETA: <%= start_p%>  - <%= end_p %></b>
 					<% end %>
 					</nobr></td>
-					<% unless task.projections.nil? || task.projections.empty?%>
+					<% unless task.projections.nil? || task.projections.empty? || true %>
 					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || start_p.nil? || end_p.nil? %>
 						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">							
@@ -137,6 +137,17 @@ function startup()
 		}
 	});
 	<% end %>
+
+	<% Release.all.each do |release| %>
+	$('#taskList<%=release.id%>').sortable({
+		axis: "y",
+		stop: function(e,ui) {
+			$('#order').val( $('#taskList<%=release.id%>').sortable('serialize', {"key":''}));
+			$('#task_submit').show();
+		}
+	});
+	<% end %>
+	
 	$('#task_submit').hide();
 
      $('a.stopped').hover(function() {
@@ -153,8 +164,6 @@ function startup()
 }
 function updateScroll()
 {
-	alert('foo')
-	//setTimeout("",5);
 
 }
 function scrollDiv(lckDiv, scrDiv)
