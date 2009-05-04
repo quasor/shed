@@ -14,16 +14,12 @@
 	
 <% if true %>
 	<script src="http://www.google.com/jsapi"></script>
-	<link type="text/css" href="http://jqueryui.com/latest/themes/base/ui.all.css" rel="stylesheet" />
-  <script type="text/javascript" src="http://jqueryui.com/latest/jquery-1.3.2.js"></script>
-  <script type="text/javascript" src="http://jqueryui.com/latest/ui/ui.core.js"></script>
-  <script type="text/javascript" src="http://jqueryui.com/latest/ui/ui.resizable.js"></script>
-  
+	
 	<%#= javascript_include_tag 'jquery-1.2.6'%>
 	<script type="text/javascript" charset="utf-8">
 	function startup() {}
-	//google.load("jquery", "1");
-	//google.load("jqueryui", "1");
+	google.load("jquery", "1");
+	google.load("jqueryui", "1");
 	google.setOnLoadCallback(function() { 
 		// Load jQuery
 		//jQuery.noConflict();		
