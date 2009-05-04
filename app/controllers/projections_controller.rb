@@ -58,7 +58,6 @@ class ProjectionsController < ApplicationController
   # PUT /projections/1.xml
   def update
     @projection = Projection.find(params[:id])
-
     respond_to do |format|
       if @projection.update_attributes(params[:projection])
         flash[:notice] = 'Projection was successfully updated.'

@@ -4,10 +4,10 @@ module ApplicationHelper
 	controller.logged_in?
   end
   def admin?
-	  controller.admin?
+		@is_admin ||= controller.admin?
   end
   def current_user
-	  controller.current_user
+		@current_user ||= controller.current_user
   end
   
   def render_nested_set( node, i )

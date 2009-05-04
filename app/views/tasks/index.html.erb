@@ -1,3 +1,4 @@
+<% @slow_down = false %>
 <% unless @tasks.empty? %>
 <div id="leftcol" class="resizeable">
 		<div class="st">
@@ -25,15 +26,25 @@
 						<div style="position:relative; margin-left:0px">				
 							<% @milestones = Release.all.collect(&:due)%>
 							<% for i in 0..@total_calendar_days-%>
-							<% d = @today + i -%>
-							<div style="position:absolute;top:1em;left:<%= @day_in_pixels * i %>px;height:<%= @tasks.size * 2.5%>em;width:<%=@day_in_pixels-1%>px;<% if d.wday == 0 || d.wday == 6 %>background-color:#cdc;opacity:0.5;<% elsif @milestones.include? d%>border-right:2px dotted #900;<%end %>border-left:1px solid #ccc;"><span style="position:absolute;top:-1.5em;left:-<%=1%>px;z-index:10;font-weight:normal;font-size:11px;padding-left:2px; border-left:1px solid #ccc"><%= d.strftime('%m/%d') if d.wday == 1%></span></div>
+								<% d = @today + i -%>
+								<%
+								if @milestones.include? d
+								@milestone = Release.find_by_due(d) 
+								@height = i
+								end
+								-%>
+								<%if @milestones.include? d%><!-- milestones -->
+								<div style="position:absolute;top:1em;left:<%= @pixels_per_day * i %>px;height:<%= @tasks.size * 2.5%>em;width:<%=@pixels_per_day-1%>px;border-right:<%=@pixels_per_day/2%>px dotted #<%= cycle("cyan", "magenta", "yellow", "black")%>; opacity:0.25;border-left:1px solid #ccc;"><span style="position:absolute;top:-1.5em;left:-<%=1%>px;z-index:10;font-weight:normal;font-size:11px;padding-left:2px; border-left:1px solid #ccc"><%= d.strftime('%m/%d') if d.wday == 1%><span style="position:relative;top:-1em;font-size:16px;z-index:200"><%= @milestone.title %></span></span></div>
+								<%else%>
+								<div style="position:absolute;top:1em;left:<%= @pixels_per_day * i %>px;height:<%= @tasks.size * 2.5%>em;width:<%=@pixels_per_day-1%>px;<% if d.wday == 0 || d.wday == 6 %>background-color:#cdc;opacity:0.5;<%end%>border-left:1px solid #ccc;"><span style="position:absolute;top:-1.5em;left:-<%=1%>px;z-index:10;font-weight:normal;font-size:11px;padding-left:2px; border-left:1px solid #ccc"><%= d.strftime('%m/%d') if d.wday == 1%></span></div>
+								<%end%>
 							<% end -%>
 						</div>
 				</td>
 			</tr>
 	  </thead>
 		<% for task in @tasks %>
-			<% if false %>
+			<% if @slow_down %>
 				<% projection1 = task.projections.confidence(1).last %>
 				<% projection67 = task.projections.confidence(67).last %>
 				<% unless projection67.nil?%>
@@ -55,40 +66,41 @@
 									  <% unless projection67.nil? %><% end %></nobr>
 										</td>
 
-					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
+					<td style="width:<%=@pixels_per_day * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || task.start.nil? || task.end.nil? %>
-						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">							
+						<div style="position:relative; width:<%= @pixels_per_day*@total_calendar_days %>px;">							
 							<span title="<%=task.title %>: <%= task.start.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
-								style="width:<%= @day_in_pixels * (task.end - task.start)%>px; left:
-								<%= @day_in_pixels * (task.start - @today)  %>px"></span>					
+								style="width:<%= @pixels_per_day * (task.end - task.start)%>px; left:
+								<%= @pixels_per_day * (task.start - @today)  %>px"></span>					
 								<% unless projection67.nil?%>
 							<span class="ganttbar_r" title="<%=task.title %> - projected (95%): <%=projection67.start.to_s(:long)%> - <%=projection67.end.to_s(:long)%>"
-									style="width:<%= @day_in_pixels * (projection67.end - projection67.start) %>px; left:<%= @day_in_pixels * (projection67.start - @today) %>px"></span>
+									style="width:<%= @pixels_per_day * (projection67.end - projection67.start) %>px; left:<%= @pixels_per_day * (projection67.start - @today) %>px"></span>
 								<% end %>					
 									<% unless projection1.nil?%>
 								<span class="ganttbar_o" title="<%=task.title %> - projected (mean): <%=projection1.start.to_s(:long)%> - <%=projection1.end.to_s(:long)%>"
-										style="width:<%= @day_in_pixels * (projection1.end - projection1.start) %>px; left:<%= @day_in_pixels * (projection1.start - @today) %>px"></span>
+										style="width:<%= @pixels_per_day * (projection1.end - projection1.start) %>px; left:<%= @pixels_per_day * (projection1.start - @today) %>px"></span>
 									<% end %>					
 						</div>
 						<% end %>
 					</td>
-			    <td><%= link_to 'E', edit_task_path(task) %></td>
-					<td><%= link_to 'X', task, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n", :method => :delete%></td>
-				<%else # Releases and Projects:%>
+			    <td><%#= link_to 'E', edit_task_path(task) %></td>
+					<td><%#= link_to 'X', task, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n", :method => :delete%></td>
+				<%else 
+				# Releases and Projects:%>
 				<td colspan="6"><nobr>
 					Due <%= task.due_date %>  
-					<% unless task.projections.nil? || task.projections.empty? || true%>
+					<% unless !@slow_down || task.projections.nil? || task.projections.empty?%>
 					<% start_p = task.projections.rollup.last.start %>
 					<% end_p = task.projections.rollup.last.end %>
 						<b>ETA: <%= start_p%>  - <%= end_p %></b>
 					<% end %>
 					</nobr></td>
-					<% unless task.projections.nil? || task.projections.empty? || true %>
-					<td style="width:<%=@day_in_pixels * @total_calendar_days %>px;vertical-align:top">
+					<% unless !@slow_down || task.projections.nil? || task.projections.empty? %>
+					<td style="width:<%=@pixels_per_day * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || start_p.nil? || end_p.nil? %>
-						<div style="position:relative; width:<%= @day_in_pixels*@total_calendar_days %>px;">							
-							<span class="ganttbar_s" style="width:<%= @day_in_pixels * (start_p - @today) %>px; left:<%= @day_in_pixels * (0) %>px"></span>					
-							<span class="ganttbar_p" style="width:<%= @day_in_pixels * (end_p - start_p) %>px; left:<%= @day_in_pixels * (start_p - @today) %>px"></span>					
+						<div style="position:relative; width:<%= @pixels_per_day*@total_calendar_days %>px;">							
+							<span class="ganttbar_s" style="width:<%= @pixels_per_day * (start_p - @today) %>px; left:<%= @pixels_per_day * (0) %>px"></span>					
+							<span class="ganttbar_p" style="width:<%= @pixels_per_day * (end_p - start_p) %>px; left:<%= @pixels_per_day * (start_p - @today) %>px"></span>					
 						</div>
 						<% end %>
 					</td>
@@ -117,7 +129,7 @@ function startup()
 {
 	Resize();
 	$('#leftcol').resizable({ 
-	    handles: "e",
+	    handles: "ew",
 	    stop: function(e, ui) { 
 				$('#rightcol').animate({
 					left: $('#leftcol').width(),
@@ -127,6 +139,7 @@ function startup()
 	});	
 
 	$('.ui-resizable-handle').css('background-color','#ABABAB');
+	
 	<% Project.all.each do |project| %>
 	$('#taskList<%=project.id%>').sortable({
 		axis: "y",

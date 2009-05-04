@@ -5,7 +5,7 @@ class TasksController < ApplicationController
   before_filter :supports_iphone, :only => [:index]
   before_filter :login_required, :except => [:redo]
   def index
-    @day_in_pixels = 16
+    @pixels_per_day =16
     # init filters
     session[:filter] ||= {}
     session[:filter][:tasks] ||= 1
@@ -21,18 +21,29 @@ class TasksController < ApplicationController
     #else
     #  @tasks = @taskz
     #end
+		if session[:filter][:user] != 0
+			@user_id = session[:filter][:user]
+			@project_ids = (Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent).collect(&:parent) + Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent)).uniq.map(&:id).sort
+		end
     @tasks = @taskz.collect do |task|
       skip = false
       if task.type.nil?
         if session[:filter][:tasks] == 1 && task.completed? 
           skip = true
         end  
-        if session[:filter][:user] != 0 && session[:filter][:user] != task.user_id
+        if session[:filter][:user] != 0 && (session[:filter][:user] != task.user_id )
           skip = true
         end  
         if session[:filter][:project] != 0 && session[:filter][:project] != task.parent_id
           skip = true
-        end  
+        end
+  		else
+				#
+				if task.type == "Release" || task.type == "Project"
+					if session[:filter][:user] != 0 && !@project_ids.include?(task.id) 
+	      		skip = true
+	        end  
+				end
       end
       if skip
         logger.info 'skipping task...'
@@ -137,7 +148,7 @@ class TasksController < ApplicationController
       @task = Task.find(params[:id]) 
     end
     respond_to do |format|
-      format.html { render :layout => false }
+      format.html { }
       format.js  { 
 				render :update do |page|
 					page.replace_html "edit_task_#{params[:id]}", :partial => "edit"
@@ -296,7 +307,6 @@ class TasksController < ApplicationController
   end 
 
   def redo
-    @dirty = Rails.cache.fetch("dirty") { 1 }
     @rebuilt = false
 		@root = Task.root
 		@root.reload
@@ -456,7 +466,7 @@ class TasksController < ApplicationController
         unless alltasks.empty?
           end_dates = alltasks.collect(&:end) 
           unless end_dates.compact.empty?
-            @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 7	
+            @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 42	
           end
         end
         #@tasks_raw

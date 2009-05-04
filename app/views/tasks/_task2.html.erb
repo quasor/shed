@@ -4,6 +4,10 @@
 <% if (task2.type == "Release") && @release_opened_ul == true-%>
 </ul><%@release_opened_ul = false%>
 <% end -%>
+<% if (task2.type == "Release") && @project_opened_ul == true-%>
+</ul><%@project_opened_ul = false%>
+<% end -%>
+
 <li style="padding-left:8px" id="task_<%=task2.read_attribute('id') -%>" class="lirow <%="completed" if task2.completed? -%> <%=task2.type -%><%=" mine" if task2.user_id == current_user -%>">
 		<% if task2.type.nil? 
 			-%><% if task2.user_id == current_user.id && !@timer.nil? 
