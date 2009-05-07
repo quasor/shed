@@ -29,7 +29,7 @@ class UsersController < ApplicationController
       returning redirect_to(current_user)
     end
 		@conditions = { :parent_id => params[:project] } unless params[:project].blank?
-    @tasks = current_user.tasks.find :all,  :conditions => @conditions, :order => :position
+    @tasks = current_user.tasks.find :all,  :conditions => @conditions, :order => "completed desc, position asc"
 		#@tasks = Task.all :all, :conditions => {:type => nil }, :order => :position
     @tasks.delete_if {|t| (t.user_id != @user.id || (t.completed? && !t.touched_today?)) && t.type.nil? }   
 		@tasks.delete_if { |t| ((t.completed? && !t.touched_today?)) && t.type.nil? } 
