@@ -48,12 +48,6 @@
 		</tr>
 		</table>
 	<% end %>
-<% content_for :save_module do %>
-	<% remote_form_for :task, nil, {:url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')"}, :html => { :id => "remote_form"} do |f|%>
-	<%= hidden_field_tag :order%>
-	<%= f.submit "Save Order" %>
-	<% end %>
-<% end %>
 </div>
 <script type="text/javascript" charset="utf-8">
 var last_updated = new Number();
