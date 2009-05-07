@@ -496,9 +496,12 @@ class TasksController < ApplicationController
         #@tasks_raw
 				#t
 				t = []
-				Project.all.each do |p|
-					t << p
-					t << (p.children.find :all, :order => :position)
+				Release.all.each do |r|
+					t << r
+					r.children.each do |p|
+						t << p
+						t << (p.children.find :all, :order => :position)
+					end
 				end
 				t.flatten
     end
