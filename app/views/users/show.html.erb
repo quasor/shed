@@ -38,7 +38,7 @@
 			<% end %>
 		</td><td id="tasks" valign="top">
 			<p id="notice"></p>
-			<%= button_to_remote "New Task", :url => new_task_path(), :html => {:class => 'hideul', :title => 'New Task'} -%>
+			<%= link_to_remote "New Task", :url => new_task_path(), :html => {:class => 'hideul', :title => 'New Task'} -%>
 			
 			<div class="inline_edit" id="edit_task"></div>
 			<ul id="taskList">
