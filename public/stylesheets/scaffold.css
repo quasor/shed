@@ -172,13 +172,12 @@ body {overflow:hidden;}
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius:5px;
-	padding:4px;
+	padding:3px;
 	line-height:1.5em;
-	margin:4px;
 	list-style-type:none;cursor:move;
 	min-height:14px;
 	border-top:1px solid #ccc; 
-	margin:1px;
+	margin-bottom:-1px;
 	line-height:1.5em;cursor:move; width:99%;
 	background-color:white;
 	}
@@ -223,3 +222,53 @@ body {overflow:hidden;}
 select {font-size:11px;}
 label {width:50px; display:block; float:left; height:32px;}
 textarea {font-size:10px;}
+.project_tag {font-size:9px;color:#777;}
+/*
+.mine {background-color:#FAE9D5;}
+*/
+
+#mytasks #projects {
+	min-width:160px;
+	width:160px;
+	padding:0px;
+	background-color:#D5DDE5;
+	border-right:1px solid #666;
+}
+#mytasks #tasks {
+	width:auto; min-width:640px;
+	padding:4px;
+}
+#mytasks #projects h2 {
+	padding:4px;
+	font-size:12px;
+	text-transform: uppercase;
+}
+#mytasks #projects li {
+}
+#mytasks #projects a {
+	text-decoration:none;
+}
+#mytasks #projects a:hover {
+	color:black;
+}
+#mytasks #projects .project
+{
+	display:block;
+	background: url(/images/icons/folder2.png) no-repeat scroll 12px 4px;
+	line-height:11px;
+	padding:6px 0px 6px 32px;
+	font-size:11px;
+	margin-bottom:4px;
+	
+}
+#mytasks #projects span.current
+{
+	color:white;
+	font-weight:bold;
+	background-color:#707C97;
+}
+.appcanvas
+{
+	border-bottom: 1px solid #666;
+}
+#notice {font-weight:bold;;}

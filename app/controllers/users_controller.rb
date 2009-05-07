@@ -13,6 +13,10 @@ class UsersController < ApplicationController
     end
   end
 
+	def mytasks
+		redirect_to user_path(current_user)
+	end
+	
   # GET /users/1
   # GET /users/1.xml
   # display the user's timers
@@ -24,11 +28,22 @@ class UsersController < ApplicationController
     unless @user == current_user || admin?
       returning redirect_to(current_user)
     end
-
-    @tasks = Task.root.descendants
+		@conditions = { :parent_id => params[:project] } unless params[:project].blank?
+    @tasks = current_user.tasks.find :all,  :conditions => @conditions, :order => :position
+		#@tasks = Task.all :all, :conditions => {:type => nil }, :order => :position
     @tasks.delete_if {|t| (t.user_id != @user.id || (t.completed? && !t.touched_today?)) && t.type.nil? }   
+		@tasks.delete_if { |t| ((t.completed? && !t.touched_today?)) && t.type.nil? } 
     @project_ids = @tasks.collect { |t| t.parent_id }.uniq
-    @tasks.delete_if {|t| !@project_ids.include?(t.id) && t.type == "Project" }   
+    @tasks.delete_if {|t| !t.type.nil? || t.root? }   
+		
+		#pos = 1
+		#for task in @tasks
+		#	unless task.in_list? 
+		#	task.insert_at(pos)	
+		#	pos = pos + 1
+		#	end
+		#end
+
 		@this_sunday = Date.today - Date.today.cwday
 		
     #@tasks.delete_if {|t| t.type.nil? && (t.start.to_date > Date.today  + 1.week) }   		

@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
   require 'digest/sha1'
-  has_many :tasks
+  has_many :tasks, :conditions => {:type => nil}
   has_many :intervals
   validates_uniqueness_of :login
   validates_presence_of :login
@@ -16,6 +16,11 @@ class User < ActiveRecord::Base
     end
     i
   end
+	
+	def active_projects
+		Project.find(self.tasks.collect(&:parent_id).uniq.sort) unless self.tasks.empty?
+	end
+
   def update_login_key
     s = Digest::SHA1.hexdigest('username' + self.login + rand(12345).to_s).to_s.reverse
     self.loginkey = s

@@ -87,31 +87,40 @@ class TasksController < ApplicationController
   def reorder
     
     @order = params[:order].scan(/\d+/)
-    @tasks = Task.find @order
-    
-    unless @tasks.empty? || @tasks.size < 2
-      logger.info @order.collect { |i| Task.find(i).title }.join ','
-      #@order.delete_if { |i| !Task.find(i).type.nil? }
-      @order.each_with_index do |o,i|
-        task = Task.find o
-        unless i == 0
-          puts "moving #{@order[i]} to right of #{@order[i-1]}"
-          preceeding_task = Task.find @order[i-1]
-          task.move_to_right_of preceeding_task if task.type.nil? && (admin? || current_user.id == task.user_id)
-        else 
-          puts "move to top"
-          #task.move_to_top if task.type.nil?
-        end
-      end
+    Task.transaction do
+			@tasks = Task.find @order
+	    @previous_positions = @tasks.collect(&:position).sort
+			logger.info "previous positions:#{@previous_positions.inspect}"
+	    unless @tasks.empty? || @tasks.size < 2
+	      logger.info @order.collect { |i| Task.find(i).title }.join ','
+	      #@order.delete_if { |i| !Task.find(i).type.nil? }
+	      @order.each_with_index do |o,i|
+					if false
+		        task = Task.find o
+		        unless i == 0
+		          puts "moving item:#{i} #{@order[i]} to right of #{@order[i-1]}"
+		          preceeding_task = Task.find @order[i-1]
+		          task.move_to_right_of preceeding_task if task.type.nil? && (admin? || current_user.id == task.user_id)
+		        else 
+		          puts "move to top"
+		          #task.move_to_top if task.type.nil?
+		        end
+					else
+						task = Task.find o
+						task.position = @previous_positions[i]
+						task.save
+					end
+	      end
 
-      Task.roots.each do |t|
-        t.updated_at = Time.now
-        t.save
-      end
+	      Task.roots.each do |t|
+	        t.updated_at = Time.now
+	        t.save
+	      end
     
-      rebuild_schedule
-    end
-        
+	      rebuild_schedule true
+	    end
+     
+		end
     render :update do |page|
       page.replace_html 'flash', :partial => 'refresh'
     end
@@ -124,14 +133,16 @@ class TasksController < ApplicationController
   # GET /tasks/new.xml
   def new
     @task = Task.new
-    @task.user = current_user
+    @task.user_id = current_user.id
 		@task.title = 'New Task' if request.xhr?
+		@parent_id = session[:last_new_parent_id] = (params[:parent_id] || session[:last_new_parent_id])
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @task }
 			format.js	{ 
 				render :update do |page|
-					page.replace_html "edit_task_#{params[:parent_id]}", :partial => "new"
+					#page.replace_html "edit_task_#{params[:parent_id]}", :partial => "new"
+					page.replace_html "edit_task", :partial => "new"
 					page["task_title"].focus
 					page["task_title"].select
 				end				
@@ -147,6 +158,7 @@ class TasksController < ApplicationController
     else
       @task = Task.find(params[:id]) 
     end
+		@parent_id = @task.parent_id
     respond_to do |format|
       format.html { }
       format.js  { 
@@ -162,6 +174,9 @@ class TasksController < ApplicationController
   # POST /tasks
   # POST /tasks.xml
   def create
+	 	@new_task_title = 'Another New Task (ESC to close)'
+		@parent_id = session[:last_new_parent_id] = (params[:parent_id] || session[:last_new_parent_id])
+	
     @task = Task.new(params[:task])
     
 #    unless params[:task].nil? || params[:task][:low].blank?
@@ -172,7 +187,7 @@ class TasksController < ApplicationController
 #    end
     
     respond_to do |format|
-      if @task.save
+      if @task.title != @new_task_title && @task.save
         unless (params[:parent_id].blank?)
           @task.move_to_child_of(Task.find(params[:parent_id]))
         end
@@ -182,23 +197,25 @@ class TasksController < ApplicationController
 	      t.updated_at = Time.now
 	      t.save
 
-        flash[:notice] = 'Task was successfully created.'
+        flash[:notice] = "Task '#{@task.title}' was successfully created."
         format.html { redirect_to current_user }
         format.xml  { render :xml => @task, :status => :created, :location => @task }
 				format.js { 
 					render :update do |page|
 						page.remove "new_task"
-						page.insert_html :bottom, "taskList#{params[:parent_id]}", :partial => @task
-						#page["task_#{@task.id}"].scrollTo
+						#page.insert_html :bottom, "taskList#{params[:parent_id]}", :partial => @task
+						page.insert_html :bottom, "taskList", :partial => @task
+						#page.call "$('#task_#{@task.id}').autoscroll"
 						page.visual_effect :highlight, "task_#{@task.id}"						
 						# insert another:
 						@task = Task.new
-						@task.title = 'Another New Task (ESC to close)'
+						@task.title = @new_task_title
 						@task.user = current_user
-						page.replace_html "edit_task_#{params[:parent_id]}", :partial => "new"
+						page.replace_html "edit_task", :partial => "new"
 						page["task_title"].focus
 						page["task_title"].select						
-						
+						page.replace_html :notice, flash[:notice]
+						flash.discard
 					end
 					}
       else
@@ -212,6 +229,9 @@ class TasksController < ApplicationController
   # PUT /tasks/1.xml
   def update
     @task = Task.find(params[:id])
+    unless (params[:parent_id].blank?)
+      @task.move_to_child_of(Task.find(params[:parent_id]))
+    end
 
     respond_to do |format|
       if @task.update_attributes(params[:task] || params[:project])
@@ -315,7 +335,7 @@ class TasksController < ApplicationController
        @rebuilt = true       
     end
     Rails.cache.fetch("run_sim_#{Task.root.cache_key}") do 
-      run_simulation
+      #run_simulation
       @rebuilt = true       
     end 
     render :text => @rebuilt ? " #{Time.now} - Rebuild Complete" : " #{Time.now} - Using Cached Copy"
@@ -437,27 +457,31 @@ class TasksController < ApplicationController
         @dirty = Rails.cache.fetch("dirty") { 1 }
         Release.all
         Project.all
-        t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
+        #t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
             user_end_dates = {}
             tasks = []
-            @tasks_raw = Task.root.descendants
-            # Compute start times for each task
-            @tasks_raw.each do |task|
-              unless task.user.nil? || task.completed?
-                # compute the schedule
-                user_end_dates[task.user.id] ||= Date.today.work_day(0)
-                task.start = user_end_dates[task.user.id].work_day(0)
-                task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate_days)
+            
+						# @tasks_raw = Task.root.descendants
+						User.all.each do |user|
+							@tasks_raw = user.tasks.find :all, :order => "position"
+							# Compute start times for each task
+	            @tasks_raw.each do |task|
+	              unless task.user.nil? || task.completed?
+	                # compute the schedule
+	                user_end_dates[task.user.id] ||= Date.today.work_day(0)
+	                task.start = user_end_dates[task.user.id].work_day(0)
+	                task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate_days)
 									
-								task.start = task.start.to_datetime + task.start.day_fraction
-								task.end = task.end.to_datetime + task.end.day_fraction
+									task.start = task.start.to_datetime + task.start.day_fraction
+									task.end = task.end.to_datetime + task.end.day_fraction
 
-                task.save! #unless fromUI
-              else 
-                task.start = Date.today.to_datetime
-              end
-            end
-          end
+	                task.save! #unless fromUI
+	              else 
+	                task.start = Date.today.to_datetime
+	              end
+	            end
+						end
+          #end
           
           # done with the rebuild...
           
@@ -470,7 +494,13 @@ class TasksController < ApplicationController
           end
         end
         #@tasks_raw
-				t
+				#t
+				t = []
+				Project.all.each do |p|
+					t << p
+					t << (p.children.find :all, :order => :position)
+				end
+				t.flatten
     end
     # end of class
 end

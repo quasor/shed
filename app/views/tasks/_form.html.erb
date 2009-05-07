@@ -12,18 +12,22 @@
 	<%= f.text_field :title, :id => "task_title_#{@task.id}"%>
 <% end %>
 <%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
+
 <div>
 <% if @task.type.nil?%>
-
 <p>
 	<%= f.label :estimate %>
   <%= f.text_field :estimate%><br>
-	<span class="help"> Example: 0.5h,&nbsp; 1-2 hours,&nbsp; 5h - 1d,&nbsp; 2days </span>
+	<span class="help"> e.g.: 0.5h,&nbsp; 1-2 hours,&nbsp; 5h - 1d,&nbsp; 2days </span>
 </p>
 
 <p>
 	<%= f.label :Tags %>
   <%= f.text_field :tag_list%><br>
+</p>
+<p>
+		<%= f.label :project %>
+		<%= select_tag(:parent_id, option_groups_from_collection_for_select(Release.all, :children, :title, :id, :title, @parent_id.to_i) ) %>
 </p>
 
 <% else %>
@@ -46,11 +50,10 @@
 -->
 <% end %>
 <p>
-	<%= hidden_field_tag :parent_id, params[:parent_id]%>
-</p>
+ </p>
 </div>
 <div>
-<p>
+<p style="clear:both">
   <%= f.label :notes %> 
   <%= f.text_area :description, :rows => 8, :style=>"width:90%"%>
 </p>

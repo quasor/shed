@@ -1,13 +1,17 @@
 #require 'nested_set_list'
+#require 'acts_as_list'
 class Task < ActiveRecord::Base
   acts_as_nested_set
   acts_as_taggable_on :tags
+	
   named_scope :by_user, lambda { |user_id| { :conditions => {:user_id => user_id} } }
   named_scope :active, :conditions => {:completed => false, :type => nil}
   named_scope :complete, :conditions => {:completed => true}
   include NestedSetList
 
   belongs_to :user
+	acts_as_list# :scope => :user_id
+
   has_many :intervals, :dependent => :destroy
   has_many :projections, :dependent => :destroy
   #validates_presence_of :low
@@ -32,7 +36,16 @@ class Task < ActiveRecord::Base
 	def touched_today?
 		updated_at.to_date == Date.today
 	end
-  
+  def duration_days
+		(self.end - self.start)/1.day
+	end
+
+  def start_in_days
+		t = Date.today
+		d = DateTime.new(t.year,t.month,t.day,8)
+		(self.start - d).to_f / 1.day
+	end
+
   def velocity
     ed = self.estimate_days
     if self.completed? && ed > 0 && !self.intervals.empty?

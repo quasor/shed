@@ -6,7 +6,7 @@
 	#ttimer #total-display {background-color: #FF8D6F; padding: 4px 2px 2px 2px; text-align: left; font: bold 16px arial, sans-serif; line-height: 11px}
 	#ttimer #total-display label {font: normal 10px arial; line-height: 8px; padding-right: 3px}
 	.running #timer #total-display {background-color: #8eff6f}
-	body {overflow:auto; width:800px;}
+	body {overflow:auto;margin:0px;} 
 	.completed img.item {
 		background: transparent;
 		height:20px;
@@ -16,15 +16,37 @@
 	body {background-color:#A9AEB7;}
 </style>
 
-<div style="position:relative;top:60px;">
+<div style="position:relative;top:36px;" id="mytasks">
 	<% if current_user.tasks.empty? %>
 	<h1>Your task list is empty</h1> <p>Click the <span class="button_link">+</span> or <span class="button_link">++</span> beside a project to add some tasks.
 	<p><b><%= link_to_function 'Close this window', "window.close();"%></b>
 	<% else %>
-		<div id="tasks">
+		<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%" class="appcanvas">
+			<tr>
+				<td id="projects" valign="top">
+			<h2>Active Projects</h2>
+			<% if !params[:project].blank? %>
+				<%= link_to("All Projects", user_path(current_user), :class => "project") %>
+			<% else %>
+				<span class="project current">All Projects</span>
+			<% end %>
+			<% for project in Project.find @project_ids%>
+			<%= link_to_unless_current(project.title, user_path(current_user, :project => project.id), :class => "project") do 
+					"<span class=\"project current\">#{project.title}</span>"
+				end
+				%>
+			<% end %>
+		</td><td id="tasks" valign="top">
+			<p id="notice"></p>
+			<%= button_to_remote "New Task", :url => new_task_path(), :html => {:class => 'hideul', :title => 'New Task'} -%>
+			
+			<div class="inline_edit" id="edit_task"></div>
+			<ul id="taskList">
 			<%= render :partial => 'tasks/task', :collection => @tasks %>
 			</ul>
-		</div>
+		</td>
+		</tr>
+		</table>
 	<% end %>
 <% content_for :save_module do %>
 	<% remote_form_for :task, :url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')" do |f|%>
@@ -39,17 +61,16 @@ var last_updated = new Number();
 function startup(){
 	$('.ui-resizable-handle').css('background-color','#ABABAB');
 	
-	<% Project.all.each do |project| %>
-	$('#taskList<%=project.id%>').sortable({
+	$('#taskList').sortable({
 		axis: "y",
 		stop: function(e,ui) {
-			$('#order').val( $('#taskList<%=project.id%>').sortable('serialize', {"key":''}));
+			$('#order').val( $('#taskList').sortable('serialize', {"key":''}));
 			$('#task_submit').show();
 			$('#task_submit').submit();
 			
 		}
 	});	
-	<% end%>
+
 	/*
 	<% Project.all.each do |project| %>
 	$('#taskList<%=project.id%>').selectable();	

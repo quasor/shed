@@ -70,17 +70,17 @@
 					<td style="width:<%=@pixels_per_day * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || task.start.nil? || task.end.nil? %>
 						<div style="position:relative; width:<%= @pixels_per_day*@total_calendar_days %>px;">							
-							<span title="<%=task.title %>: <%= task.start.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
-								style="width:<%= @pixels_per_day * (task.end - task.start)%>px; left:
-								<%= @pixels_per_day * (task.start - @today)  %>px"></span>					
+							<span title="<%=task.title %>: <%= task.start.to_date.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
+								style="width:<%= @pixels_per_day * task.duration_days %>px; 
+								left:<%= @pixels_per_day * task.start_in_days %>px"></span>					
 								<% unless projection67.nil?%>
 							<span class="ganttbar_r" title="<%=task.title %> - projected (95%): <%=projection67.start.to_s(:long)%> - <%=projection67.end.to_s(:long)%>"
 									style="width:<%= @pixels_per_day * (projection67.end - projection67.start) %>px; left:<%= @pixels_per_day * (projection67.start - @today) %>px"></span>
 								<% end %>					
-									<% unless projection1.nil?%>
-								<span class="ganttbar_o" title="<%=task.title %> - projected (mean): <%=projection1.start.to_s(:long)%> - <%=projection1.end.to_s(:long)%>"
-										style="width:<%= @pixels_per_day * (projection1.end - projection1.start) %>px; left:<%= @pixels_per_day * (projection1.start - @today) %>px"></span>
-									<% end %>					
+								<% unless projection1.nil?%>
+							<span class="ganttbar_o" title="<%=task.title %> - projected (mean): <%=projection1.start.to_s(:long)%> - <%=projection1.end.to_s(:long)%>"
+									style="width:<%= @pixels_per_day * (projection1.end - projection1.start) %>px; left:<%= @pixels_per_day * (projection1.start - @today) %>px"></span>
+								<% end %>					
 						</div>
 						<% end %>
 					</td>

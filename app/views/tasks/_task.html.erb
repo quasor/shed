@@ -1,11 +1,11 @@
 <% if (task.type == "Project" || task.type == "Release") && @opened_ul -%>
 </ul><%@opened_ul = false%>
 <% end -%>
-<li id="task_<%=task.read_attribute('id') -%>" class="lirow2 <%='started' if task == @current_task %><%="completed" if task.completed? -%> <%=task.type -%><%="Task" if task.type.blank? -%><%=" mine" if task.user_id == current_user -%>">
+<li id="task_<%=task.read_attribute('id') -%>" class="lirow2 <%='started' if task == @current_task %><%="completed" if task.completed? -%> <%=task.type -%><%="Task" if task.type.blank? -%><%=" mine" if task.user_id == current_user.id -%>">
 		<% if task.type.nil? 
 			-%>
-			  <%if task.user_id == current_user.id -%>
-					<div style="position:absolute;right:2px">
+			  <%if true#task.user_id == current_user.id -%>
+					<div style="float:right;">
 						<% 
 						@interval = Interval.new
 						@interval.task = task
@@ -36,6 +36,7 @@
 					<% remote_form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "display:inline"}) do |f| -%>
 						<%= f.check_box :completed, :onclick => "this.form.onsubmit();", :style => 'cursor:hand' -%>
 					<% end -%>
+					<span class="project_tag"><%= task.parent.title unless task.parent.nil?%>:</span>
 					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get)%>
 						<% unless task.estimate.blank? %><span class="estimate"><%= task.estimate %></span><% end %>
 						<% for tag in task.tag_list%>
