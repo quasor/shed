@@ -49,7 +49,7 @@
 		</table>
 	<% end %>
 <% content_for :save_module do %>
-	<% remote_form_for :task, :url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')" do |f|%>
+	<% remote_form_for :task, nil, {:url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')"}, :html => { :id => "remote_form"} do |f|%>
 	<%= hidden_field_tag :order%>
 	<%= f.submit "Save Order" %>
 	<% end %>
@@ -65,9 +65,11 @@ function startup(){
 		axis: "y",
 		stop: function(e,ui) {
 			$('#order').val( $('#taskList').sortable('serialize', {"key":''}));
-			$('#task_submit').show();
-			$('#task_submit').submit();
-			
+			/* $('#task_submit').show(); 
+			alert($('#taskList').sortable('serialize', {"key":''}));
+			*/
+			<%= remote_function( :url => reorder_tasks_path, :with => "'order='+$('#taskList').sortable('serialize', {\"key\":''})",
+			:before => "$('#flash').html('Saving Order...')") %>
 		}
 	});	
 

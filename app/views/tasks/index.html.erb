@@ -156,7 +156,7 @@ function startup()
 			
 		}
 	});
-	<% end %>
+	<% end if false %>
 
 	<% Release.all.each do |release| %>
 	$('#taskList<%=release.id%>').sortable({
@@ -166,7 +166,7 @@ function startup()
 			$('#task_submit').show();
 		}
 	});
-	<% end %>
+	<% end if false %>
 	
 	$('#task_submit').hide();
 

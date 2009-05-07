@@ -123,6 +123,7 @@ class TasksController < ApplicationController
 		end
     render :update do |page|
       page.replace_html 'flash', :partial => 'refresh'
+			page['flash'].show()
     end
   end
 
