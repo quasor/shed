@@ -13,9 +13,9 @@ class UsersController < ApplicationController
     end
   end
 
-	def mytasks
-		redirect_to user_path(current_user)
-	end
+	#def mytasks
+	#	redirect_to user_path(current_user)
+	#end
 	
   # GET /users/1
   # GET /users/1.xml
