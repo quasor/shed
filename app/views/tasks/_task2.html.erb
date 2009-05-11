@@ -32,7 +32,7 @@
 								:timer =>params[:timer]), 
 								:class => "hideul #{(task2 == @current_task ? 'started' : 'stopped')}" unless task2.completed? -%>
 				  		<%else -%>
-								<%if task2.completed?%><img class="item" src="/images/space.gif" align="absmiddle"><%end%><%= task2.title -%>
+								<%if task2.completed?%><img class="item" src="/images/space.gif" align="absmiddle"><%end%><%= link_to task2.title, task2 -%>
 							<%end -%>
 					</div>
 				<% elsif task2.user_id == current_user.id -%>
