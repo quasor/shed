@@ -17,10 +17,6 @@
 </style>
 
 <div style="position:relative;top:36px;" id="mytasks">
-	<% if current_user.tasks.empty? %>
-	<h1>Your task list is empty</h1> <p>Click the <span class="button_link">+</span> or <span class="button_link">++</span> beside a project to add some tasks.
-	<p><b><%= link_to_function 'Close this window', "window.close();"%></b>
-	<% else %>
 		<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%" class="appcanvas">
 			<tr>
 				<td id="projects" valign="top">
@@ -47,7 +43,6 @@
 		</td>
 		</tr>
 		</table>
-	<% end %>
 </div>
 <script type="text/javascript" charset="utf-8">
 var last_updated = new Number();
