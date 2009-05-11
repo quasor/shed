@@ -1,4 +1,4 @@
-<% if @task.new_record? && !request.xhr?%>
+<% if !request.xhr?%>
 <h1></h1><%#= f.label :task %>
 <%end%>
 <% unless @task.new_record?%>
