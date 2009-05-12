@@ -15,7 +15,8 @@ class ReleasesController < ApplicationController
   # GET /releases/1
   # GET /releases/1.xml
   def show
-    redirect_to releases_path
+		@release = Release.find(params[:id])
+    #redirect_to releases_path
   end
 
   # GET /releases/new

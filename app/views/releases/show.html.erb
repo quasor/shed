@@ -1,3 +1,26 @@
+<%= content_tag :h1, @release.title %>
+Due: <%= @release.due.to_s(:long) %>
+<%
+@projects = @release.children
 
+%>
+<% for project in @projects %>
+	<%= content_tag :h2, project.title %>
+	<%= content_tag :h3, project.due %>
+	<% @tasks = project.children %>
+	<% @users = @tasks.collect(&:user).uniq %>
+	<table>
+		<tr><th></th><th>Finish On</th><th>+/-</th>
+	<% for user in @users %>
+		<tr>
+			<td><%= user.name %></td>
+			<% date = @tasks.by_user(user).max{|a,b| a.end <=> b.end }.end.to_date%>
+			<td><%= date.to_s(:long) %></td>
+			<% overunder = @release.due.net_work_days_until(date)%>
+			<td class="<%= overunder < 0 ? "negative" : "positive"%>"><%= overunder %></td>
+		</tr>
+	<% end %>
+	</table>
+<% end %>
 <%= link_to 'Edit', edit_release_path(@release) %> |
 <%= link_to 'Back', releases_path %>

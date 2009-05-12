@@ -58,6 +58,8 @@
 				<b><%= link_to_unless_current 'My Tasks', current_user %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
 				<b><%= link_to_unless_current @timer.nil? ? 'Schedule' : '', tasks_path %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
 				<b><%= link_to_unless_current 'Time Spent', intervals_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
+				<b><%= link_to_unless_current 'Releases', releases_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
+				
 				<% if controller.controller_name == 'tasks'%>
 				<form style="display:inline" action="/tasks" id='filter_form'>
 					<b>Filters:</b>

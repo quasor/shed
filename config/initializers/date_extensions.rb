@@ -1,13 +1,23 @@
 class Date
   def net_work_days_until(date1, date2=nil)
+		flip = false
     if date2.nil?
       date2 = date1
       date1 = self
     end
+		if (date2 < date1)
+			flip = true
+			date3 = date1
+			date1 = date2
+			date2 = date3
+		end
     holidays = Holiday.all#find(:all, :conditions => {:holiday => date1..date2 }).collect(&:holiday)
     dates = (date1.to_date .. date2.to_date).collect
     results = dates.collect {|d| d.wday == 0 || d.wday == 6 || holidays.include?(d)}
-    results.find_all { |r| r == false }.size
+    n = results.find_all { |r| r == false }.size 
+		n = n - 1 if n > 0
+		n = n * -1 if flip 
+		n 
   end
 #  def work_day1(days)
 #    if days.nil?

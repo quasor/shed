@@ -6,7 +6,7 @@
 
 <% for release in @releases %>
   <tr>
-		<td><%= release.title %></td>
+		<td><h2><%= link_to release.title, release %></h2></td>
     <td><%= link_to 'Edit', edit_release_path(release) %></td>
     <td><%= link_to 'Destroy', release, :confirm => 'Are you sure?', :method => :delete if release.leaf?%></td>
   </tr>

@@ -275,3 +275,5 @@ textarea {font-size:10px;}
 .logbook {
 	margin-top:300px;
 }
+.negative {color:#900; font-weight:bold;}
+.positive {color:#090; font-weight:bold;}
