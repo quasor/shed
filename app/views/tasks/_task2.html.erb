@@ -32,7 +32,7 @@
 								:timer =>params[:timer]), 
 								:class => "hideul #{(task2 == @current_task ? 'started' : 'stopped')}" unless task2.completed? -%>
 				  		<%else -%>
-								<%if task2.completed?%><img class="item" src="/images/space.gif" align="absmiddle"><%end%><%= task2.title -%>
+								<%if task2.completed?%><img class="item" src="/images/space.gif" align="absmiddle"><%end%><%= link_to task2.title, task2 -%>
 							<%end -%>
 					</div>
 				<% elsif task2.user_id == current_user.id -%>
@@ -40,7 +40,7 @@
 					<%= link_to task2.title, edit_task_path(task2)%>
 					<span id="edit_task_<%=task2.id%>"></span>
 				<% else -%>
-		  		<%if task2.completed?%><img class="item" src="/images/space.gif" align="absmiddle"><%end%><%= task2.title -%>
+		  		<%if task2.completed?%><img class="item" src="/images/space.gif" align="absmiddle"><%end%><%= link_to task2.title, task2, :title => task2.title -%>
 				<% end -%>				
 		<% elsif task2.type == "Project" -%>
 			<span><%= link_to task2.title, edit_project_path(task2) -%></span>

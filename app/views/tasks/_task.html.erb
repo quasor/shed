@@ -1,7 +1,7 @@
 <% if (task.type == "Project" || task.type == "Release") && @opened_ul -%>
 </ul><%@opened_ul = false%>
 <% end -%>
-<% if !request.xhr? && !task.start.nil? &&  @cweek != task.start.to_date.cweek %>
+<% if !task.start.nil? && @cweek != task.start.to_date.cweek && !request.xhr? %>
 <% @cweek = task.start.to_date.cweek %>
 <p class="date-heading">
 	<% if @cweek == Date.today.cweek %>

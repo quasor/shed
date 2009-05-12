@@ -1,4 +1,4 @@
-<% if @task.new_record? && !request.xhr?%>
+<% if !request.xhr?%>
 <h1></h1><%#= f.label :task %>
 <%end%>
 <% unless @task.new_record?%>
@@ -7,9 +7,9 @@
 <label><%= f.check_box :completed if @task.type.nil?%></label>
 <% end %>
 <% if @task.new_record?%>
-	<%= f.text_field :title%>
+	<%= f.text_field :title, :size => 80%>
 <% else%>
-	<%= f.text_field :title, :id => "task_title_#{@task.id}"%>
+	<%= f.text_field :title, :id => "task_title_#{@task.id}", :size => 80%>
 <% end %>
 <%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
 
