@@ -6,7 +6,7 @@
 	#ttimer #total-display {background-color: #FF8D6F; padding: 4px 2px 2px 2px; text-align: left; font: bold 16px arial, sans-serif; line-height: 11px}
 	#ttimer #total-display label {font: normal 10px arial; line-height: 8px; padding-right: 3px}
 	.running #timer #total-display {background-color: #8eff6f}
-	body {overflow:auto;margin:0px;} 
+	body {overflow:auto;margin:0;padding:0;} 
 	.completed img.item {
 		background: transparent;
 		height:20px;
@@ -36,6 +36,8 @@
 				end
 				%>
 			<% end %>
+			<%= link_to("Completed Projects", user_path(current_user), :class => "project logbook") %>
+			
 		</td><td id="tasks" valign="top">
 			<p id="notice"></p>
 			<%= link_to_remote "New Task", :url => new_task_path(), :html => {:class => 'button_link', :title => 'New Task'} -%>
@@ -59,9 +61,7 @@ function startup(){
 		axis: "y",
 		stop: function(e,ui) {
 			$('#order').val( $('#taskList').sortable('serialize', {"key":''}));
-			/* $('#task_submit').show(); 
-			alert($('#taskList').sortable('serialize', {"key":''}));
-			*/
+			$('.date-heading').html('&nbsp;');
 			<%= remote_function( :url => reorder_tasks_path, :with => "'order='+$('#taskList').sortable('serialize', {\"key\":''})",
 			:before => "$('#flash').html('Saving Order...')") %>
 		}

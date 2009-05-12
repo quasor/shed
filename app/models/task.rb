@@ -41,9 +41,9 @@ class Task < ActiveRecord::Base
 	end
 
   def start_in_days
-		t = Date.today
-		d = DateTime.new(t.year,t.month,t.day,8)
-		(self.start - d).to_f / 1.day
+t = Time.now.to_date.to_time
+s = (self.start - t).to_f / 1.day
+s > 0 ? s : 0
 	end
 
   def velocity

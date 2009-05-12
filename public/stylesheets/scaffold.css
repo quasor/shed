@@ -272,3 +272,6 @@ textarea {font-size:10px;}
 	border-bottom: 1px solid #666;
 }
 #notice {font-weight:bold;;}
+.logbook {
+	margin-top:300px;
+}

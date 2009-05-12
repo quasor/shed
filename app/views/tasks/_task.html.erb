@@ -1,9 +1,9 @@
 <% if (task.type == "Project" || task.type == "Release") && @opened_ul -%>
 </ul><%@opened_ul = false%>
 <% end -%>
-<% if !task.start.nil? && @cweek != task.start.to_date.cweek %>
+<% if !request.xhr? && !task.start.nil? &&  @cweek != task.start.to_date.cweek %>
 <% @cweek = task.start.to_date.cweek %>
-<p>
+<p class="date-heading">
 	<% if @cweek == Date.today.cweek %>
 	This week
 	<% elsif @cweek == Date.today.cweek + 1%>
@@ -50,7 +50,7 @@
 					<% end -%>
 					<span class="project_tag"><%= task.parent.title unless task.parent.nil?%>:</span>
 					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get)%>
-						<% unless task.estimate.blank? %><span class="estimate"><%= task.estimate %></span><% end %>
+						<% unless task.estimate.blank? %><span class="estimate"><%= link_to_remote(task.estimate, :url => edit_task_path(task, :edit_estimate => true), :method => :get)%></span><% end %>
 						<% for tag in task.tag_list%>
 							<span class="taglist"><%= tag%></span>
 						<% end %>

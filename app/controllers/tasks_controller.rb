@@ -165,8 +165,13 @@ class TasksController < ApplicationController
       format.js  { 
 				render :update do |page|
 					page.replace_html "edit_task_#{params[:id]}", :partial => "edit"
-					page["task_title"].focus
-					page["task_title"].select						
+					if params[:edit_estimate].blank?
+						page["task_title_#{@task.id}"].focus
+						page["task_title_#{@task.id}"].select						
+					else
+						page["task_estimate_#{@task.id}"].focus
+						page["task_estimate_#{@task.id}"].select						
+					end
 				end
 			}
     end
