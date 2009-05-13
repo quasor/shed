@@ -277,3 +277,8 @@ textarea {font-size:10px;}
 }
 .negative {color:#900; font-weight:bold;}
 .positive {color:#090; font-weight:bold;}
+.thininput {
+	border-style:solid;
+	border-width:1px;
+}
+.warn {border: 2px solid #FF7777;}

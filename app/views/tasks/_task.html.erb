@@ -28,13 +28,14 @@
 							<%= f.hidden_field :task_id %>
 							<%= f.text_field :hours, 
 								:value => "#{task.duration_friendly}",
-								:style=>"border:1px solid #777;margin-top:1px;width:5em;text-align:center;backround-color:none;", 
+								:style=>"margin-top:1px;width:5em;text-align:center;backround-color:none;", 
 								:onclick => "this.select();",
 								:id => "interval_hours_#{task.id}",
-								:title => 'Log hours spent today'
+								:title => 'Log hours spent today',
+								:class => "thininput #{'warn' if task.completed? && !task.has_actuals?}"
 								-%>
 							<%= f.submit "save", :id => "save_btn_#{task.id}", :style => "display:none" %>
-							<% end unless task.completed?-%>
+							<% end unless task.completed? && task.has_actuals? -%>
 						<%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped-hover') + '" src="/images/space.gif" align="absmiddle" border="0"> ',
 						 	 user_path(current_user, 
 								:task_id => (@current_task == task ? nil : task.id), 

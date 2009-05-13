@@ -57,16 +57,20 @@ class Task < ActiveRecord::Base
   end
 
 	def duration_friendly
-		d = duration
+		d = duration_today
 		s = ""
 		s = s + "#{d.days}d " unless d.days == 0
 		s = s + "#{d.hours}h #{d.minutes}m"
 	end
 	
-	def duration
+	def duration_today
 		Duration.new(self.intervals.find(:all, :conditions => {:end => Date.today..Date.today+1}).collect {|i| i.to_seconds}.sum)
 	end
-  
+
+  def has_actuals?
+		self.intervals.size > 0	
+	end
+
   def friendly_estimate
     ed = self.estimate_days
     if ed < 2

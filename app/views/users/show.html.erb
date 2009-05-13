@@ -16,7 +16,7 @@
 	body {background-color:#A9AEB7;}
 </style>
 
-<div style="position:relative;top:36px;" id="mytasks">
+<div style="position:relative;top:36px;" id="mytasks">			
 		<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%" class="appcanvas">
 			<tr>
 				<td id="projects" valign="top">
@@ -35,6 +35,9 @@
 			<%= link_to("Completed Projects", user_path(current_user), :class => "project logbook") %>
 			
 		</td><td id="tasks" valign="top">
+			
+			<div id="tasks_time_header" style="float:right; position:relative; right:8px; top:3em">Log Hours Spent Today</div>
+			
 			<p id="notice"></p>
 			<%= link_to_remote "New Task", :url => new_task_path(), :html => {:class => 'button_link', :title => 'New Task'} -%>
 			
@@ -56,8 +59,9 @@ function startup(){
 		axis: "y",
 		stop: function(e,ui) {
 			$('#order').val( $('#taskList').sortable('serialize', {"key":''}));
+			//alert($('#taskList').sortable('serialize', {"key":''}));
 			$('.date-heading').html('&nbsp;');
-			<%= remote_function( :url => reorder_tasks_path, :with => "'order='+$('#taskList').sortable('serialize', {\"key\":''})",
+			<%= remote_function( :url => reorder_tasks_path, :with => "$('#taskList').sortable('serialize', {\"key\":''})",
 			:before => "$('#flash').html('Saving Order...')") %>
 		}
 	});	

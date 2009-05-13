@@ -57,7 +57,9 @@
 			<div style="padding-right:2em;padding-left:0.5em;float:left;padding-top:.75em;font-size:12px">
 				<b><%= link_to_unless_current 'My Tasks', current_user %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
 				<b><%= link_to_unless_current @timer.nil? ? 'Schedule' : '', tasks_path %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
-				<b><%= link_to_unless_current 'Time Spent', intervals_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
+				<% if false %>
+					<b><%= link_to_unless_current 'Time Spent', intervals_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
+				<% end %>
 				<b><%= link_to_unless_current 'Releases', releases_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
 				
 				<% if controller.controller_name == 'tasks'%>

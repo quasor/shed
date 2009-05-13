@@ -86,7 +86,8 @@ class TasksController < ApplicationController
 
   def reorder
     
-    @order = params[:order].scan(/\d+/)
+    @order = params[:task]
+
     Task.transaction do
 			@tasks = Task.find @order
 	    @previous_positions = @tasks.collect(&:position).sort
