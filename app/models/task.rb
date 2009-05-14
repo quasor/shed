@@ -80,6 +80,22 @@ class Task < ActiveRecord::Base
     end
   end
 
+	def indent_size
+		case self.type
+			when "Release" then 8
+			when "Project" then 4
+			else 0
+		end
+	end
+
+	def type_string
+		if self.type.nil?
+			"Task"
+		else
+			self.type
+		end
+	end
+
   WORKING_HOURS_PER_DAY = 8
   
   def task?

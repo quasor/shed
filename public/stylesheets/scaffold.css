@@ -102,12 +102,15 @@ body {}
 	width: auto !important;
 }
 .help { color: #666; font-size:80%;}
-.lirow.Project {
-	font-weight:bold; font-size:11px;height:20px;
+td.Project {
+	font-weight:bold; font-size:11px;height:20px; padding-left:2em;
 }
-.Project a {text-decoration:none; display:inline; font-size:14px;}
+td.Task {
+	padding-left:4em;
+}
+.Project a {text-decoration:none; display:inline;}
 
-.lirow.Release {font-weight:bold;font-size:11px;height:20px;}
+td.Release {font-weight:bold;font-size:11px;height:20px;}
 
 img.plus {
 	background: url(/images/sprites.png) no-repeat scroll -192px -96px;
