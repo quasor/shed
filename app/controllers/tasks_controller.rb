@@ -28,7 +28,7 @@ class TasksController < ApplicationController
     @tasks = @taskz.collect do |task|
       skip = false
       if task.type.nil?
-        if session[:filter][:tasks] == 1 && task.completed? 
+        if session[:filter][:tasks] == 1 && (task.completed? || task.parent.on_hold?)
           skip = true
         end  
         if session[:filter][:user] != 0 && (session[:filter][:user] != task.user_id )
