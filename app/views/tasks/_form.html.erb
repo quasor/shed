@@ -32,13 +32,18 @@
 
 <% else %>
 <p>
-  <%= f.label :due %><br />
+  <%= f.label :due %>
   <%= f.date_select :due %>
 	<% if @task.type == "Project"%>
 		<%= collection_select :neighbor, :project_id, @task.siblings, :id, :title, {:prompt => "Prioritize Below"} %> <span class="help">(optional)</span>
 	<% end %>
 </p>	
 
+<% if @task.type == "Project"%>
+<p>
+  <%= f.label :on_hold %><%= f.check_box :on_hold%> (pause)
+</p>
+<% end %>
 
 <% end %>
 <% if false %>

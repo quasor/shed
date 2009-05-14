@@ -1,14 +1,5 @@
-<% if (task2.type == "Project") && @project_opened_ul == true-%>
-</ul><%@project_opened_ul = false%>
-<% end -%>
-<% if (task2.type == "Release") && @release_opened_ul == true-%>
-</ul><%@release_opened_ul = false%>
-<% end -%>
-<% if (task2.type == "Release") && @project_opened_ul == true-%>
-</ul><%@project_opened_ul = false%>
-<% end -%>
 
-<li style="padding-left:8px<%if !task2.due.nil? && task2.type=="Release"%>;background-color:<%= cycle("#E2FEFE", "#F6DAFC", "#FFFEDC", "#D8D9FB")%>; opacity:0.95<%end%>" id="task_<%=task2.read_attribute('id') -%>" class="lirow <%="completed" if task2.completed? -%> <%=task2.type -%><%=" mine" if task2.user_id == current_user -%>">
+<tr><td style="padding-left:8px<%if !task2.due.nil? && task2.type=="Release"%>;background-color:<%= cycle("#E2FEFE", "#F6DAFC", "#FFFEDC", "#D8D9FB")%>; opacity:0.95<%end%>" id="task_<%=task2.read_attribute('id') -%>" class="strow <%="completed" if task2.completed? -%> <%="onhold" if task2.on_hold? -%> <%=task2.type -%><%=" mine" if task2.user_id == current_user -%>">
 		<% if task2.type.nil? 
 			-%><% if task2.user_id == current_user.id && !@timer.nil? 
 				-%><div id="timer_link_<%=task2.id -%>">
@@ -55,10 +46,4 @@
 				<%#= link_to "++", {:controller => 'tasks', :action => 'bulknew', :project_id => task2.id}, {:class => 'button_link', :title => 'Bulk Add Multiple Tasks'}%>
 			<% end -%>
 		<% end -%>
-	</li>
-	<% if task2.type == "Release"-%>
-		<ul id="taskList<%=task2.id%>"><%@release_opened_ul = true%>
-	<% end -%>
-	<% if task2.type == "Project"-%>
-		<ul id="taskList<%=task2.id%>"><%@project_opened_ul = true%>
-	<% end -%>
+	</td></tr>

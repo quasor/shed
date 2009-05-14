@@ -1,13 +1,13 @@
 <% @slow_down = false %>
 <% unless @tasks.empty? %>
 <div id="leftcol" class="resizeable">
-		<div class="st">
-			<div style="height:21px;border-top:0px solid white">
-				<%= @task_intervals%>
-				</div>
 			<%#= render :partial => 'tasklist', :locals => {:skip_completed => nil}%>
+			<table class="st" id="left-schedule" width="100%">
+					<tr class="srow2">
+						<td>Tasks</td>
+					</tr>
 			<%= render :partial => 'task2', :collection => @tasks%>
-		</div>
+			</table>
 <% reset_cycle %>
 </div>
 <div id="rightcol" onscroll="scrollDiv('leftcol','rightcol')">
@@ -55,7 +55,7 @@
 				<% end %>
 			<% end %>
 		
-	  <tr class="srow">
+	  <tr class="srow <%= "onhold" if task.on_hold || task.parent.on_hold %>">
 				<% unless task.type == "Release" or task.type == "Project"%>
 			    <td nowrap><%#=h task.tag_list %></td>
 			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?h or task.estimate.include? ?d or task.estimate.blank?%></td>
@@ -95,7 +95,7 @@
 			      else edit_task_path(task)
 			    end
 				%>
-					Due <%= link_to task.due_date, url %>  
+					<%if true %>Due <%= link_to task.due_date, url %> <%end-%>
 					<% unless !@slow_down || task.projections.nil? || task.projections.empty?%>
 					<% start_p = task.projections.rollup.last.start %>
 					<% end_p = task.projections.rollup.last.end %>
@@ -199,7 +199,7 @@ function scrollDiv(lckDiv, scrDiv)
 function Resize()
 {
 	$('#rightcol').css('height',$(window).height() - 48);
-	$('#leftcol').css('height',$(window).height() - 48 - 16);
+	$('#leftcol').css('height',$(window).height() - 48 - 20);
 	$('#rightcol').css('width',$(window).width() - 303);	
 }
 if (window.attachEvent) {

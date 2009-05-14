@@ -74,11 +74,13 @@ class ProjectsController < ApplicationController
       if @project.update_attributes(params[:project])
 				unless @neighbor.nil?
 					@project.move_to_right_of Project.find(@neighbor)
-					@root = Task.root
-					@root.updated_at = Time.now
-          @root.save!
 				end
-        flash[:notice] = 'Project was successfully updated.'
+				
+				@root = Task.root
+				@root.updated_at = Time.now
+        @root.save!
+        
+				flash[:notice] = 'Project was successfully updated.'
         format.html { redirect_to tasks_path }
         format.xml  { head :ok }
       else

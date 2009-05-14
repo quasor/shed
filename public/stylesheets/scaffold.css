@@ -68,11 +68,11 @@ a:hover { color: #fff; background-color:#000; }
 #main { position:absolute; top:36px;}
 #header h1 {padding-top:0em; color:white;font-family:Helvetica,Arial; line-height:10px;}
 #leftcol  { width:297px; left: 0px;  top:37px;position:absolute; border:0px solid green; overflow:hidden; z-index:10;background-color:white;;}
-#rightcol { width:1135px;left: 300px;top:36px;position:absolute; border:0px solid red; overflow:auto;}
-.srow {height:2.0em;background-color:white;}
+#rightcol { width:1135px;left: 300px;top:37px;position:absolute; border:0px solid red; overflow:auto;}
+.srow {height:20px; background-color:white;}
 .srow2 {height:2.0em;}
 ul {margin:0px;cursor:move;padding:0px;padding-left:8px;}
-.lirow {list-style-type:none;cursor:move;height:2.0em;border-top:1px solid #ccc; margin:0px;line-height:2.0em;margin-top:-1px;cursor:move;overflow:hidden; width:100%;}
+.lirow {list-style-type:none;cursor:move;height:20px;border-bottom:1px solid #ccc; margin:0px;line-height:2.0em;overflow:hidden; width:100%;}
 .lirow:hover {cursor:move}
 .lirow a.startstop {display:block;}
 .lirow a.button_link {display:inline;font-size:10px;margin-bottom:4px}
@@ -83,7 +83,7 @@ a.started {display:block;}
 
 .srow:hover {background-color:#FFF0CB;}
 div.t_title { width:298px;overflow:hidden;}
-.st td {padding-left:3px;padding-right:3px;line-height:1.5em;}
+.st td {padding-left:3px;padding-right:3px;height:20px;}
 .ganttbar {height:1em; background-color: #74A5FF;position:absolute;margin-top:0.25em;border:0px solid black;z-index:3;}
 .ganttbar_r {height:1.4em; background-color: #777;position:absolute;margin-top:0.05em;border:0px solid black;z-index:1;opacity:0.35;}
 .ganttbar_o {height:1.2em; background-color: #555;position:absolute;margin-top:0.15em;border:0px solid black;z-index:2;opacity:0.55;}
@@ -103,11 +103,11 @@ body {}
 }
 .help { color: #666; font-size:80%;}
 .lirow.Project {
-	font-weight:bold; border-top:1px solid black;font-size:12px;height:22px;
+	font-weight:bold; font-size:11px;height:20px;
 }
 .Project a {text-decoration:none; display:inline; font-size:14px;}
 
-.lirow.Release {font-weight:bold;font-size:14px;height:22px;}
+.lirow.Release {font-weight:bold;font-size:11px;height:20px;}
 
 img.plus {
 	background: url(/images/sprites.png) no-repeat scroll -192px -96px;
@@ -124,6 +124,13 @@ img.minus {
 	height:20px;
 	width:20px;
 }
+
+.onhold {
+	list-style-image: url(/images/icons/control_pause.png);
+	opacity:0.25;
+	list-style-type:circle;
+}
+
 
 img.item {
 	height:20px;
@@ -282,3 +289,4 @@ textarea {font-size:10px;}
 	border-width:1px;
 }
 .warn {border: 2px solid #FF7777;}
+#left-cont {margin-bottom:1px;}

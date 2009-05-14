@@ -364,7 +364,7 @@ class TasksController < ApplicationController
       projections={}
       tasks = Task.root.descendants
       tasks.each do |task|
-        unless task.user.nil? || task.completed? 
+        unless task.user.nil? || task.completed? || task.parent.on_hold?
           user_end_dates[task.user.id] ||= Date.today.work_day(0)
           task.start = user_end_dates[task.user.id].work_day(0)
           task_end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate)
@@ -473,7 +473,7 @@ class TasksController < ApplicationController
 							@tasks_raw = user.tasks.find :all, :order => "position"
 							# Compute start times for each task
 	            @tasks_raw.each do |task|
-	              unless task.user.nil? || task.completed?
+	              unless task.user.nil? || task.completed? || task.parent.on_hold?
 	                # compute the schedule
 	                user_end_dates[task.user.id] ||= Date.today.work_day(0)
 	                task.start = user_end_dates[task.user.id].work_day(0)
