@@ -1,5 +1,5 @@
 
-<tr><td style="<%if !task2.due.nil? && task2.type=="Release"%>;background-color:<%= cycle("#E2FEFE", "#F6DAFC", "#FFFEDC", "#D8D9FB")%>; opacity:0.95<%end%>" id="task_<%=task2.read_attribute('id') -%>" class="strow <%="completed" if task2.completed? -%> <%="onhold" if task2.on_hold? || task2.parent.on_hold? -%> <%=task2.type_string -%><%=" mine" if task2.user_id == current_user -%>">
+<tr><td style="<%if !task2.due.nil? && task2.type=="Release"%>;background-color:<%= cycle("#E2FEFE", "#F6DAFC", "#FFFEDC", "#D8D9FB")%>; opacity:0.95<%end%>" id="task_<%=task2.read_attribute('id') -%>" class="strow <%="completed" if task2.completed? -%> <%="onhold" if task2.on_hold? || task2.parent.on_hold? -%> <%=task2.type_string -%><%=" mine" if task2.user_id == current_user -%>"><div>
 		<% if task2.type.nil? 
 			-%><% if task2.user_id == current_user.id && !@timer.nil? 
 				-%><div id="timer_link_<%=task2.id -%>">
@@ -47,4 +47,4 @@
 			<% end -%>
 		<% end -%>
 		<% if task2.on_hold?%>( On Hold )<%end-%>
-	</td></tr>
+	</div></td></tr>
