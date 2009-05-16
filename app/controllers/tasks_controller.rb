@@ -118,12 +118,8 @@ class TasksController < ApplicationController
 					end
 	      end
 
-	      Task.roots.each do |t|
-	        t.updated_at = Time.now
-	        t.save
-	      end
-    
-	      rebuild_schedule true
+				Task.root.touch	    
+	      #rebuild_schedule
 	    end
      
 		end
@@ -203,7 +199,6 @@ class TasksController < ApplicationController
         unless (params[:parent_id].blank?)
           @task.move_to_child_of(Task.find(params[:parent_id]))
         end
-        Rails.cache.increment "dirty"
 
 				t = Task.root
 	      t.updated_at = Time.now
@@ -247,7 +242,9 @@ class TasksController < ApplicationController
 
     respond_to do |format|
       if @task.update_attributes(params[:task] || params[:project])
-        Rails.cache.increment "dirty"
+				
+				Task.root.touch	
+					
         flash[:notice] = 'Task was successfully updated.'
         format.html { redirect_to current_user }
         format.xml  { head :ok }
@@ -271,7 +268,7 @@ class TasksController < ApplicationController
     respond_to do |format|
       if @task.update_attributes(params[:task] || params[:project])
 
-				rebuild_schedule
+				Task.root.touch	
 				
         flash[:notice] = 'Task was successfully updated.'				
         format.html { redirect_to(user_path(current_user, :timer => true)) }
@@ -298,7 +295,6 @@ class TasksController < ApplicationController
     @task = (admin? ? Task : current_user.tasks).find(params[:id])
 		@task_id = @task.id
     @task.destroy
-    Rails.cache.increment "dirty"
 
     respond_to do |format|
       format.html { redirect_to(current_user) }
@@ -312,7 +308,6 @@ class TasksController < ApplicationController
   end
     
   def bulk
-    Rails.cache.increment "dirty"
     @text = params[:tasks]
     @rows = @text.chomp.strip.split("\n").collect {|t| t.split(',') }
     @tasks = []
@@ -465,14 +460,9 @@ class TasksController < ApplicationController
         # @root = Task.find current_user.team_id unless current_user.nil? # replace this later with a local root
         @total_calendar_days = 0
         unless @root.nil?
-        if force
-          @root.updated_at = Time.now
-          @root.save!
-        end
-        @dirty = Rails.cache.fetch("dirty") { 1 }
         Release.all
         Project.all
-        t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
+        t = Rails.cache.fetch("schedule_#{@root.cache_key}", :expires_in => 1.hour ) do 
             user_end_dates = {}
             tasks = []
             

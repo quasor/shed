@@ -214,10 +214,4 @@ if (window.attachEvent) {
     window.addEventListener("resize", function() {setTimeout("Resize()",50);}, false);
 }	
 </script>
-<% content_for :save_module do %>
-	<% remote_form_for :task, :url => reorder_tasks_path, :before => "$('#task_submit').hide();$('#flash').html('Saving Changes & Rebuilding Schedule...')" do |f|%>
-	<%= hidden_field_tag :order%>
-	<%= f.submit %>
-	<% end %>
-<% end %>
 <% end %>

@@ -22,6 +22,11 @@ class Task < ActiveRecord::Base
   
   DEFAULT_VELOCITIIES = [0.72, 0.75, 0.81, 0.88, 1.8, 0.92, 0.94, 1.01, 1.21, 0.68]
 
+	def touch
+		self.updated_at = Time.now
+		self.save!
+	end
+
   def estimate_days
     if !low.blank? and !high.blank?
       ((low + 4*(low + ((high-low) * 0.66 )) + high)/6.0).round(2)

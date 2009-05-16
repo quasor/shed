@@ -69,7 +69,7 @@
 				<form style="display:inline" action="/tasks" id='filter_form'>
 					<b>Filters:</b>
 					<%= link_to 'reset', tasks_path(:filter_tasks => 1, :filter_user => current_user.id, :filter_project => 0)%>
-				<%=select_tag 'filter_user', options_for_select([['All Users',0]]) + options_from_collection_for_select( User.all.collect { |user| user if user.tasks.size > 0 }.compact ,:id,:name,session[:filter][:user].to_i), :onchange =>"$('#filter_form').submit()" %>
+				<%=select_tag 'filter_user', options_for_select([['All Users',0]]) + options_from_collection_for_select( User.all ,:id,:name,session[:filter][:user].to_i), :onchange =>"$('#filter_form').submit()" %>
 				<%=select_tag 'filter_tasks', options_for_select([['All Tasks',0], ['Active Tasks',1]],session[:filter][:tasks]), :onchange =>"$('#filter_form').submit()" %>
 				<%=select_tag 'filter_project', options_for_select([['All Projects',0]]) +
 				option_groups_from_collection_for_select(Release.all, :children, :title, :id, :title, session[:filter][:project].to_i), :onchange =>"$('#filter_form').submit()" %>
@@ -90,7 +90,7 @@
 <%= link_to_unless_current 'Home', root_path%> | 
 <%= link_to_unless_current 'Users', users_path%>
 <% form_for(:session, :url => tasks_path, :html => {:method => "get"}) do |f| %>
-Filter:<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>	
+Filter:<%= f.collection_select :user_id, User.all, :id, :name, {:prompt => :true} %>	
 <%= f.submit 'Go'%>
 <%end%>
 
