@@ -51,9 +51,10 @@ class IntervalsController < ApplicationController
     @interval = Interval.new(params[:interval])
 		unless params[:interval][:hours].blank?
 			@task = Task.find params[:interval][:task_id]
-			@task.intervals(true).find(:all, :conditions => {:start => Date.today..Date.today+1}).collect(&:destroy)
+			@task.intervals(true).find(:all, :conditions => {:created_at => Date.today..Date.today+1}).collect(&:destroy)
 			@interval.end = DateTime.now
-			@interval.start = DateTime.now - params[:interval][:hours].to_f.hours
+			hours = (parse_as_days(params[:interval][:hours]).to_f * WORKING_HOURS_PER_DAY)
+			@interval.start = DateTime.now - hours.hours
 		end
     @interval.user = current_user
     respond_to do |format|
@@ -65,7 +66,7 @@ class IntervalsController < ApplicationController
 				format.js {
 					render :update do |page|
 						@el = "interval_hours_#{@task.id}"
-						page[@el].val("#{@task.duration_friendly}")
+						page[@el].val("#{@task.time_spent_today}")
 						page.visual_effect :highlight, @el						
 						
 					end

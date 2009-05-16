@@ -79,7 +79,7 @@ class UsersController < ApplicationController
       redirect_to current_user
     else
       respond_to do |format|
-        format.html { render "show"} 
+        format.html { render :template => "users/show"} 
         format.xml  { render :xml => @user }
       end
     end

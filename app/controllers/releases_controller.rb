@@ -68,7 +68,7 @@ class ReleasesController < ApplicationController
     respond_to do |format|
       if @release.update_attributes(params[:release])
         flash[:notice] = 'Release was successfully updated.'
-        format.html { redirect_to(@release) }
+        format.html { redirect_to(tasks_path) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
