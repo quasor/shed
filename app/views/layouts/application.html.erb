@@ -27,6 +27,7 @@
 	});
 	</script>
 	<%= javascript_include_tag 'jquery.hotkeys-0.7.8-packed'%>
+	<%#= javascript_include_tag 'splitter-1.5'%>
 <% end %>
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.1/themes/base/jquery-ui.css"/>
 <style type="text/css" media="screen">
@@ -55,12 +56,14 @@
 			<%= yield :save_module%>
 			</div>
 			<div style="padding-right:2em;padding-left:0.5em;float:left;padding-top:.75em;font-size:12px">
-				<b><%= link_to_unless_current 'My Tasks', current_user %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
+				<b><%= link_to_unless_current 'My Tasks', root_path %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
 				<b><%= link_to_unless_current @timer.nil? ? 'Schedule' : '', tasks_path %>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
 				<% if false %>
 					<b><%= link_to_unless_current 'Time Spent', intervals_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
 				<% end %>
 				<b><%= link_to_unless_current 'Releases', releases_path%>&nbsp;&nbsp;|&nbsp;&nbsp;</b>  
+
+				<%= yield :button_bar %>
 				
 				<% if controller.controller_name == 'tasks'%>
 				<form style="display:inline" action="/tasks" id='filter_form'>

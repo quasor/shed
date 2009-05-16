@@ -107,4 +107,33 @@ def standard_deviation(population)
   Math.sqrt(variance(population))
 end
 
+WORKING_HOURS_PER_DAY = 8.0
 
+def format_seconds_as_working_days_hours(seconds)
+	part = seconds.to_f / WORKING_HOURS_PER_DAY.hours
+	days = part.div(1)
+	hours = part.modulo(1)*WORKING_HOURS_PER_DAY
+	hours = hours.to_i if hours.to_i == hours
+	days = days > 0 ? "#{days}d" : ""
+	hours = hours > 0 ? "#{hours}h" : ""
+	"#{days} #{hours}".strip
+end
+
+
+def parse_as_days(string)
+  unless string.nil?
+     # look for h in e.g. 1-2h or 1h-2 = 1h-2h
+     # 1-2 = 1d - 2d
+     default_unit = string.scan("h").empty? ? 1 : WORKING_HOURS_PER_DAY
+     days = 0.0
+     string.downcase.scan(/(\d*\.*\d*)\s?([h|d]?)/).each do |part|  
+      n_unit = case part[1]
+        when "h" : WORKING_HOURS_PER_DAY
+        when "d" : 1
+        else default_unit
+      end
+     	days = days + (part[0].to_f / n_unit)
+   	end 
+    days
+  end
+end

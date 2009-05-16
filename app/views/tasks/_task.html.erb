@@ -1,11 +1,10 @@
 <% if (task.type == "Project" || task.type == "Release") && @opened_ul -%>
 </ul><%@opened_ul = false%>
 <% end -%>
-<% if !task.start.nil? && @cweek != task.start.to_date.cweek && !request.xhr? %>
+<% if !task.start.nil? && @cweek != task.start.to_date.cweek && !request.xhr? && !task.completed? %>
 <% @cweek = task.start.to_date.cweek %>
 <p class="date-heading">
 	<% if @cweek == Date.today.cweek %>
-	This week
 	<% elsif @cweek == Date.today.cweek + 1%>
 	Next week
 	<% else %>
@@ -27,15 +26,16 @@
 								:html => {:method => 'post', :id => "interval_task_#{task.id}", :style => "display:inline"}) do |f| -%>
 							<%= f.hidden_field :task_id %>
 							<%= f.text_field :hours, 
-								:value => "#{task.duration_friendly}",
+								:value => "#{task.time_spent_today}",
 								:style=>"margin-top:1px;width:5em;text-align:center;backround-color:none;", 
 								:onclick => "this.select();",
 								:id => "interval_hours_#{task.id}",
 								:title => 'Log hours spent today',
-								:class => "thininput #{'warn' if task.completed? && !task.has_actuals?}"
+								:class => "thininput #{'warn' if task.completed_without_actuals?}",
+								:onblur => "this.form.onsubmit();"
 								-%>
 							<%= f.submit "save", :id => "save_btn_#{task.id}", :style => "display:none" %>
-							<% end unless task.completed? && task.has_actuals? -%>
+							<% end -%>
 						<%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped-hover') + '" src="/images/space.gif" align="absmiddle" border="0"> ',
 						 	 user_path(current_user, 
 								:task_id => (@current_task == task ? nil : task.id), 
@@ -45,9 +45,11 @@
 								 -%>
 						<%= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} unless task.completed?%>
 					</div>
+					<% if task.completed_without_actuals?%>
+					<% end %>
 					<span class="task_label" id="<%="task_label_#{task.id}"%>">
-					<% remote_form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "display:inline"}) do |f| -%>
-						<%= f.check_box :completed, :onclick => "this.form.onsubmit();", :style => 'cursor:hand' -%>
+					<% form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "display:inline"}) do |f| -%>
+						<%= f.check_box :completed, :onclick => "this.form.submit();", :style => 'cursor:hand' -%>
 					<% end -%>
 					<span class="project_tag"><%= task.parent.title unless task.parent.nil?%>:</span>
 					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get)%>
@@ -59,9 +61,9 @@
 							
 				<% end -%>				
 		<% elsif task.type == "Project" -%>
-				<% (2*task.level).times do %>&nbsp;<%end%><%= link_to task.title, edit_project_path(task) -%>
+				<% (2*task.indent_size).times do %>&nbsp;<%end%><%= link_to task.title, edit_project_path(task) -%>
 		<% else -%>
-				<% (2*task.level).times do %>&nbsp;<%end%><%= task.title -%>
+				<% (2*task.indent_size).times do %>&nbsp;<%end%><%= link_to task.title, edit_release_path(task) -%>
 		<% end -%>			
 		<%if @timer.nil?%>
 			<% if task.type == "Release"%>

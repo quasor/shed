@@ -1,5 +1,6 @@
 <% @slow_down = false %>
 <% unless @tasks.empty? %>
+<div id="canvas">
 <div id="leftcol" class="resizeable">
 			<%#= render :partial => 'tasklist', :locals => {:skip_completed => nil}%>
 			<table class="st" id="left-schedule" width="100%">
@@ -24,7 +25,7 @@
 		    <td>End</td>
 			  <td>
 						<div style="position:relative; margin-left:0px">				
-							<% @milestones = Release.all.collect(&:due)%>
+							<% @milestones = Release.incomplete.collect(&:due)%>
 							<% for i in 0..@total_calendar_days-%>
 								<% d = @today + i -%>
 								<%
@@ -125,6 +126,7 @@
 	<% end %>
 		</table>
 </div>
+</div>
 <div id="progress_dialog" style="display:none; background-color:blue; z-index:10">
 	word
 </div>
@@ -135,6 +137,9 @@
 function startup()
 {
 	Resize();
+	
+	/*
+	$("#canvas").splitter();
 	$('#leftcol').resizable({ 
 	    handles: "ew",
 	    stop: function(e, ui) { 
@@ -146,6 +151,7 @@ function startup()
 	});	
 
 	$('.ui-resizable-handle').css('background-color','#ABABAB');
+	*/
 	
 	<% Project.all.each do |project| %>
 	$('#taskList<%=project.id%>').sortable({

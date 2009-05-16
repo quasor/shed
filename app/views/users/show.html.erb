@@ -35,12 +35,11 @@
 			<%= link_to("Completed Projects", user_path(current_user), :class => "project logbook") %>
 			
 		</td><td id="tasks" valign="top">
-			
-			<div id="tasks_time_header" style="float:right; position:relative; right:8px; top:3em">Log Hours Spent Today</div>
-			
+						
 			<p id="notice"></p>
-			<%= link_to_remote "New Task", :url => new_task_path(), :html => {:class => 'button_link', :title => 'New Task'} -%>
-			
+			<% content_for :button_bar do %>
+			<%= link_to_remote "New Task", :url => new_task_path(), :html => {:class => 'button_link', :title => 'New Task', :style => 'margin-bottom:2em'} -%>
+			<% end %>
 			<div class="inline_edit" id="edit_task"></div>
 			<ul id="taskList">
 			<%= render :partial => 'tasks/task', :collection => @tasks %>
@@ -60,11 +59,17 @@ function startup(){
 		stop: function(e,ui) {
 			$('#order').val( $('#taskList').sortable('serialize', {"key":''}));
 			//alert($('#taskList').sortable('serialize', {"key":''}));
-			$('.date-heading').html('&nbsp;');
 			<%= remote_function( :url => reorder_tasks_path, :with => "$('#taskList').sortable('serialize', {\"key\":''})",
 			:before => "$('#flash').html('Saving Order...')") %>
-		}
+		},
+		start: function(e,ui) {
+			$('.date-heading').remove();
+		},
+		items: 'li:not(.date-heading)',
+		delay:500,
+		
 	});	
+	$("#taskList").disableSelection();
 
 	/*
 	<% Project.all.each do |project| %>

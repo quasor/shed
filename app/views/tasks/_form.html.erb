@@ -2,9 +2,9 @@
 <h1></h1><%#= f.label :task %>
 <%end%>
 <% unless @task.new_record?%>
-<label><%= f.check_box :completed if @task.type.nil?%></label>
+<label><%= f.check_box :completed%></label>
 <%else%>
-<label><%= f.check_box :completed if @task.type.nil?%></label>
+<label><%= f.check_box :completed%></label>
 <% end %>
 <% if @task.new_record?%>
 	<%= f.text_field :title, :size => 80%>

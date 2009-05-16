@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   # GET /users
   # GET /users.xml
   before_filter :login_required
-  before_filter :authorized, :except => [:show]
+  before_filter :authorized, :except => [:show, :mytasks]
   def index
     @users = User.find(:all)
 
@@ -12,10 +12,11 @@ class UsersController < ApplicationController
       format.xml  { render :xml => @users }
     end
   end
-
-	#def mytasks
-	#	redirect_to user_path(current_user)
-	#end
+	
+	def mytasks
+		params[:id] = current_user.id
+		show
+	end
 	
   # GET /users/1
   # GET /users/1.xml
@@ -78,7 +79,7 @@ class UsersController < ApplicationController
       redirect_to current_user
     else
       respond_to do |format|
-        format.html {} 
+        format.html { render "show"} 
         format.xml  { render :xml => @user }
       end
     end

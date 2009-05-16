@@ -7,7 +7,9 @@ class Task < ActiveRecord::Base
   named_scope :by_user, lambda { |user_id| { :conditions => {:user_id => user_id} } }
   named_scope :active, :conditions => {:completed => false, :type => nil}
   named_scope :complete, :conditions => {:completed => true}
+	named_scope :upcoming, :conditions => ["due > ?", Date.today]
   include NestedSetList
+  named_scope :incomplete, :conditions => {:completed => false}
 
   belongs_to :user
 	acts_as_list# :scope => :user_id
@@ -19,6 +21,7 @@ class Task < ActiveRecord::Base
   #validates_presence_of :user
   
   DEFAULT_VELOCITIIES = [0.72, 0.75, 0.81, 0.88, 1.8, 0.92, 0.94, 1.01, 1.21, 0.68]
+
   def estimate_days
     if !low.blank? and !high.blank?
       ((low + 4*(low + ((high-low) * 0.66 )) + high)/6.0).round(2)
@@ -50,23 +53,23 @@ class Task < ActiveRecord::Base
     ed = self.estimate_days
     if self.completed? && ed > 0 && !self.intervals.empty?
       act = self.intervals.collect {|i| i.to_seconds}.sum
-      est = ed * 8.hours
+      est = ed * WORKING_HOURS_PER_DAY.hours
       r = est / act
       (0.20 <= r && r <= 20 ) ? r : nil
     end
   end
 
-	def duration_friendly
-		d = duration_today
-		s = ""
-		s = s + "#{d.days}d " unless d.days == 0
-		s = s + "#{d.hours}h #{d.minutes}m"
-	end
-	
-	def duration_today
-		Duration.new(self.intervals.find(:all, :conditions => {:end => Date.today..Date.today+1}).collect {|i| i.to_seconds}.sum)
+	def time_spent_today
+		seconds = self.intervals.find(:all, :conditions => {:end => Date.today..Date.today+1}).collect {|i| i.to_seconds}.sum
+		format_seconds_as_working_days_hours(seconds)
 	end
 
+	def time_spent_friendly
+		seconds = self.intervals.collect {|i| i.to_seconds}.sum
+		format_seconds_as_working_days_hours(seconds)
+	end
+
+	
   def has_actuals?
 		self.intervals.size > 0	
 	end
@@ -74,7 +77,7 @@ class Task < ActiveRecord::Base
   def friendly_estimate
     ed = self.estimate_days
     if ed < 2
-      Duration.new(ed * 8.hours)
+      Duration.new(ed * WORKING_HOURS_PER_DAY.hours)
     else
       ed
     end
@@ -95,8 +98,6 @@ class Task < ActiveRecord::Base
 			self.type
 		end
 	end
-
-  WORKING_HOURS_PER_DAY = 8
   
   def task?
     self.type.nil?
@@ -165,7 +166,7 @@ class Task < ActiveRecord::Base
     
   def formatted_estimate_part(part)
     days = "#{part.div(1)}d"
-    hours = part.modulo(1) > 0 ? " #{part.modulo(1)*8}h" : ""
+    hours = part.modulo(1) > 0 ? " #{part.modulo(1)*WORKING_HOURS_PER_DAY}h" : ""
     (days + " " + hours).strip
   end
 
@@ -178,6 +179,10 @@ class Task < ActiveRecord::Base
       low_str
     end
   end
+	
+	def completed_without_actuals?
+		self.completed? && !self.estimate.blank? && !self.has_actuals?
+	end
   
 end
 

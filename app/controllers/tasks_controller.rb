@@ -21,6 +21,7 @@ class TasksController < ApplicationController
     #else
     #  @tasks = @taskz
     #end
+				
 		if session[:filter][:user] != 0
 			@user_id = session[:filter][:user]
 			@project_ids = (Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent).collect(&:parent) + Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent)).uniq.map(&:id).sort
@@ -28,7 +29,7 @@ class TasksController < ApplicationController
     @tasks = @taskz.collect do |task|
       skip = false
       if task.type.nil?
-        if session[:filter][:tasks] == 1 && (task.completed? || task.parent.on_hold?)
+        if session[:filter][:tasks] == 1 && (task.completed? || task.parent.on_hold? || task.parent.parent.completed? || task.parent.completed?)
           skip = true
         end  
         if session[:filter][:user] != 0 && (session[:filter][:user] != task.user_id )
@@ -40,14 +41,18 @@ class TasksController < ApplicationController
   		else
 				#
 				if task.type == "Release" || task.type == "Project"
+	        if session[:filter][:tasks] == 1 && (task.completed? || (task.type == "Project" && task.parent.completed?))
+	          skip = true
+	        end  
+
 					if session[:filter][:user] != 0 && !@project_ids.include?(task.id) 
 	      		skip = true
 	        end  
 				end
       end
-      if skip
-        logger.info 'skipping task...'
-      end
+      #if skip
+      #  logger.info 'skipping task...'
+      #end
       task unless skip
     end
     @tasks.compact!
@@ -91,9 +96,9 @@ class TasksController < ApplicationController
     Task.transaction do
 			@tasks = Task.find @order
 	    @previous_positions = @tasks.collect(&:position).sort
-			logger.info "previous positions:#{@previous_positions.inspect}"
+			#logger.info "previous positions:#{@previous_positions.inspect}"
 	    unless @tasks.empty? || @tasks.size < 2
-	      logger.info @order.collect { |i| Task.find(i).title }.join ','
+	      #logger.info @order.collect { |i| Task.find(i).title }.join ','
 	      #@order.delete_if { |i| !Task.find(i).type.nil? }
 	      @order.each_with_index do |o,i|
 					if false
@@ -265,14 +270,17 @@ class TasksController < ApplicationController
 
     respond_to do |format|
       if @task.update_attributes(params[:task] || params[:project])
-        Rails.cache.increment "dirty"
-        flash[:notice] = 'Task was successfully updated.'
+
+				rebuild_schedule
+				
+        flash[:notice] = 'Task was successfully updated.'				
         format.html { redirect_to(user_path(current_user, :timer => true)) }
         format.xml  { head :ok }
 				format.js { 
 					render :update do |page|
 						page.replace "task_#{@task.id}", :partial => @task
 						page.visual_effect :highlight, "task_#{@task.id}"
+						#page.replace_html :taskList, :partial => current_user.tasks(true)
 					end
 					}
       else
