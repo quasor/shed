@@ -29,25 +29,25 @@ class TasksController < ApplicationController
     @tasks = @taskz.collect do |task|
       skip = false
       if task.type.nil?
-        if session[:filter][:tasks] == 1 && (task.completed? || task.parent.on_hold? || task.parent.parent.completed? || task.parent.completed?)
-          skip = true
-        end  
         if session[:filter][:user] != 0 && (session[:filter][:user] != task.user_id )
           skip = true
         end  
-        if session[:filter][:project] != 0 && session[:filter][:project] != task.parent_id
+        if !skip && session[:filter][:project] != 0 && session[:filter][:project] != task.parent_id
           skip = true
         end
+        if !skip && session[:filter][:tasks] == 1 && (task.completed? || task.parent.on_hold? || task.parent.parent.completed? || task.parent.completed?)
+          skip = true
+        end  
   		else
 				#
 				if task.type == "Release" || task.type == "Project"
-	        if session[:filter][:tasks] == 1 && (task.completed? || (task.type == "Project" && task.parent.completed?))
-	          skip = true
-	        end  
-
 					if session[:filter][:user] != 0 && !@project_ids.include?(task.id) 
 	      		skip = true
 	        end  
+	        !skip && if session[:filter][:tasks] == 1 && (task.completed? || (task.type == "Project" && task.parent.completed?))
+	          skip = true
+	        end  
+
 				end
       end
       #if skip
@@ -472,7 +472,7 @@ class TasksController < ApplicationController
         @dirty = Rails.cache.fetch("dirty") { 1 }
         Release.all
         Project.all
-        #t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
+        t = Rails.cache.fetch("schedule_#{@root.cache_key}-#{@dirty}", :expires_in => 1.hour ) do 
             user_end_dates = {}
             tasks = []
             
@@ -496,7 +496,7 @@ class TasksController < ApplicationController
 	              end
 	            end
 						end
-          #end
+          end
           
           # done with the rebuild...
           
