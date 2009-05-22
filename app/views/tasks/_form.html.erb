@@ -31,7 +31,7 @@
 </p>
 <p>
 		<%= f.label :project %>
-		<%= select_tag(:parent_id, option_groups_from_collection_for_select(Release.all, :children, :title, :id, :title, @parent_id.to_i) ) %>
+		<%= select_tag(:parent_id, option_groups_from_collection_for_select(Release.find(:all, :conditions => {:completed => :false }), :children, :title, :id, :title, @parent_id.to_i) ) %>
 </p>
 
 <% else %>
