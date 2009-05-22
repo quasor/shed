@@ -1,7 +1,7 @@
 <% if (task.type == "Project" || task.type == "Release") && @opened_ul -%>
 </ul><%@opened_ul = false%>
 <% end -%>
-<% if !task.start.nil? && @cweek != task.start.to_date.cweek && !request.xhr? && !task.completed? %>
+<% if params[:project].blank? && !task.start.nil? && @cweek != task.start.to_date.cweek && !request.xhr? && !task.completed?  %>
 <% @cweek = task.start.to_date.cweek %>
 <p class="date-heading">
 	<% if @cweek == Date.today.cweek %>
@@ -35,13 +35,13 @@
 								:onblur => "this.form.onsubmit();"
 								-%>
 							<%= f.submit "save", :id => "save_btn_#{task.id}", :style => "display:none" %>
-							<% end -%>
+							<% end unless task.user_id != current_user.id -%>
 						<%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped-hover') + '" src="/images/space.gif" align="absmiddle" border="0"> ',
 						 	 user_path(current_user, 
 								:task_id => (@current_task == task ? nil : task.id), 
 								:stop => (@current_task == task ? true : nil), 
 								:timer =>params[:timer]), 
-									:class => "hideul", :title => 'Start the clock on this task' unless task.completed?
+									:class => "hideul", :title => 'Start the clock on this task' unless task.completed? || task.user_id != current_user.id
 								 -%>
 						<%= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} unless task.completed?%>
 					</div>
@@ -52,6 +52,9 @@
 						<%= f.check_box :completed, :onclick => "this.form.submit();", :style => 'cursor:hand' -%>
 					<% end -%>
 					<span class="project_tag"><%= task.parent.title unless task.parent.nil?%>:</span>
+					<% unless params[:project].blank? %>
+						<% unless @users.size == 1%><span class="taglist color<%=@users[task.user_id]%>"><%= task.user.name %></span><%end%>
+					<% end %>
 					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get)%>
 						<% unless task.estimate.blank? %><span class="estimate"><%= link_to_remote(task.estimate, :url => edit_task_path(task, :edit_estimate => true), :method => :get)%></span><% end %>
 						<% for tag in task.tag_list%>

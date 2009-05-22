@@ -17,7 +17,11 @@
 <% if @task.type.nil?%>
 <p>
 	<%= f.label :estimate %>
-  <%= f.text_field :estimate%><br>
+	<% if @task.new_record?%>
+		<%= f.text_field :estimate %>
+	<% else%>
+		<%= f.text_field :estimate, :id => "task_estimate_#{@task.id}"%>
+	<% end %>
 	<span class="help"> e.g.: 0.5h,&nbsp; 1-2 hours,&nbsp; 5h - 1d,&nbsp; 2days </span>
 </p>
 

@@ -29,13 +29,24 @@ class UsersController < ApplicationController
     unless @user == current_user || admin?
       returning redirect_to(current_user)
     end
-		@conditions = { :parent_id => params[:project] } unless params[:project].blank?
-    @tasks = current_user.tasks.find :all,  :conditions => @conditions, :order => "completed desc, position asc"
+		@conditions = { :type => nil }
+		@conditions.merge({  }) unless params[:project].blank?
+		if params[:project].blank?
+    	@tasks = current_user.tasks.find :all,  :conditions => @conditions, :order => "completed desc, position asc"
+		else
+    	@tasks = Task.find :all, :conditions => {:parent_id => params[:project], :type => nil}, :order => "completed desc, position asc"
+		end
+		
+
 		#@tasks = Task.all :all, :conditions => {:type => nil }, :order => :position
-    @tasks.delete_if {|t| (t.user_id != @user.id || (t.completed? && !t.touched_today?)) && t.type.nil? }   
-		@tasks.delete_if { |t| ((t.completed? && !t.touched_today?) || t.parent.on_hold?) && t.type.nil? } 
-    @project_ids = @tasks.collect { |t| t.parent_id }.uniq
+    @tasks.delete_if {|t| ((t.completed? && !t.touched_today?)) && t.type.nil? }   
+		@tasks.delete_if { |t| (!t.	parent.nil? && t.parent.on_hold?) && t.type.nil? } 
+    @project_ids = current_user.tasks.collect { |t| t.parent_id if t.type.nil? }.flatten.uniq
     @tasks.delete_if {|t| !t.type.nil? || t.root? }   
+		@users = {}
+		@tasks.collect(&:user_id).uniq.each_with_index do |user,index|
+			@users[user] = index
+		end
 		
 		#pos = 1
 		#for task in @tasks
