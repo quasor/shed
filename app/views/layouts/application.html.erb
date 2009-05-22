@@ -72,7 +72,7 @@
 				<%=select_tag 'filter_user', options_for_select([['All Users',0]]) + options_from_collection_for_select( User.find(:all, :order => :name) ,:id,:name,session[:filter][:user].to_i), :onchange =>"$('#filter_form').submit()" %>
 				<%=select_tag 'filter_tasks', options_for_select([['All Tasks',0], ['Active Tasks',1]],session[:filter][:tasks]), :onchange =>"$('#filter_form').submit()" %>
 				<%=select_tag 'filter_project', options_for_select([['All Projects',0]]) +
-				option_groups_from_collection_for_select(Release.all, :children, :title, :id, :title, session[:filter][:project].to_i), :onchange =>"$('#filter_form').submit()" %>
+				option_groups_from_collection_for_select(Release.find(:all, :conditions => {:completed => :false }), :children, :title, :id, :title, session[:filter][:project].to_i), :onchange =>"$('#filter_form').submit()" %>
 				</form>
 				<% end %>
 			</div>
