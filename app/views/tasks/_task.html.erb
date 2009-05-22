@@ -33,7 +33,7 @@
 								:title => 'Log hours spent today',
 								:class => "thininput #{'warn' if task.completed_without_actuals?}",
 								:onblur => "this.form.onsubmit();"
-								-%>
+								 -%>
 							<%= f.submit "save", :id => "save_btn_#{task.id}", :style => "display:none" %>
 							<% end unless task.user_id != current_user.id -%>
 						<%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped-hover') + '" src="/images/space.gif" align="absmiddle" border="0"> ',
@@ -43,13 +43,13 @@
 								:timer =>params[:timer]), 
 									:class => "hideul", :title => 'Start the clock on this task' unless task.completed? || task.user_id != current_user.id
 								 -%>
-						<%= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} unless task.completed?%>
+						<%= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} unless task.completed? || task.user_id != current_user.id%>
 					</div>
 					<% if task.completed_without_actuals?%>
 					<% end %>
 					<span class="task_label" id="<%="task_label_#{task.id}"%>">
 					<% form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "display:inline"}) do |f| -%>
-						<%= f.check_box :completed, :onclick => "this.form.submit();", :style => 'cursor:hand' -%>
+						<%= f.check_box :completed, :onclick => "this.form.submit();", :style => 'cursor:hand', :disabled => task.user_id != current_user.id -%>
 					<% end -%>
 					<span class="project_tag"><%= task.parent.title unless task.parent.nil?%>:</span>
 					<% unless params[:project].blank? %>
