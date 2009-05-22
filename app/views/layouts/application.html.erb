@@ -69,7 +69,7 @@
 				<form style="display:inline" action="/tasks" id='filter_form'>
 					<b>Filters:</b>
 					<%= link_to 'reset', tasks_path(:filter_tasks => 1, :filter_user => current_user.id, :filter_project => 0)%>
-				<%=select_tag 'filter_user', options_for_select([['All Users',0]]) + options_from_collection_for_select( User.all ,:id,:name,session[:filter][:user].to_i), :onchange =>"$('#filter_form').submit()" %>
+				<%=select_tag 'filter_user', options_for_select([['All Users',0]]) + options_from_collection_for_select( User.find(:all, :order => :name) ,:id,:name,session[:filter][:user].to_i), :onchange =>"$('#filter_form').submit()" %>
 				<%=select_tag 'filter_tasks', options_for_select([['All Tasks',0], ['Active Tasks',1]],session[:filter][:tasks]), :onchange =>"$('#filter_form').submit()" %>
 				<%=select_tag 'filter_project', options_for_select([['All Projects',0]]) +
 				option_groups_from_collection_for_select(Release.all, :children, :title, :id, :title, session[:filter][:project].to_i), :onchange =>"$('#filter_form').submit()" %>
