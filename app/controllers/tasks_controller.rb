@@ -5,7 +5,7 @@ class TasksController < ApplicationController
   before_filter :supports_iphone, :only => [:index]
   before_filter :login_required, :except => [:redo]
   def index
-    @pixels_per_day =16
+    @pixels_per_day =12
     # init filters
     session[:filter] ||= {}
     session[:filter][:tasks] ||= 1
@@ -74,7 +74,7 @@ class TasksController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.iphone 
-      format.xml  { render :xml => @tasks }
+      format.xml 
     end
   end
 

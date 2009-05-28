@@ -11,7 +11,7 @@
 <% else%>
 	<%= f.text_field :title, :id => "task_title_#{@task.id}", :size => 80%>
 <% end %>
-<%= f.collection_select :user_id, User.find(:all), :id, :name, {:prompt => :true} %>
+<%= f.collection_select :user_id, User.find(:all, :order => :name), :id, :name, {:prompt => :true} %>
 
 <div>
 <% if @task.type.nil?%>
