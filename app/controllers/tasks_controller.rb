@@ -344,8 +344,8 @@ class TasksController < ApplicationController
        rebuild_schedule(true) 
        @rebuilt = true       
     end
-    Rails.cache.fetch("run_sim_#{Task.root.cache_key}") do 
-      #run_simulation
+    Rails.cache.fetch("run_sim_#{Task.root.cache_key}#{Date.today}") do 
+      run_simulation
       @rebuilt = true       
     end 
     render :text => @rebuilt ? " #{Time.now} - Rebuild Complete" : " #{Time.now} - Using Cached Copy"
@@ -366,18 +366,30 @@ class TasksController < ApplicationController
       user_end_dates = {}
       projections={}
       tasks = Task.root.descendants
-      tasks.each do |task|
-        unless task.user.nil? || task.completed? || task.parent.on_hold?
-          user_end_dates[task.user.id] ||= Date.today.work_day(0)
-          task.start = user_end_dates[task.user.id].work_day(0)
-          task_end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate)
-          projections[task.id] = Projection.new(:start => task.start, :end => task_end, :simulation_id => @simulation.id) if task.type.nil?
-          @task_projections[task.id] ||= []
-          @task_projections[task.id].push Projection.new(:task_id => task.id, :start => task.start, :end => task_end == task.start ? (task_end + 1) : task_end, :simulation_id => @simulation.id) if task.type.nil?
-        else 
-          task.start = Date.today
-        end
-      end
+
+			User.all.each do |user|
+				@tasks_raw = user.tasks.find :all, :order => "position"
+				# Compute start times for each task
+				@tasks_raw.each do |task|
+					unless task.user.nil? || task.completed? || task.parent.on_hold?
+						# compute the schedule
+						user_end_dates[task.user.id] ||= Date.today.work_day(0)
+						task.start = user_end_dates[task.user.id].work_day(0)
+						task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate) # use a monte estimate, instead of actual estimate
+
+						task.start = task.start.to_datetime + task.start.day_fraction
+						task.end = task.end.to_datetime + task.end.day_fraction
+						
+						# ok, now we've computed the schedule, save the projection
+	          projections[task.id] = Projection.new(:start => task.start, :end => task.end, :simulation_id => @simulation.id) if task.type.nil?
+	          @task_projections[task.id] ||= []
+	          @task_projections[task.id].push Projection.new(:task_id => task.id, :start => task.start, :end => task.end == task.start ? (task.end + 1) : task.end, :simulation_id => @simulation.id) if task.type.nil?
+					else 
+						task.start = Date.today.to_datetime
+					end
+				end
+			end
+
       logger.warn "\n\n\n---------\n#{user_end_dates.inspect}"
       # use the estimates from the simulation to determine the end date of the project
       Project.all.each do |project|
@@ -435,6 +447,11 @@ class TasksController < ApplicationController
       starts = projections.collect(&:start).sort
       ends = projections.collect(&:end).sort
       unless projections.empty? || !task.type.nil? || task.completed?
+				task.best_start = starts[mid-std_dev1]
+				task.worst_start = starts[mid]
+				task.best_end = ends[mid+std_dev1] == starts[mid-std_dev1] ? (ends[mid+std_dev1] + 1) : projections[mid+std_dev1].end
+				task.worst_end = ends[mid] == starts[mid] ? (ends[mid] + 1) : ends[mid] 
+				task.save!
         Projection.create(:task_id => task.id, :start => starts[mid], :end => ends[mid] == starts[mid] ? (ends[mid] + 1) : ends[mid], :confidence => 1) # mean
         Projection.create(:task_id => task.id, :start => starts[mid-std_dev1], :end => ends[mid+std_dev1] == starts[mid-std_dev1] ? (ends[mid+std_dev1] + 1) : projections[mid+std_dev1].end, :confidence => 67) # mean
       end
