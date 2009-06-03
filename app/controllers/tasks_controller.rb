@@ -71,6 +71,13 @@ class TasksController < ApplicationController
     else
       # flash[:notice] = "Last updated at #{Task.root.updated_at.to_s()}"
     end
+		colors = ["#E2FEFE", "#F6DAFC", "#FFFEDC", "#D8D9FB"]
+		@releases = Release.find(:all, :order => 'due')
+		@release_color=[]
+		@releases.each_with_index do |r,i|
+			@release_color[r.id] = colors[i%colors.size]			
+		end
+
     respond_to do |format|
       format.html # index.html.erb
       format.iphone 
