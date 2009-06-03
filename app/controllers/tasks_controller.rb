@@ -63,8 +63,8 @@ class TasksController < ApplicationController
      Holiday.find(:all, :select => :holiday).collect(&:holiday)
    end
     
-   @simulation = Simulation.last
-	@today = Date.today
+		@simulation = Simulation.last
+		@today = Date.today
     
     if Release.count == 0
       flash[:warning] = 'Your schedule is empty'
@@ -344,7 +344,7 @@ class TasksController < ApplicationController
        rebuild_schedule(true) 
        @rebuilt = true       
     end
-    Rails.cache.fetch("run_sim_#{Task.root.cache_key}#{Date.today}") do 
+    Rails.cache.fetch("run_sim_#{@root.cache_key}#{Date.today}") do 
       run_simulation
       @rebuilt = true       
     end 
@@ -518,7 +518,7 @@ class TasksController < ApplicationController
         #@tasks_raw
 				#t
 				t = []
-				Release.all.each do |r|
+				Release.find(:all, :order => 'due').each do |r|
 					t << r
 					r.children.each do |p|
 						t << p

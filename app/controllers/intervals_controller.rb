@@ -68,7 +68,6 @@ class IntervalsController < ApplicationController
 						@el = "interval_hours_#{@task.id}"
 						page[@el].val("#{@task.time_spent_today}")
 						page.visual_effect :highlight, @el						
-						
 					end
 				}
       else
