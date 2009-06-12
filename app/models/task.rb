@@ -3,6 +3,7 @@
 class Task < ActiveRecord::Base
   acts_as_nested_set
   acts_as_taggable_on :tags
+  acts_as_versioned
 	
   named_scope :by_user, lambda { |user_id| { :conditions => {:user_id => user_id} } }
   named_scope :active, :conditions => {:completed => false, :type => nil}

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090514054210) do
+ActiveRecord::Schema.define(:version => 20090612180656) do
 
   create_table "holidays", :force => true do |t|
     t.date     "holiday"
@@ -20,8 +20,8 @@ ActiveRecord::Schema.define(:version => 20090514054210) do
   create_table "intervals", :force => true do |t|
     t.datetime "start"
     t.datetime "end"
-    t.integer  "user_id"
-    t.integer  "task_id"
+    t.integer  "user_id",    :limit => 11
+    t.integer  "task_id",    :limit => 11
     t.integer  "hours",      :limit => 10, :precision => 10, :scale => 0
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -30,14 +30,14 @@ ActiveRecord::Schema.define(:version => 20090514054210) do
   add_index "intervals", ["task_id"], :name => "index_intervals_on_task_id"
 
   create_table "projections", :force => true do |t|
-    t.integer  "task_id"
+    t.integer  "task_id",       :limit => 11
     t.date     "start"
     t.date     "end"
-    t.integer  "confidence",    :default => 0
+    t.integer  "confidence",    :limit => 11, :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "user_id"
-    t.integer  "simulation_id"
+    t.integer  "user_id",       :limit => 11
+    t.integer  "simulation_id", :limit => 11
   end
 
   add_index "projections", ["task_id"], :name => "index_projections_on_task_id"
@@ -48,9 +48,9 @@ ActiveRecord::Schema.define(:version => 20090514054210) do
   end
 
   create_table "taggings", :force => true do |t|
-    t.integer  "tag_id"
-    t.integer  "taggable_id"
-    t.integer  "tagger_id"
+    t.integer  "tag_id",        :limit => 11
+    t.integer  "taggable_id",   :limit => 11
+    t.integer  "tagger_id",     :limit => 11
     t.string   "tagger_type"
     t.string   "taggable_type"
     t.string   "context"
@@ -64,18 +64,19 @@ ActiveRecord::Schema.define(:version => 20090514054210) do
     t.string "name"
   end
 
-  create_table "tasks", :force => true do |t|
+  create_table "task_versions", :force => true do |t|
+    t.integer  "task_id",             :limit => 11
+    t.integer  "version",             :limit => 11
     t.string   "title"
-    t.string   "type"
     t.text     "description"
     t.float    "low_estimate_cache"
     t.float    "high_estimate_cache"
-    t.boolean  "completed",           :default => false
-    t.integer  "user_id"
+    t.boolean  "completed",                         :default => false
+    t.integer  "user_id",             :limit => 11
     t.datetime "start"
-    t.integer  "parent_id"
-    t.integer  "lft"
-    t.integer  "rgt"
+    t.integer  "parent_id",           :limit => 11
+    t.integer  "lft",                 :limit => 11
+    t.integer  "rgt",                 :limit => 11
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "cached_tag_list"
@@ -86,22 +87,50 @@ ActiveRecord::Schema.define(:version => 20090514054210) do
     t.date     "worst_start"
     t.date     "best_end"
     t.date     "worst_end"
-    t.integer  "position"
-    t.boolean  "on_hold",             :default => false
+    t.integer  "position",            :limit => 11
+    t.boolean  "on_hold",                           :default => false
+    t.string   "versioned_type"
   end
 
+  create_table "tasks", :force => true do |t|
+    t.string   "title"
+    t.string   "type"
+    t.text     "description"
+    t.float    "low_estimate_cache"
+    t.float    "high_estimate_cache"
+    t.boolean  "completed",                         :default => false
+    t.integer  "user_id",             :limit => 11
+    t.datetime "start"
+    t.integer  "parent_id",           :limit => 11
+    t.integer  "lft",                 :limit => 11
+    t.integer  "rgt",                 :limit => 11
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "cached_tag_list"
+    t.date     "due"
+    t.datetime "end"
+    t.string   "estimate"
+    t.date     "best_start"
+    t.date     "worst_start"
+    t.date     "best_end"
+    t.date     "worst_end"
+    t.integer  "position",            :limit => 11
+    t.boolean  "on_hold",                           :default => false
+    t.integer  "version",             :limit => 11
+  end
+
+  add_index "tasks", ["user_id"], :name => "index_tasks_on_user_id"
   add_index "tasks", ["lft"], :name => "leftidx"
   add_index "tasks", ["rgt"], :name => "rightidx"
-  add_index "tasks", ["user_id"], :name => "index_tasks_on_user_id"
 
   create_table "users", :force => true do |t|
     t.string   "name"
     t.string   "login"
-    t.float    "efficiency", :default => 0.0
+    t.float    "efficiency",               :default => 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "loginkey"
-    t.integer  "team_id"
+    t.integer  "team_id",    :limit => 11
   end
 
 end
