@@ -3,8 +3,8 @@
 class Task < ActiveRecord::Base
   acts_as_nested_set
   acts_as_taggable_on :tags
-	before_save :setup_the_version
-	after_save :save_the_version
+	#before_save :setup_the_version
+	#after_save :save_the_version
   #acts_as_versioned
 	
   named_scope :by_user, lambda { |user_id| { :conditions => {:user_id => user_id} } }

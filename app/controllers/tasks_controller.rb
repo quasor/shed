@@ -247,9 +247,11 @@ class TasksController < ApplicationController
       @task.move_to_child_of(Task.find(params[:parent_id]))
     end
 
+		@task.setup_the_version
+
     respond_to do |format|
       if @task.update_attributes(params[:task] || params[:project])
-				
+				@task.save_the_version
 				Task.root.touch	
 					
         flash[:notice] = 'Task was successfully updated.'
