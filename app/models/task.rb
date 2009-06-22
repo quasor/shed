@@ -3,6 +3,8 @@
 class Task < ActiveRecord::Base
   acts_as_nested_set
   acts_as_taggable_on :tags
+  before_save :setup_the_version
+	after_save :save_the_version
   # acts_as_versioned
 	
   named_scope :by_user, lambda { |user_id| { :conditions => {:user_id => user_id} } }
@@ -17,6 +19,7 @@ class Task < ActiveRecord::Base
 
   has_many :intervals, :dependent => :destroy
   has_many :projections, :dependent => :destroy
+	has_many :task_versions, :dependent => :destroy
   #validates_presence_of :low
   validates_presence_of :title
   #validates_presence_of :user
@@ -189,7 +192,17 @@ class Task < ActiveRecord::Base
 	def completed_without_actuals?
 		self.completed? && !self.estimate.blank? && !self.has_actuals?
 	end
-  
+
+	def setup_the_version
+		puts 'setup the version'
+		current = Task.find self.id
+		@saving_version = TaskVersion.new current.attributes.merge({:versioned_type => current.type, :task_id => current.id})
+	end
+
+  def save_the_version
+		@saving_version.save
+	end
+
 end
 
 
