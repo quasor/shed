@@ -9,7 +9,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :releases
 
-  map.resources :users
+  map.resources :users, :member => {:update_ticker => :get}
 
   map.resources :holidays
 

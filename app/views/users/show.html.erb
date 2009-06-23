@@ -48,7 +48,9 @@
 		</tr>
 		</table>
 </div>
+<%= periodically_call_remote(:url => {:action => 'update_ticker'},:method => "get", :frequency => '60')%>
 <script type="text/javascript" charset="utf-8">
+
 var last_updated = new Number();
 
 function startup(){

@@ -110,29 +110,37 @@ end
 WORKING_HOURS_PER_DAY = 8.0
 
 def format_seconds_as_working_days_hours(seconds)
-	part = seconds.to_f / WORKING_HOURS_PER_DAY.hours
-	days = part.div(1)
-	hours = part.modulo(1)*WORKING_HOURS_PER_DAY
-	hours = hours.to_i if hours.to_i == hours
-	days = days > 0 ? "#{days}d" : ""
-	hours = hours > 0 ? "#{hours}h" : ""
-	"#{days} #{hours}".strip
+	# round up to the minute
+	# format the rest as 6:30 (6hours 30minutes)
+	seconds = seconds.div(60) * 60
+	days, seconds = seconds.divmod(WORKING_HOURS_PER_DAY.hours)
+	hours, seconds  = seconds.divmod(1.hour)
+	minutes,seconds = seconds.divmod(1.minute)
+	days = days > 0 ? "#{days.to_i}d" : ""
+	"#{days} #{hours}:#{"%02d" % minutes}".strip
 end
 
 
 def parse_as_days(string)
   unless string.nil?
-     # look for h in e.g. 1-2h or 1h-2 = 1h-2h
-     # 1-2 = 1d - 2d
+		 # parse 2.5d as 2 days 4 hours
+		 # parse 2.5h, 2.5 and 2:30 as 2 hours 30 minutes
      default_unit = string.scan("h").empty? ? 1 : WORKING_HOURS_PER_DAY
      days = 0.0
-     string.downcase.scan(/(\d*\.*\d*)\s?([h|d]?)/).each do |part|  
-      n_unit = case part[1]
+     string.downcase.scan(/(\d*)([\.|:])?(\d*)\s?([h|d|m]?)/).each do |part|  
+		  major, sep, minor, unit = part
+      n_unit = case unit
         when "h" : WORKING_HOURS_PER_DAY
         when "d" : 1
+				when "m" : WORKING_HOURS_PER_DAY * 60.0
         else default_unit
       end
-     	days = days + (part[0].to_f / n_unit)
+			f_unit = 10
+			if sep == ":"
+				n_unit = WORKING_HOURS_PER_DAY
+				f_unit = 60
+			end
+     	days = days + (major.to_f / n_unit) + (minor.to_f / f_unit / n_unit)
    	end 
     days
   end

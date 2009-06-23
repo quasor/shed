@@ -67,8 +67,55 @@
   <%= f.text_area :description, :rows => 8, :style=>"width:90%"%>
 </p>
 </div>
+
+<!-- Task work interval history -->
+
 <p>
+	<%= f.label :history%>
+	<table class="paddedcolumn" style="float:left">
+		<tr>
+			<th>Date</th>
+			<th>Hours</th>
+		</tr>
+	<% for i in @task.intervals %>
+	<% unless i.end.nil?%>
+	<tr>
+		<td>
+			<%= i.created_at.to_date.to_s(:short) %>
+		</td>
+		<td>
+			<%= link_to i.duration, edit_interval_path(i) %>
+		</td>
+	</tr>
+	<% end %>
+	<% end %>
+	<tr>
+		<td colspan="2">
+			<%= link_to 'New Interval', new_interval_path(:task_id => @task.id) %>
+		</td>
+	</tr>
+	</table>
+	<table class="paddedcolumn" style="float:left">
+		<tr>
+			<th>Date</th>
+			<th>Estimate</th>
+		</tr>
+	<% for t in @task.task_versions %>
+	<tr>
+		<td>
+			<%= t.created_at.to_date.to_s(:short) %>
+		</td>
+		<td>
+			<%= t.estimate %>
+		</td>
+	</tr>
+	<% end %>
+	</table>
 </p>
+
+
+
+
 <div style="clear:both"></div>
 <script type="text/javascript" charset="utf-8">
 <% if !request.xhr?%>

@@ -65,9 +65,11 @@ class IntervalsController < ApplicationController
         format.xml  { render :xml => @interval, :status => :created, :location => @interval }
 				format.js {
 					render :update do |page|
-						@el = "interval_hours_#{@task.id}"
-						page[@el].val("#{@task.time_spent_today}")
-						page.visual_effect :highlight, @el						
+						#@el = "interval_hours_#{@task.id}"
+						#page[@el].val("#{@task.time_spent_today}")
+						#page.visual_effect :highlight, @el						
+						page.replace "task_#{@task.id}", :partial => @task
+						#page.visual_effect :highlight, "task_#{@task.id}"						
 					end
 				}
       else

@@ -65,8 +65,11 @@ class UsersController < ApplicationController
     @interval = current_user.active_intervals.first
     @current_task = @interval.task unless @interval.nil?
     
-		# timer code
+		# start the timer code
     unless params[:task_id].blank?
+	    @intervals = current_user.intervals(true).find(:all, :conditions => {:end => nil})      
+	    @intervals.each {|i| i.end = DateTime.now;i.save! }
+
       @task = current_user.tasks.find(params[:task_id]) 
       @interval = @task.intervals.active.first    
       if @interval.nil?
@@ -95,6 +98,19 @@ class UsersController < ApplicationController
       end
     end
   end
+
+	def update_ticker
+    @interval = current_user.active_intervals.first
+    @current_task = @interval.task unless @interval.nil?
+		unless @current_task.nil?
+			render :update do |page|
+				page.replace "task_#{@current_task.id}", :partial => @current_task
+				page.visual_effect :highlight, "task_#{@current_task.id}"
+			end 
+		else
+			render :text => ""
+		end
+	end
 
   # GET /users/new
   # GET /users/new.xml

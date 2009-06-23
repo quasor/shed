@@ -25,12 +25,12 @@
 						<% remote_form_for(@interval, 
 								:html => {:method => 'post', :id => "interval_task_#{task.id}", :style => "display:inline"}) do |f| -%>
 							<%= f.hidden_field :task_id %>
-							<%= f.text_field :hours, 
+							<span class="ghosthint">Total Actual:</span><span class="estimate"><%= task.time_spent_friendly %></span> Today: <%= f.text_field :hours, 
 								:value => "#{task.time_spent_today}",
 								:style=>"margin-top:1px;width:5em;text-align:center;backround-color:none;", 
 								:onclick => "this.select();",
 								:id => "interval_hours_#{task.id}",
-								:title => 'Log hours spent today',
+								:title => "Log actual hours spent today\ne.g. 2.5 or 2:30",
 								:class => "thininput #{'warn' if task.completed_without_actuals?}",
 								:onblur => "this.form.onsubmit();"
 								 -%>
@@ -43,7 +43,7 @@
 								:timer =>params[:timer]), 
 									:class => "hideul", :title => 'Start the clock on this task' unless task.completed? || task.user_id != current_user.id
 								 -%>
-						<%= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} unless task.completed? || task.user_id != current_user.id%>
+						<%= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle, :class => "ghosthint"), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} unless task.completed? || task.user_id != current_user.id%>
 					</div>
 					<% if task.completed_without_actuals?%>
 					<% end %>
