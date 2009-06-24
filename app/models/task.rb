@@ -195,13 +195,17 @@ class Task < ActiveRecord::Base
 	end
 
 	def setup_the_version
-		puts 'setup the version'
-		current = Task.find self.id
-		@saving_version = TaskVersion.new current.attributes.merge({:versioned_type => current.type, :task_id => current.id})
+		unless self.new_record?
+			puts 'setup the version'
+			current = Task.find self.id
+			@saving_version = TaskVersion.new current.attributes.merge({:versioned_type => current.type, :task_id => current.id})
+		end
 	end
 
   def save_the_version
-		@saving_version.save
+		unless @saving_version.nil?
+			@saving_version.save
+		end
 	end
 
 end

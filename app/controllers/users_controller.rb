@@ -23,9 +23,9 @@ class UsersController < ApplicationController
   # display the user's timers
   def show
 		@title = "My Tasks"
-    @user = User.find(params[:id])
+    # @user = User.find(params[:id])
     #@timer = !params[:timer].blank?
-
+		@user = current_user
     unless @user == current_user || admin?
       returning redirect_to(current_user)
     end
