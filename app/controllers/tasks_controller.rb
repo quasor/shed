@@ -24,7 +24,8 @@ class TasksController < ApplicationController
 				
 		if session[:filter][:user] != 0
 			@user_id = session[:filter][:user]
-			@project_ids = (Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent).collect(&:parent) + Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent)).uniq.map(&:id).sort
+			
+			@project_ids = (Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent).collect(&:parent) + Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent)).uniq.compact.map(&:id).sort
 		end
     @tasks = @taskz.collect do |task|
       skip = false
