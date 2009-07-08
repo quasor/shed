@@ -3,8 +3,8 @@
 class Task < ActiveRecord::Base
   acts_as_nested_set
   acts_as_taggable_on :tags
-	before_save :setup_the_version
-	after_save :save_the_version
+	# before_save :setup_the_version
+	# after_save :save_the_version
   #acts_as_versioned
 	
   named_scope :by_user, lambda { |user_id| { :conditions => {:user_id => user_id} } }
@@ -23,6 +23,8 @@ class Task < ActiveRecord::Base
   #validates_presence_of :low
   validates_presence_of :title
   #validates_presence_of :user
+
+	has_many :task_versions
   
   DEFAULT_VELOCITIIES = [0.72, 0.75, 0.81, 0.88, 1.8, 0.92, 0.94, 1.01, 1.21, 0.68]
 
