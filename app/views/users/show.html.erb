@@ -21,7 +21,7 @@
 			<tr>
 				<td id="projects" valign="top">
 			<h2>Active Projects</h2>
-			<% if !params[:project].blank? %>
+			<% if !params[:project].blank? && !params[:release].blank?%>
 				<%= link_to("All Projects", user_path(current_user), :class => "project") %>
 			<% else %>
 				<span class="project current">All Projects</span>
@@ -32,13 +32,25 @@
 				end
 				%>
 			<% end %>
+			<hr>
+			<% for release in Release.find(:all, :order => "due desc") %>
+			<%= link_to_unless_current(release.title, user_path(current_user, :release => project.id), :class => "release") do
+			  "<span class=\"release current\">#{release.title}</span>"			
+			 end %>
+			<% for project in release.children%>
+			<%= link_to_unless_current(project.title, user_path(current_user, :project => project.id), :class => "project") do 
+					"<span class=\"project current\">#{project.title}</span>"
+				end
+				%>
+			<% end %>
+			<% end %>
 			<%= link_to("Completed Projects", user_path(current_user), :class => "project logbook") %>
 			
 		</td><td id="tasks" valign="top">
 						
 			<p id="notice"></p>
 			<% content_for :button_bar do %>
-			<%= link_to_remote "New Task", :url => new_task_path(), :html => {:class => 'button_link', :title => 'New Task', :style => 'margin-bottom:2em'} -%>
+			<%= link_to_remote "  New Task", :url => new_task_path(), :html => {:id=>'new-task-button', :class => 'button_link', :title => 'New Task', :style => 'margin-bottom:2em'} -%>
 			<% end %>
 			<div class="inline_edit" id="edit_task"></div>
 			<ul id="taskList">
@@ -104,7 +116,13 @@ function startup(){
 	// createTimer();
 	<% end %>
 	// document.title = 'Timer';
-
+	// do:
+	<% prj = params[:parent_id] || params[:project] %>
+	<% unless prj.blank? %>
+	<% if !params[:new].blank? || @tasks.empty? %> 
+	<%= remote_function(:url => new_task_path(:parent_id => prj)) %>
+  <% end %>
+  <% end %>
 }
 
 

@@ -42,7 +42,7 @@
 			<% if task2.type == "Release"%>
 				<%=  link_to 'New Project', new_project_path(:parent_id => task2.id),:class => 'small' -%>
 			<% elsif task2.type == "Project"%>
-				<%= link_to image_tag('icons/add.png',:border => 0, :align=>:absmiddle), new_task_path(:parent_id => task2.id), :title => 'New Task' -%>
+				<%= link_to image_tag('icons/add.png',:border => 0, :align=>:absmiddle), root_path(:parent_id => task2.id, :new => true), :title => 'New Task' -%>
 				<%#= link_to "++", {:controller => 'tasks', :action => 'bulknew', :project_id => task2.id}, {:class => 'button_link', :title => 'Bulk Add Multiple Tasks'}%>
 			<% end -%>
 		<% end -%>

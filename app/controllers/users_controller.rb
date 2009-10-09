@@ -22,6 +22,18 @@ class UsersController < ApplicationController
   # GET /users/1.xml
   # display the user's timers
   def show
+    params[:project] = params[:parent_id] unless params[:parent_id].blank?
+    
+    session[:filter] ||= {}
+    session[:filter][:tasks] ||= 1
+    session[:filter][:user] ||= current_user.id
+    session[:filter][:project] ||= 0
+    session[:filter][:release] ||= 0
+    session[:filter][:tasks] = params[:filter_tasks].to_i unless params[:filter_tasks].blank?
+    session[:filter][:user] = params[:filter_user].to_i unless params[:filter_user].blank?
+    session[:filter][:project] = params[:filter_project].to_i unless params[:filter_project].blank?
+
+    
 		@title = "My Tasks"
     # @user = User.find(params[:id])
     #@timer = !params[:timer].blank?

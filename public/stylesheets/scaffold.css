@@ -233,8 +233,8 @@ textarea {font-size:10px;}
 */
 
 #mytasks #projects {
-	min-width:160px;
-	width:160px;
+	min-width:220px;
+	width:220px;
 	padding:0px;
 	background-color:#D5DDE5;
 	border-right:1px solid #666;
@@ -259,13 +259,24 @@ textarea {font-size:10px;}
 #mytasks #projects .project
 {
 	display:block;
+	background: url(/images/icons/folder2.png) no-repeat scroll 30px 4px;
+	line-height:11px;
+	padding:6px 0px 6px 50px;
+	font-size:11px;
+	margin-bottom:4px;
+}
+
+#mytasks #projects .release
+{
+  font-weight:bold;
+	display:block;
 	background: url(/images/icons/folder2.png) no-repeat scroll 12px 4px;
 	line-height:11px;
 	padding:6px 0px 6px 32px;
 	font-size:11px;
-	margin-bottom:4px;
-	
+  margin-bottom:4px;
 }
+
 #mytasks #projects span.current
 {
 	color:white;
