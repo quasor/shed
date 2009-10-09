@@ -73,8 +73,8 @@
 					</td>
 			    <td><%#= link_to 'E', edit_task_path(task) %></td>
 					<td><%#= link_to 'X', task, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n", :method => :delete%></td>
-				<%else 
-				# Releases and Projects:%>
+				<%else%>
+				<!-- Releases and Projects: -->
 				<td colspan="6"><nobr>
 				<%
 					url = case task.type
@@ -83,7 +83,7 @@
 			      else edit_task_path(task)
 			    end
 				%>
-					<%if true %>Due <%= link_to task.due_date, url %> <%end-%>
+					<%if task.due_date %>Due <%= link_to task.due_date, url %> <%end-%>
 					<% start_p = task.best_start %>
 					<% end_p = task.worst_end %>
 						<b>ETA: <%= start_p%>  - <%= end_p %></b>

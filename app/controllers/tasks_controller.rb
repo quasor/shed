@@ -357,7 +357,7 @@ class TasksController < ApplicationController
        @rebuilt = true       
     end
     Rails.cache.fetch("run_sim_#{@root.cache_key}#{Date.today}") do 
-      run_simulation
+      # run_simulation
       @rebuilt = true       
     end 
     render :text => @rebuilt ? " #{Time.now} - Rebuild Complete" : " #{Time.now} - Using Cached Copy"
@@ -389,8 +389,8 @@ class TasksController < ApplicationController
 						task.start = user_end_dates[task.user.id].work_day(0)
 						task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.monte_estimate) # use a monte estimate, instead of actual estimate
 
-						task.start = task.start.to_datetime + task.start.day_fraction
-						task.end = task.end.to_datetime + task.end.day_fraction
+						task.start = task.start.to_datetime + task.start.to_datetime.day_fraction
+						task.end = task.end.to_datetime + task.end.to_datetime.day_fraction
 						
 						# ok, now we've computed the schedule, save the projection
 	          projections[task.id] = Projection.new(:start => task.start, :end => task.end, :simulation_id => @simulation.id) if task.type.nil?
@@ -506,8 +506,8 @@ class TasksController < ApplicationController
 	                task.start = user_end_dates[task.user.id].work_day(0)
 	                task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate_days)
 									
-									task.start = task.start.to_datetime + task.start.day_fraction
-									task.end = task.end.to_datetime + task.end.day_fraction
+									task.start = task.start.to_datetime + task.start.to_datetime.day_fraction
+									task.end = task.end.to_datetime + task.end.to_datetime.day_fraction
 
 	                task.save! #unless fromUI
 	              else 
