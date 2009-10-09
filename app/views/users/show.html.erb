@@ -1,3 +1,5 @@
+<% prj ||= params[:project] %>
+<% prj ||= params[:parent_id] %>
 <style type="text/css" media="screen">
   .running #timer {background-color: #CCFFBF; border: solid 1px #2AB400;height: 24px;}
 	#timer {text-align:right; padding: 0px; border: 1px solid #B42A00; background-color: #FFCEBF; margin:0px;}
@@ -21,7 +23,7 @@
 			<tr>
 				<td id="projects" valign="top">
 			<h2>Active Projects</h2>
-			<% if !params[:project].blank? && !params[:release].blank?%>
+			<% unless params[:project].blank? && params[:release].blank?%>
 				<%= link_to("All Projects", user_path(current_user), :class => "project") %>
 			<% else %>
 				<span class="project current">All Projects</span>
@@ -34,7 +36,7 @@
 			<% end %>
 			<hr>
 			<% for release in Release.find(:all, :order => "due desc") %>
-			<%= link_to_unless_current(release.title, user_path(current_user, :release => project.id), :class => "release") do
+			<%= link_to_unless_current(release.title, user_path(current_user, :release => release.id), :class => "release") do
 			  "<span class=\"release current\">#{release.title}</span>"			
 			 end %>
 			<% for project in release.children%>
@@ -50,7 +52,7 @@
 						
 			<p id="notice"></p>
 			<% content_for :button_bar do %>
-			<%= link_to_remote "  New Task", :url => new_task_path(), :html => {:id=>'new-task-button', :class => 'button_link', :title => 'New Task', :style => 'margin-bottom:2em'} -%>
+			<%= link_to_remote "  New Task", :url => new_task_path(:parent_id => prj), :html => {:id=>'new-task-button', :class => 'button_link', :title => 'New Task', :style => 'margin-bottom:2em'} -%>
 			<% end %>
 			<div class="inline_edit" id="edit_task"></div>
 			<ul id="taskList">
@@ -110,6 +112,19 @@ function startup(){
 	     $(".task_label").show();
 	   }
 	 });
+
+ 	$(document).keydown( function( e ) {
+ 	   if( e.which == 27) {  // escape, close box
+ 	     $(".inline_edit").html('');
+ 	     $(".task_label").show();
+ 	   }
+ 	 });
+
+   $(document).bind('keydown', 'ctrl+n', function(e)
+   {
+   	<%= remote_function(:url => new_task_path(:parent_id => prj)) %>     
+   }
+   );
 	
 	<% unless current_user.active_interval.nil? %>
 	last_updated = <%=current_user.active_interval.start.to_f.to_i * 1000%>;
@@ -117,7 +132,8 @@ function startup(){
 	<% end %>
 	// document.title = 'Timer';
 	// do:
-	<% prj = params[:parent_id] || params[:project] %>
+	<% prj ||= params[:project] %>
+	<% prj ||= params[:parent_id] %>
 	<% unless prj.blank? %>
 	<% if !params[:new].blank? || @tasks.empty? %> 
 	<%= remote_function(:url => new_task_path(:parent_id => prj)) %>

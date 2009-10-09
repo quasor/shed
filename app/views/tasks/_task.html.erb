@@ -1,7 +1,7 @@
 <% if (task.type == "Project" || task.type == "Release") && @opened_ul -%>
 </ul><%@opened_ul = false%>
 <% end -%>
-<% if params[:project].blank? && !task.start.nil? && @cweek != task.start.to_date.cweek && !request.xhr? && !task.completed?  %>
+<% if params[:project].blank? && params[:release].blank? && !task.start.nil? && @cweek != task.start.to_date.cweek && !request.xhr? && !task.completed?  %>
 <% @cweek = task.start.to_date.cweek %>
 <p class="date-heading">
 	<% if @cweek == Date.today.cweek %>

@@ -43,10 +43,13 @@ class UsersController < ApplicationController
     end
 		@conditions = { :type => nil }
 		@conditions.merge({  }) unless params[:project].blank?
-		if params[:project].blank?
+		if params[:project].blank? && params[:release].blank?
     	@tasks = current_user.tasks.find :all,  :conditions => @conditions, :order => "completed desc, position asc"
-		else
+		elsif !params[:project].blank?
     	@tasks = Task.find :all, :conditions => {:parent_id => params[:project], :type => nil}, :order => "completed desc, position asc"
+		elsif !params[:release].blank?
+		  @release = Release.find(params[:release])
+    	@tasks = @release.descendants
 		end
 		
 
