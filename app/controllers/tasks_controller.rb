@@ -357,7 +357,7 @@ class TasksController < ApplicationController
        @rebuilt = true       
     end
     Rails.cache.fetch("run_sim_#{@root.cache_key}#{Date.today}") do 
-      run_simulation
+      #run_simulation
       @rebuilt = true       
     end 
     render :text => @rebuilt ? " #{Time.now} - Rebuild Complete" : " #{Time.now} - Using Cached Copy"
