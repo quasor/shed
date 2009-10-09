@@ -122,7 +122,8 @@ function startup(){
 
    $(document).bind('keydown', 'ctrl+n', function(e)
    {
-   	<%= remote_function(:url => new_task_path(:parent_id => prj)) %>     
+   	<%= remote_function(:url => new_task_path(:parent_id => prj)) %>;     
+   	return false;
    }
    );
 	
