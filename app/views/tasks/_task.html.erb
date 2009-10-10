@@ -52,7 +52,7 @@
 						<%= f.check_box :completed, :onclick => "this.form.submit();", :style => 'cursor:hand', :disabled => task.user_id != current_user.id -%>
 					<% end -%>
 					<span class="project_tag"><%= task.parent.title unless task.parent.nil?%>:</span>
-					<% unless params[:project].blank? %>
+					<% unless params[:project].blank? && params[:release].blank? %>
 						<% unless @users.size == 1%><span class="taglist color<%=@users[task.user_id]%>"><%= task.user.name %></span><%end%>
 					<% end %>
 					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get)%>
