@@ -33,6 +33,16 @@ class Task < ActiveRecord::Base
 		self.save!
 	end
 
+  def high_estimate_days
+    if !high.blank?
+      high.to_f
+    elsif !low.blank?
+      low.to_f
+    else
+      0.0
+    end
+  end
+
   def estimate_days
     if !low.blank? and !high.blank?
       ((low + 4*(low + ((high-low) * 0.66 )) + high)/6.0).round(2)

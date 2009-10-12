@@ -87,7 +87,7 @@
 					<% start_p = task.best_start %>
 					<% end_p = task.worst_end %>
 						<b>ETA: <%= start_p%>  - <%= end_p %></b>
-						<%= task.descendants.collect{|e| e.estimate_days.round(1)}.sum %>
+						<%= task.descendants.collect{|e| e.high_estimate_days}.sum %>
 					</nobr></td>
 					<td style="width:<%=@pixels_per_day * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || start_p.nil? || end_p.nil? %>
