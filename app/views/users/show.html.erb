@@ -7,6 +7,10 @@
 	#ttimer #timer-display small {font-size: 14px; letter-spacing: 0}
 	#ttimer #total-display {background-color: #FF8D6F; padding: 4px 2px 2px 2px; text-align: left; font: bold 16px arial, sans-serif; line-height: 11px}
 	#ttimer #total-display label {font: normal 10px arial; line-height: 8px; padding-right: 3px}
+
+  #taskList .ui-selecting { background: #FECA40; }
+	#taskList .ui-selected { background: #F39814; color: white; }
+
 	.running #timer #total-display {background-color: #8eff6f}
 	body {overflow:auto;margin:0;padding:0;} 
 	.completed img.item {
@@ -62,6 +66,7 @@
 		</tr>
 		</table>
 </div>
+<div id="select-result"></div>
 <%= periodically_call_remote(:url => {:action => 'update_ticker'},:method => "get", :frequency => '60')%>
 <script type="text/javascript" charset="utf-8">
 
@@ -84,9 +89,18 @@ function startup(){
 		items: 'li:not(.date-heading)',
 		delay:500,
 		
-	});	
+	});
 	$("#taskList").disableSelection();
-
+  $("#taskList").selectable({
+  			stop: function(){
+  				var result = $("#select-result").empty();
+  				$(".ui-selected", this).each(function(){
+  					var index = $("#selectable li").index(this);
+  					result.append(" #" + (index + 1));
+  				});
+  			}
+  		});
+  
 	/*
 	<% Project.all.each do |project| %>
 	$('#taskList<%=project.id%>').selectable();	

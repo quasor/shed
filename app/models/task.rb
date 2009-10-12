@@ -48,7 +48,7 @@ class Task < ActiveRecord::Base
   end
 
 	def touched_today?
-		updated_at.to_date == Date.today
+		self.updated_at.to_date == Date.today
 	end
   def duration_days
 		(self.end - self.start)/1.day
@@ -70,7 +70,7 @@ class Task < ActiveRecord::Base
     end
   end
 
-	def time_spent_today
+	def time_spent_today  
 		seconds = self.intervals.find(:all, :conditions => {:end => Date.today..Date.today+1}).collect {|i| i.to_seconds}.sum
 		seconds_in_progress = self.intervals.find(:all, :conditions => {:end => nil}).collect {|i| i.to_seconds}.sum.to_i
 		format_seconds_as_working_days_hours(seconds + seconds_in_progress)
@@ -83,7 +83,7 @@ class Task < ActiveRecord::Base
 
 	
   def has_actuals?
-		self.intervals.size > 0	
+    self.intervals.size > 0	
 	end
 
   def friendly_estimate
@@ -206,7 +206,7 @@ class Task < ActiveRecord::Base
 
   def save_the_version
 		unless @saving_version.nil?
-			@saving_version.save
+  		@saving_version.save
 		end
 	end
 

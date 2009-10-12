@@ -13,6 +13,7 @@
 </p>
 <% end %>
 
+<% cache("tb-#{task.cache_key}") do %>
 <li id="task_<%=task.read_attribute('id') -%>" class="lirow2 <%='started' if task == @current_task %><%="completed" if task.completed? -%> <%=task.type -%><%="Task" if task.type.blank? -%><%=" mine" if task.user_id == current_user.id -%>">
 		<% if task.type.nil? 
 			-%>
@@ -22,8 +23,8 @@
 						@interval = Interval.new
 						@interval.task = task
 						%>
-						<% remote_form_for(@interval, 
-								:html => {:method => 'post', :id => "interval_task_#{task.id}", :style => "display:inline"}) do |f| -%>
+						<% if true %>
+						<% remote_form_for(@interval, :html => {:method => 'post', :id => "interval_task_#{task.id}", :style => "display:inline"}) do |f| -%>
 							<%= f.hidden_field :task_id %>
 							<span class="ghosthint">Total Actual:</span><span class="estimate"><%= task.time_spent_friendly %></span> Today: <%= f.text_field :hours, 
 								:value => "#{task.time_spent_today}",
@@ -35,7 +36,8 @@
 								:onblur => "this.form.onsubmit();"
 								 -%>
 							<%= f.submit "save", :id => "save_btn_#{task.id}", :style => "display:none" %>
-							<% end unless task.user_id != current_user.id -%>
+						<% end unless task.user_id != current_user.id -%>
+						<% end %>
 						<%=link_to '<img class="item ' + (task == @current_task ? 'started' : 'stopped-hover') + '" src="/images/space.gif" align="absmiddle" border="0"> ',
 						 	 user_path(current_user, 
 								:task_id => (@current_task == task ? nil : task.id), 
@@ -43,23 +45,27 @@
 								:timer =>params[:timer]), 
 									:class => "hideul", :title => 'Start the clock on this task' unless task.completed? || task.user_id != current_user.id
 								 -%>
-						<%= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle, :class => "ghosthint"), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} unless task.completed? || task.user_id != current_user.id%>
+						<%#= link_to_remote image_tag('icons/delete.png', :border => 0, :align => :absmiddle, :class => "ghosthint"), {:url => task_path(task),:method => :delete, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n"}, {:class => "hideul", :title => 'Delete task'} unless task.completed? || task.user_id != current_user.id%>
 					</div>
 					<% if task.completed_without_actuals?%>
 					<% end %>
 					<span class="task_label" id="<%="task_label_#{task.id}"%>">
+					<% if true %>
 					<% form_for(:task, task, :url => complete_task_path( task ), :html => {:method => 'put', :id => "complete_task_#{task.id}",:style => "display:inline"}) do |f| -%>
 						<%= f.check_box :completed, :onclick => "this.form.submit();", :style => 'cursor:hand', :disabled => task.user_id != current_user.id -%>
 					<% end -%>
+				  <% end %>
 					<span class="project_tag"><%= task.parent.title unless task.parent.nil?%>:</span>
 					<% unless params[:project].blank? && params[:release].blank? %>
 						<% unless @users.size == 1%><span class="taglist color<%=@users[task.user_id]%>"><%= task.user.name %></span><%end%>
 					<% end %>
+					<% if true %>
 					<%= link_to_remote(task.title, :url => edit_task_path(task), :method => :get)%>
 						<% unless task.estimate.blank? %><span class="estimate"><%= link_to_remote(task.estimate, :url => edit_task_path(task, :edit_estimate => true), :method => :get)%></span><% end %>
 						<% for tag in task.tag_list%>
 							<span class="taglist"><%= tag%></span>
 						<% end %>
+					<% end %>
  					</span>
 							
 				<% end -%>				
@@ -78,6 +84,7 @@
 		<% end -%>
 		<span class="inline_edit" id="edit_task_<%=task.id%>"></span>
 	</li>
+<% end %>
 	<% if task.type == "Project" -%>
 		<ul id="taskList<%=task.id%>"><%@opened_ul = true%>
 	<% end -%>
