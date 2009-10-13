@@ -54,7 +54,7 @@ class UsersController < ApplicationController
 		
 
 		#@tasks = Task.all :all, :conditions => {:type => nil }, :order => :position
-    @tasks.delete_if {|t| ((!t.touched_today?)) && t.type.nil? }   
+    @tasks.delete_if {|t| ((t.completed? && !t.touched_today?)) && t.type.nil? }   
 		@tasks.delete_if { |t| (!t.	parent.nil? && t.parent.on_hold?) && t.type.nil? } 
     @project_ids = current_user.tasks.collect { |t| t.parent_id if t.type.nil? }.flatten.uniq
     @tasks.delete_if {|t| !t.type.nil? || t.root? }   
