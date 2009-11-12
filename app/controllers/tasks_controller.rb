@@ -357,7 +357,7 @@ class TasksController < ApplicationController
        @rebuilt = true       
     end
     Rails.cache.fetch("run_sim_#{@root.cache_key}#{Date.today}") do 
-      #run_simulation
+      run_simulation
       @rebuilt = true       
     end 
     render :text => @rebuilt ? " #{Time.now} - Rebuild Complete" : " #{Time.now} - Using Cached Copy"
@@ -371,9 +371,13 @@ class TasksController < ApplicationController
     @project_date_collection = {}
     @project_user_date_collection = {}
     user_ids = []
-    @sim_count = 100
+    @sim_count = 10
     @task_projections = {}
     @sim_count.times do |i|
+      
+      logger.warn "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n ==== SIMULATION ##{i} Step 1/2 ====#{Time.now}\n"
+      
+      
       # walk the schedule once
       user_end_dates = {}
       projections={}
@@ -401,8 +405,7 @@ class TasksController < ApplicationController
 					end
 				end
 			end
-
-      logger.warn "\n\n\n---------\n#{user_end_dates.inspect}"
+      logger.warn "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n ==== SIMULATION ##{i} Step 2/2 ====#{Time.now}\n"
       # use the estimates from the simulation to determine the end date of the project
       Project.all.each do |project|
         #project.projections.destroy_all
