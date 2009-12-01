@@ -388,6 +388,7 @@ class TasksController < ApplicationController
 				# Compute start times for each task
 				@tasks_raw.each do |task|
 					unless task.user.nil? || task.completed? || task.parent.on_hold?
+						
 						# compute the schedule
 						user_end_dates[task.user.id] ||= Date.today.work_day(0)
 						task.start = user_end_dates[task.user.id].work_day(0)
@@ -499,14 +500,19 @@ class TasksController < ApplicationController
             tasks = []
             
 						# @tasks_raw = Task.root.descendants
-						User.all.each do |user|
-							@tasks_raw = user.tasks.find :all, :order => "position"
+						t = User.all.each do |user|
+							@tasks_raw = user.tasks.incomplete #find :all, :order => "position"
 							# Compute start times for each task
 	            @tasks_raw.each do |task|
 	              unless task.user.nil? || task.completed? || task.parent.on_hold?
 	                # compute the schedule
 	                user_end_dates[task.user.id] ||= Date.today.work_day(0)
+	                
 	                task.start = user_end_dates[task.user.id].work_day(0)
+	                
+	                task.start_in_days = user_end_dates[task.user.id].work_day(0) - Date.today.work_day(0)
+	                
+									task.end_in_days = ( user_end_dates[task.user.id].work_day(task.estimate_days) - Date.today.work_day(0) )
 	                task.end = user_end_dates[task.user.id] = user_end_dates[task.user.id].work_day(task.estimate_days)
 									
 									task.start = task.start.to_datetime + task.start.to_datetime.day_fraction
@@ -518,10 +524,10 @@ class TasksController < ApplicationController
 	              end
 	            end
 						end
+          # // end of cache  
           end
           
-          # done with the rebuild...
-          
+        # done with the rebuild...
         end
         alltasks = Task.root.descendants
         unless alltasks.empty?

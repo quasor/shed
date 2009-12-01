@@ -12,7 +12,7 @@ class Task < ActiveRecord::Base
   named_scope :complete, :conditions => {:completed => true}
 	named_scope :upcoming, :conditions => ["due > ?", Date.today]
   include NestedSetList
-  named_scope :incomplete, :conditions => {:completed => false}
+  named_scope :incomplete, :conditions => {:completed => false}, :order => :position
 
   belongs_to :user
 	acts_as_list# :scope => :user_id
@@ -61,13 +61,11 @@ class Task < ActiveRecord::Base
 		self.updated_at.to_date == Date.today
 	end
   def duration_days
-		(self.end - self.start)/1.day
-	end
-
-  def start_in_days
-		t = Time.now.to_date.to_time
-		s = (self.start - t).to_f / 1.day
-		s > 0 ? s : 0
+    unless self.end_in_days.nil?
+		  (self.end_in_days - self.start_in_days) 
+  	else
+  	  0.0
+    end
 	end
 
   def velocity
@@ -216,7 +214,7 @@ class Task < ActiveRecord::Base
 
   def save_the_version
 		unless @saving_version.nil?
-  		@saving_version.save
+  	#	@saving_version.save
 		end
 	end
 

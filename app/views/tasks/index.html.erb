@@ -59,7 +59,7 @@
 					<td style="width:<%=@pixels_per_day * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || task.start.nil? || task.end.nil? %>
 						<div style="position:relative; width:<%= @pixels_per_day*@total_calendar_days %>px;">							
-							<span title="<%=task.title %>: <%= task.start.to_date.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
+							<span title="<%=task.duration_days%>: <%=task.title %>: <%= task.start.to_date.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
 								style="width:<%= @pixels_per_day * task.duration_days %>px; 
 								left:<%= @pixels_per_day * task.start_in_days %>px"></span>	
 								<% unless task.best_start.nil? %>				
