@@ -214,7 +214,7 @@ class Task < ActiveRecord::Base
 
   def save_the_version
 		unless @saving_version.nil?
-  	#	@saving_version.save
+  		@saving_version.save
 		end
 	end
 
