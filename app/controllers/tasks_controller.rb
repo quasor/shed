@@ -15,7 +15,8 @@ class TasksController < ApplicationController
     session[:filter][:user] = params[:filter_user].to_i unless params[:filter_user].blank?
     session[:filter][:project] = params[:filter_project].to_i unless params[:filter_project].blank?
     @taskz = rebuild_schedule(params[:force] == "true", true) 
-    #@taskz = Task.root.descendants
+    #@total_calendar_days = 60
+    #@taskz = Task.root.descendants.find :all, :order => "position"
     #if session[:filter][:tasks] == 1
     #  @tasks = @taskz.collect {|task| task unless task.completed?}
     #else

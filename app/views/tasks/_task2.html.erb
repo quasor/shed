@@ -1,5 +1,4 @@
-
-<tr><td style="<%if !task2.due.nil? && task2.type=="Release"%>;background-color:<%= @release_color[task2.id]%>; opacity:0.95<%end%>" id="task_<%=task2.read_attribute('id') -%>" class="strow <%="completed" if task2.completed? -%> <%="onhold" if task2.on_hold? || task2.parent.on_hold? -%> <%=task2.type_string -%><%=" mine" if task2.user_id == current_user -%>"><div>
+<tr><td style="<%if !task2.due.nil? && task2.type=="Release"%>;background-color:<%= @release_color[task2.id]%>; opacity:0.95<%end%>" id="task_<%=task2.id -%>" class="strow <%="completed" if task2.completed? -%> <%="onhold" if task2.on_hold?  -%> <%=task2.type_string -%><%=" mine" if task2.user_id == current_user -%>"><div>
 		<% if task2.type.nil? 
 			-%><%if task2.user_id == current_user.id -%>
 	  			<%if task2.completed?%><img class="item" src="/images/space.gif" align="absmiddle"><%end%><%= link_to task2.title, edit_task_path(task2)%>

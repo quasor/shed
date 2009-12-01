@@ -1,3 +1,4 @@
+<%= @hide_grey_bars = true %>
 <% unless @tasks.empty? %>
 <div id="canvas">
 <div id="leftcol" class="resizeable">
@@ -45,7 +46,7 @@
 	  </thead>
 		<% for task in @tasks %>
 					
-	  <tr class="srow <%= "onhold" if task.on_hold || task.parent.on_hold %>">
+	  <tr class="srow <%= "onhold" if task.on_hold %>">
 				<% unless task.type == "Release" or task.type == "Project"%>
 			    <td nowrap><%#=h task.tag_list %></td>
 			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?h or task.estimate.include? ?d or task.estimate.blank?%></td>
@@ -57,12 +58,12 @@
 										</td>
 
 					<td style="width:<%=@pixels_per_day * @total_calendar_days %>px;vertical-align:top">
-						<% unless task.completed? || task.start.nil? || task.end.nil? %>
+						<% unless task.completed? || task.start.nil? || task.end.nil?%>
 						<div style="position:relative; width:<%= @pixels_per_day*@total_calendar_days %>px;">							
 							<span title="<%=task.duration_days%>: <%=task.title %>: <%= task.start.to_date.to_s(:long) %> - <%= task.end.to_date.to_s(:long) %> (<%= task.estimate_days %>days)" class="ganttbar" 
 								style="width:<%= @pixels_per_day * task.duration_days %>px; 
 								left:<%= @pixels_per_day * task.start_in_days %>px"></span>	
-								<% unless task.best_start.nil? %>				
+								<% unless task.best_start.nil? || @hide_grey_bars %>				
 							<span class="ganttbar_r" title="<%=task.title %> - projected (95%): <%=task.best_start.to_s(:long)%> - <%=task.best_end.to_s(:long)%>"
 									style="width:<%= @pixels_per_day * (task.best_end - task.best_start) %>px; left:<%= @pixels_per_day * (task.best_start - @today) %>px"></span>
 							<span class="ganttbar_o" title="<%=task.title %> - projected (mean): <%=task.worst_start.to_s(:long)%> - <%=task.worst_end.to_s(:long)%>"
@@ -87,7 +88,9 @@
 					<% start_p = task.best_start %>
 					<% end_p = task.worst_end %>
 						<b>ETA: <%= start_p%>  - <%= end_p %></b>
+						<% if false %>
 						<%= task.descendants.collect{|e| e.high_estimate_days}.sum %>
+						<% end %>
 					</nobr></td>
 					<td style="width:<%=@pixels_per_day * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || start_p.nil? || end_p.nil? %>

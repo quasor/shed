@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090612180656) do
+ActiveRecord::Schema.define(:version => 20091201044305) do
 
   create_table "holidays", :force => true do |t|
     t.date     "holiday"
@@ -64,12 +64,40 @@ ActiveRecord::Schema.define(:version => 20090612180656) do
     t.string "name"
   end
 
+  create_table "task_versions", :force => true do |t|
+    t.integer  "task_id"
+    t.integer  "version"
+    t.string   "title"
+    t.text     "description"
+    t.float    "low_estimate_cache"
+    t.float    "high_estimate_cache"
+    t.boolean  "completed",                        :default => false
+    t.integer  "user_id",             :limit => 8
+    t.datetime "start"
+    t.integer  "parent_id",           :limit => 8
+    t.integer  "lft",                 :limit => 8
+    t.integer  "rgt",                 :limit => 8
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "cached_tag_list"
+    t.date     "due"
+    t.datetime "end"
+    t.string   "estimate"
+    t.date     "best_start"
+    t.date     "worst_start"
+    t.date     "best_end"
+    t.date     "worst_end"
+    t.integer  "position",            :limit => 8
+    t.boolean  "on_hold",                          :default => false
+    t.string   "versioned_type"
+  end
+
   create_table "tasks", :force => true do |t|
     t.string   "title"
     t.string   "type"
     t.text     "description"
-    t.float    "low_estimate_cache",  :default => 0.0
-    t.float    "high_estimate_cache", :default => 0.0
+    t.float    "low_estimate_cache"
+    t.float    "high_estimate_cache"
     t.boolean  "completed",           :default => false
     t.integer  "user_id"
     t.datetime "start"
@@ -88,6 +116,9 @@ ActiveRecord::Schema.define(:version => 20090612180656) do
     t.date     "worst_end"
     t.integer  "position"
     t.boolean  "on_hold",             :default => false
+    t.integer  "version"
+    t.float    "start_in_days",       :default => 0.0
+    t.float    "end_in_days",         :default => 0.0
   end
 
   add_index "tasks", ["user_id"], :name => "index_tasks_on_user_id"
