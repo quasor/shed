@@ -11,6 +11,7 @@ class Task < ActiveRecord::Base
   named_scope :active, :conditions => {:completed => false, :type => nil}
   named_scope :complete, :conditions => {:completed => true}
 	named_scope :upcoming, :conditions => ["due > ?", Date.today]
+	named_scope :inorder, :order => "position"
   include NestedSetList
   named_scope :incomplete, :conditions => {:completed => false}, :order => :position
 

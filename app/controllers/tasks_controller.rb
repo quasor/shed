@@ -6,6 +6,85 @@ class TasksController < ApplicationController
   before_filter :login_required, :except => [:redo]
   def index
     @pixels_per_day =12
+    @total_calendar_days = 60
+		@today = Date.today
+    # init filters
+    session[:filter] ||= {}
+    session[:filter][:tasks] ||= 0
+    session[:filter][:user] ||= current_user.id
+    session[:filter][:project] ||= 0
+    session[:filter][:tasks] = params[:filter_tasks].to_i unless params[:filter_tasks].blank?
+    session[:filter][:user] = params[:filter_user].to_i unless params[:filter_user].blank?
+    session[:filter][:project] = params[:filter_project].to_i unless params[:filter_project].blank?
+		if session[:filter][:user] != 0
+			@user_id = session[:filter][:user]
+			
+			@project_ids = (Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent).collect(&:parent) + Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent)).uniq.compact.map(&:id).sort
+		end
+
+    @releases = Release.all
+    @releases_upcoming = Release.upcoming
+    @releases_past = @releases - @releases_upcoming
+    
+    #@tasks = @releases_upcoming.collect { |r| [r] + r.descendants.inorder.find(:all, :conditions =>  "(user_id = 25 OR type != 'NULL')") }.flatten #, :conditions => {:completed => false } 
+    @taskz = @releases_upcoming.collect{ |r| r.self_and_descendants.inorder }.flatten 
+    #@tasks = [Release.last] + Release.last.descendants.inorder
+    #@tasks = Task.root.descendants.find :all, :order => "position", :conditions => {:completed => false }
+
+     @tasks = @taskz.collect do |task|
+       skip = false
+       if task.type.nil?
+         if session[:filter][:user] != 0 && (session[:filter][:user] != task.user_id )
+           skip = true
+         end  
+         if !skip && session[:filter][:project] != 0 && session[:filter][:project] != task.parent_id
+           skip = true
+         end
+         if !skip && session[:filter][:tasks] == 1 && (task.completed? || task.parent.on_hold? || task.parent.parent.completed? || task.parent.completed?)
+           skip = true
+         end  
+   		else
+ 				#
+ 				if task.type == "Release" || task.type == "Project"
+ 					if session[:filter][:user] != 0 && !@project_ids.include?(task.id) 
+ 	      		skip = true
+ 	        end  
+ 	        !skip && if session[:filter][:tasks] == 1 && (task.completed? || (task.type == "Project" && task.parent.completed?))
+ 	          skip = true
+ 	        end  
+
+ 				end
+       end
+       #if skip
+       #  logger.info 'skipping task...'
+       #end
+       task unless skip
+     end
+     @tasks.compact!
+
+    @tasks ||= []
+    end_dates = @tasks.collect(&:end) 
+    unless end_dates.compact.empty?
+      @total_calendar_days = [end_dates.compact.max.to_date - Date.today,14].max + 28	
+    end
+
+    if Release.count == 0
+      flash[:warning] = 'Your schedule is empty'
+    else
+      # flash[:notice] = "Last updated at #{Task.root.updated_at.to_s()}"
+    end
+		colors = ["#E2FEFE", "#F6DAFC", "#FFFEDC", "#D8D9FB"]
+		@releases = Release.find(:all, :order => 'due')
+		@release_color=[]
+		@releases.each_with_index do |r,i|
+			@release_color[r.id] = colors[i%colors.size]			
+		end
+
+    render :template => "tasks/index"
+  end
+  
+  def list # old index
+    @pixels_per_day =12
     # init filters
     session[:filter] ||= {}
     session[:filter][:tasks] ||= 1
@@ -15,13 +94,14 @@ class TasksController < ApplicationController
     session[:filter][:user] = params[:filter_user].to_i unless params[:filter_user].blank?
     session[:filter][:project] = params[:filter_project].to_i unless params[:filter_project].blank?
     @taskz = rebuild_schedule(params[:force] == "true", true) 
-    #@total_calendar_days = 60
-    #@taskz = Task.root.descendants.find :all, :order => "position"
-    #if session[:filter][:tasks] == 1
-    #  @tasks = @taskz.collect {|task| task unless task.completed?}
-    #else
-    #  @tasks = @taskz
-    #end
+    
+    # @total_calendar_days = 60
+    # @taskz = Task.root.descendants.find :all, :order => "position"
+    # if session[:filter][:tasks] == 1
+    #   @tasks = @taskz.collect {|task| task unless task.completed?}
+    # else
+    #   @tasks = @taskz
+    # end
 				
 		if session[:filter][:user] != 0
 			@user_id = session[:filter][:user]

@@ -68,7 +68,7 @@
 				<% if controller.controller_name == 'tasks' || true%>
 				<form style="display:inline" action="" id='filter_form'>
 					<b>Filters:</b>
-					<%= link_to 'reset', :filter_tasks => 1, :filter_user => current_user.id, :filter_project => 0, :filter_release => 0%>
+					<%= link_to 'reset', :filter_tasks => 0, :filter_user => current_user.id, :filter_project => 0, :filter_release => 0%>
 				<%=select_tag 'filter_user', options_for_select([['All Users',0]]) + options_from_collection_for_select( User.find(:all, :order => :name) ,:id,:name,session[:filter][:user].to_i), :onchange =>"$('#filter_form').submit()" %>
 				<%=select_tag 'filter_tasks', options_for_select([['All Tasks',0], ['Active Tasks',1]],session[:filter][:tasks]), :onchange =>"$('#filter_form').submit()" %>
 				<%=select_tag 'filter_release', options_for_select([['All Releases',0]]) + options_from_collection_for_select( Release.find(:all, :order => :title) ,:id,:title,session[:filter][:release].to_i), :onchange =>"$('#filter_form').submit()" %>

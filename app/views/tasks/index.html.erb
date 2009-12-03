@@ -15,14 +15,15 @@
 		<table class="st" id="schedule">
 		<thead>
 			<tr class="srow2">
-				<td>Section</td>
-		    <td colspan="2">Estimate</td>
+		    <td>Owner</td>
+		    <td colspan="1">Estimate</td>
 <!--
 		    <td>Sim</td> 
 -->
-		    <td>Owner</td>
+<!-- 
 		    <td>Start</td>
 		    <td>End</td>
+-->
 			  <td>
 						<div style="position:relative; margin-left:0px">				
 							<% @milestones = Release.incomplete.collect(&:due)%>
@@ -48,15 +49,13 @@
 					
 	  <tr class="srow <%= "onhold" if task.on_hold %>">
 				<% unless task.type == "Release" or task.type == "Project"%>
-			    <td nowrap><%#=h task.tag_list %></td>
-			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?h or task.estimate.include? ?d or task.estimate.blank?%></td>
-			    <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td>
 			    <td nowrap><%=task.user ? (link_to task.user.name, :filter_user => task.user.id) : '<span class="unassigned">Unassigned</span>'%></td>
+			    <td nowrap><%=h task.estimate %><%= "d" unless task.estimate.include? ?h or task.estimate.include? ?d or task.estimate.blank?%></td>
+			    <!-- <td><%=link_to task.estimate_days.round(3), edit_task_path(task) %></td> -->
+			    <% if false %>
 			    <td><nobr><%=h task.start.to_date unless task.completed? || task.end.nil?%></nobr></td>
-			    <td><nobr><%=h task.end.to_date unless task.completed? || task.end.nil?%> 
-									  </nobr>
-										</td>
-
+			    <td><nobr><%=h task.end.to_date unless task.completed? || task.end.nil?%></nobr></td>
+          <% end %>
 					<td style="width:<%=@pixels_per_day * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || task.start.nil? || task.end.nil?%>
 						<div style="position:relative; width:<%= @pixels_per_day*@total_calendar_days %>px;">							
@@ -76,7 +75,7 @@
 					<td><%#= link_to 'X', task, :confirm => "About to delete #{task.title}\n\nAre you sure you wish to delete this task?\n", :method => :delete%></td>
 				<%else%>
 				<!-- Releases and Projects: -->
-				<td colspan="6"><nobr>
+				<td colspan="2"><nobr>
 				<%
 					url = case task.type
 			      when "Project" then edit_project_path(task)
@@ -84,13 +83,15 @@
 			      else edit_task_path(task)
 			    end
 				%>
-					<%if task.due_date %>Due <%= link_to task.due_date, url %> <%end-%>
+					<%if task.due_date && false %>Due <%= link_to task.due_date, url %> <%end-%>
 					<% start_p = task.best_start %>
 					<% end_p = task.worst_end %>
+					<% unless start_p.nil? %>
 						<b>ETA: <%= start_p%>  - <%= end_p %></b>
 						<% if false %>
 						<%= task.descendants.collect{|e| e.high_estimate_days}.sum %>
 						<% end %>
+					<% end %>
 					</nobr></td>
 					<td style="width:<%=@pixels_per_day * @total_calendar_days %>px;vertical-align:top">
 						<% unless task.completed? || start_p.nil? || end_p.nil? %>

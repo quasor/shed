@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20091201044305) do
+ActiveRecord::Schema.define(:version => 20091201204938) do
 
   create_table "holidays", :force => true do |t|
     t.date     "holiday"
@@ -90,6 +90,8 @@ ActiveRecord::Schema.define(:version => 20091201044305) do
     t.integer  "position",            :limit => 8
     t.boolean  "on_hold",                          :default => false
     t.string   "versioned_type"
+    t.float    "start_in_days",                    :default => 0.0
+    t.float    "end_in_days",                      :default => 0.0
   end
 
   create_table "tasks", :force => true do |t|

@@ -52,8 +52,8 @@ a:hover { color: #fff; background-color:#000; }
 }
 
 .unassigned { color : red;}
-.st { border:1px solid #ccc;border-collapse:collapse;}
-.st td {border:1px solid #ccc; margin:0px}
+.st { border:1px solid transparent;border-collapse:collapse;}
+.st td {border:1px solid #eee; margin:0px}
 #flash {color:yellow;}
 #schedule {overflow:hidden;}
 #header { width:100%;height:36px; position:absolute; top:0px; left:0px; color:#AFD534; background-color:black;}
@@ -168,12 +168,12 @@ a.small {text-decoration:none; color:#999;}
 a.small:hover {text-decoration:none; color:#000; background-color:#fff;}
 
 body {overflow:hidden;}
-.completed a {color:#777;;}
+.completed a {color:#AAA;;}
 .lirow2.completed {background-color:#C7C8CF;}
 .ui-sortable-helper {color:#000;background-color:#cfc;border:1px dashed #000; width:97%;opacity:0.65;}
 .hideul {text-decoration:none;background-color:transparent;}
 .hideul:hover {text-decoration:none;background-color:transparent;}
-.lirow2 {border:1px solid #CCC;
+.lirow2 {border:1px solid #ccc;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius:5px;
