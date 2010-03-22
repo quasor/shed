@@ -330,6 +330,7 @@ class TasksController < ApplicationController
     unless (params[:parent_id].blank?)
       @task.move_to_child_of(Task.find(params[:parent_id]))
     end
+	  @users = User.all
 
 		@task.setup_the_version
 
