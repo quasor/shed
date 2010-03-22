@@ -21,7 +21,7 @@ class TasksController < ApplicationController
 			
 			@project_ids = (Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent).collect(&:parent) + Task.find(:all,:conditions => {:user_id => @user_id, :type => nil}).collect(&:parent)).uniq.compact.map(&:id).sort
 		end
-
+    @users = User.all
     @releases = Release.all
     @releases_upcoming = Release.upcoming
     @releases_past = @releases - @releases_upcoming
