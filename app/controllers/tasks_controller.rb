@@ -273,7 +273,7 @@ class TasksController < ApplicationController
   def create
 	 	@new_task_title = 'Another New Task (ESC to close)'
 		@parent_id = session[:last_new_parent_id] = (params[:parent_id] || session[:last_new_parent_id])
-	
+	  @users = User.all
     @task = Task.new(params[:task])
     
 #    unless params[:task].nil? || params[:task][:low].blank?
